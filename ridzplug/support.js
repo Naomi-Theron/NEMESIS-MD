@@ -2,7 +2,7 @@ module.exports = [
 
 {
     command: ['dev', 'developer'],
-    operate: async ({ kelvin, m, reply }) => {
+    operate: async ({ ridzcoder, m, reply }) => {
         try {
             const devInfo = {
                 name: "Ridz Coder",
@@ -21,7 +21,7 @@ NOTE:${devInfo.note}
 END:VCARD`;
 
             // Send only contact card - no thumbnail
-            await kelvin.sendMessage(
+            await ridzcoder.sendMessage(
                 m.chat,
                 {
                     contacts: {
