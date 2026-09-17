@@ -110,60 +110,58 @@ function run(cmd) {
 module.exports = [
 
 {
-        command: ['getpp', 'pp', 'profilepic', 'getprofile'],
-        operate: async ({ Ridzcoder, m, reply, quoted, Access, mess }) => {
-            if (!Access) return reply(global.mess.owner);
-            
-            if (!quoted) {
-                // React with 📷 even if no user is quoted
-                await Ridzcoder.sendMessage(m.chat, {
-                    react: {
-                        text: "📷",
-                        key: m.key
-                    }
-                });
-                return reply('Reply to a user to get their profile picture.');
-            }
-
-            // React with 📷 emoji to the command message
-            await Ridzcoder.sendMessage(m.chat, {
+    command: ['getpp', 'pp', 'profilepic', 'getprofile'],
+    operate: async ({ ridzcoder, m, reply, quoted }) => {
+        if (!quoted) {
+            // React with 📷 even if no user is quoted
+            await ridzcoder.sendMessage(m.chat, {
                 react: {
                     text: "📷",
                     key: m.key
                 }
             });
-
-            const userId = quoted.sender;
-
-            try {
-                const ppUrl = await Ridzcoder.profilePictureUrl(userId, 'image');
-
-                await Ridzcoder.sendMessage(m.chat, 
-                    { 
-                        image: { url: ppUrl }, 
-                        caption: ` *Profile Picture of:* @${userId.split('@')[0]}`,
-                        mentions: [ userId ]
-                    }, { quoted: m }); 
-            } catch (error) {
-                console.error('Error getting profile picture:', error);
-                await Ridzcoder.sendMessage(m.chat, { 
-                    image: { url: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png?q=60' }, 
-                    caption: '⚠️ No profile picture found.' 
-                }, { quoted: m });
-            }
+            return reply('Reply to a user to get their profile picture.');
         }
-    },
+
+        // React with 📷 emoji to the command message
+        await ridzcoder.sendMessage(m.chat, {
+            react: {
+                text: "📷",
+                key: m.key
+            }
+        });
+
+        const userId = quoted.sender;
+
+        try {
+            const ppUrl = await ridzcoder.profilePictureUrl(userId, 'image');
+
+            await ridzcoder.sendMessage(m.chat,
+                {
+                    image: { url: ppUrl },
+                    caption: ` *Profile Picture of:* @${userId.split('@')[0]}`,
+                    mentions: [userId]
+                }, { quoted: m });
+        } catch (error) {
+            console.error('Error getting profile picture:', error);
+            await ridzcoder.sendMessage(m.chat, {
+                image: { url: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png?q=60' },
+                caption: '⚠️ No profile picture found.'
+            }, { quoted: m });
+        }
+    }
+},
     {
     command: ['creategroup', 'creategc', 'newgroup'],
-    operate: async ({ Ridzcoder, m, reply, args, prefix, Access, mess, moment }) => {
+    operate: async ({ ridzcoder, m, reply, args, prefix, Access, mess, moment }) => {
         if (!Access) return reply(mess.owner);
         
         const groupName = args.join(" ");
         if (!groupName) return reply(`Example: ${prefix}creategroup Vesper Family`);
 
         try {           
-            const created = await Ridzcoder.groupCreate(groupName, []);
-            const inviteCode = await Ridzcoder.groupInviteCode(created.id);
+            const created = await ridzcoder.groupCreate(groupName, []);
+            const inviteCode = await ridzcoder.groupInviteCode(created.id);
             
             const message = 
             `╭──⧼♛ *NEMESIS MD GC CREATED*\n\n` +
@@ -174,7 +172,7 @@ module.exports = [
                 `╰────────────────≽`+
                 `> ${global.wm || 'NEMESIS-MD'}`;
             
-            await Ridzcoder.sendMessage(m.chat, { 
+            await ridzcoder.sendMessage(m.chat, { 
                 text: message, 
                 mentions: [created.owner] 
             }, { quoted: m });
@@ -187,7 +185,7 @@ module.exports = [
 },
 {
     command: ['createchannel', 'createch', 'newchannel'],
-    operate: async ({ Ridzcoder, m, reply, args, text, prefix, Access, mess }) => {
+    operate: async ({ ridzcoder, m, reply, args, text, prefix, Access, mess }) => {
         if (!Access) return reply(mess.owner);
         
         const parts = text.split('|');
@@ -199,7 +197,7 @@ module.exports = [
         }
         
         try {            
-            const metadata = await Ridzcoder.newsletterCreate(channelName, channelDesc);
+            const metadata = await ridzcoder.newsletterCreate(channelName, channelDesc);
             console.log('Channel metadata:', JSON.stringify(metadata, null, 2));
             
             // Extract channel ID from response
@@ -251,13 +249,13 @@ module.exports = [
 },
 {
     command: ['mode', 'public', 'private'],
-    operate: async ({ Ridzcoder, m, reply, prefix, args, db, botNumber, Access }) => {
+    operate: async ({ ridzcoder, m, reply, prefix, args, db, botNumber, Access }) => {
         if (!Access) return reply(global.mess.owner);
         
         const subcommand = args[0]?.toLowerCase();
         
         if (!subcommand) {
-            const currentMode = Ridzcoder.public ? 'Public 🌍' : 'Private 🔒';
+            const currentMode = ridzcoder.public ? 'Public 🌍' : 'Private 🔒';
             const savedMode = await db.get(botNumber, 'mode', 'public');
             
             return reply(
@@ -277,7 +275,7 @@ module.exports = [
         
         switch(subcommand) {
             case 'public': {
-                Ridzcoder.public = true;
+                ridzcoder.public = true;
                 await db.set(botNumber, 'mode', 'public');
                 
                 reply(`✅ Bot set to public mode successfully.`);
@@ -285,7 +283,7 @@ module.exports = [
             }
             
             case 'private': {
-                Ridzcoder.public = false;
+                ridzcoder.public = false;
                 await db.set(botNumber, 'mode', 'private');
                 
                 reply(`✅ Bot set to private mode successfully.`);
@@ -293,7 +291,7 @@ module.exports = [
             }
             
             case 'status': {
-                const currentMode = Ridzcoder.public ? 'Public 🌍' : 'Private 🔒';
+                const currentMode = ridzcoder.public ? 'Public 🌍' : 'Private 🔒';
                 const savedMode = await db.get(botNumber, 'mode', 'public');
                 
                 reply(
@@ -301,7 +299,7 @@ module.exports = [
 │┃ ♛
 │┃ ♛• Current Mode: *${currentMode}*
 │┃ ♛• Saved Setting: ${savedMode}
-│┃ ♛• Effective: ${Ridzcoder.public ? '✅ PUBLIC' : '🔒 PRIVATE'}
+│┃ ♛• Effective: ${ridzcoder.public ? '✅ PUBLIC' : '🔒 PRIVATE'}
 ╰────────────────≽
 > Use ${prefix}mode public/private to change`);
                 break;
@@ -316,7 +314,7 @@ module.exports = [
 },
     {
         command: ['toviewonce', 'tovo', 'tovv', 'vv'],
-        operate: async ({ Ridzcoder, m, reply, quoted, mime, Access, mess }) => {
+        operate: async ({ ridzcoder, m, reply, quoted, mime, Access, mess }) => {
         if (!Access) return reply(global.mess.owner) 
     try {
         if (!m.quoted) return reply('❌ Reply to a ViewOnce Video, Image, or Audio.');
@@ -326,19 +324,19 @@ module.exports = [
 
         if (quotedMessage.imageMessage) {
             let imageCaption = quotedMessage.imageMessage.caption || '';
-            let imageUrl = await Ridzcoder.downloadAndSaveMediaMessage(quotedMessage.imageMessage);
-            await Ridzcoder.sendMessage(m.chat, { image: { url: imageUrl }, caption: imageCaption });
+            let imageUrl = await ridzcoder.downloadAndSaveMediaMessage(quotedMessage.imageMessage);
+            await ridzcoder.sendMessage(m.chat, { image: { url: imageUrl }, caption: imageCaption });
         }
 
         if (quotedMessage.videoMessage) {
             let videoCaption = quotedMessage.videoMessage.caption || '';
-            let videoUrl = await Ridzcoder.downloadAndSaveMediaMessage(quotedMessage.videoMessage);
-            await Ridzcoder.sendMessage(m.chat, { video: { url: videoUrl }, caption: videoCaption });
+            let videoUrl = await ridzcoder.downloadAndSaveMediaMessage(quotedMessage.videoMessage);
+            await ridzcoder.sendMessage(m.chat, { video: { url: videoUrl }, caption: videoCaption });
         }
 
         if (quotedMessage.audioMessage) {
-            let audioUrl = await Ridzcoder.downloadAndSaveMediaMessage(quotedMessage.audioMessage);
-            await Ridzcoder.sendMessage(m.chat, { audio: { url: audioUrl }, mimetype: 'audio/mp4' });
+            let audioUrl = await ridzcoder.downloadAndSaveMediaMessage(quotedMessage.audioMessage);
+            await ridzcoder.sendMessage(m.chat, { audio: { url: audioUrl }, mimetype: 'audio/mp4' });
         }
 
     } catch (error) {
@@ -350,7 +348,7 @@ module.exports = [
 },
 {
     command: ['setprofilename', 'setname', 'changename'],
-    operate: async ({ Ridzcoder, m, reply, text, prefix, Access, mess }) => {
+    operate: async ({ ridzcoder, m, reply, text, prefix, Access, mess }) => {
         try {
             if (!Access) return reply(global.mess.owner);
 
@@ -364,12 +362,12 @@ module.exports = [
             }
 
             // Set the profile name
-            await Ridzcoder.updateProfileName(text);
+            await ridzcoder.updateProfileName(text);
             
             // Send success message
             await reply(`✅ Profile name updated successfully!\n\nNew Name: *${text}*`);
           
-            await Ridzcoder.sendMessage(m.chat, { 
+            await ridzcoder.sendMessage(m.chat, { 
                 react: { text: '✅', key: m.key } 
             });
 
@@ -383,11 +381,11 @@ module.exports = [
 },
 {
     command: ['owner', 'creator', 'dev'],
-    operate: async ({ Ridzcoder, m, reply, db, botNumber }) => {
+    operate: async ({ ridzcoder, m, reply, db, botNumber }) => {
         try {
             // Get owner info from SQLite
             const ownernumber = await db.get(botNumber, 'ownernumber', '255611199851');
-            const ownername = await db.get(botNumber, 'ownername', 'Kevin Tech');
+            const ownername = await db.get(botNumber, 'ownername', 'Ridz Coder');
             
             // Format the number
             const cleanNumber = String(ownernumber).replace(/\D/g, '');
@@ -399,7 +397,7 @@ module.exports = [
             }];
 
             // Send only the contact
-            await Ridzcoder.sendMessage(
+            await ridzcoder.sendMessage(
                 m.chat,
                 { 
                     contacts: { 
@@ -418,7 +416,7 @@ module.exports = [
 },
 {
         command: ['vv'],
-        operate: async ({ Ridzcoder, m, reply, quoted, mime, Access, mess }) => {
+        operate: async ({ ridzcoder, m, reply, quoted, mime, Access, mess }) => {
       if (!Access) return reply(global.mess.owner) 
     try {
         if (!m.quoted) return reply('*Please reply to a viewonce Media!*');
@@ -428,19 +426,19 @@ module.exports = [
 
         if (quotedMessage.imageMessage) {
             let imageCaption = quotedMessage.imageMessage.caption || '';
-            let imageUrl = await Ridzcoder.downloadAndSaveMediaMessage(quotedMessage.imageMessage);
-            await Ridzcoder.sendMessage(m.chat, { image: { url: imageUrl }, caption: imageCaption });
+            let imageUrl = await ridzcoder.downloadAndSaveMediaMessage(quotedMessage.imageMessage);
+            await ridzcoder.sendMessage(m.chat, { image: { url: imageUrl }, caption: imageCaption });
         }
 
         if (quotedMessage.videoMessage) {
             let videoCaption = quotedMessage.videoMessage.caption || '';
-            let videoUrl = await Ridzcoder.downloadAndSaveMediaMessage(quotedMessage.videoMessage);
-            await Ridzcoder.sendMessage(m.chat, { video: { url: videoUrl }, caption: videoCaption });
+            let videoUrl = await ridzcoder.downloadAndSaveMediaMessage(quotedMessage.videoMessage);
+            await ridzcoder.sendMessage(m.chat, { video: { url: videoUrl }, caption: videoCaption });
         }
 
         if (quotedMessage.audioMessage) {
-            let audioUrl = await Ridzcoder.downloadAndSaveMediaMessage(quotedMessage.audioMessage);
-            await Ridzcoder.sendMessage(m.chat, { audio: { url: audioUrl }, mimetype: 'audio/mp4' });
+            let audioUrl = await ridzcoder.downloadAndSaveMediaMessage(quotedMessage.audioMessage);
+            await ridzcoder.sendMessage(m.chat, { audio: { url: audioUrl }, mimetype: 'audio/mp4' });
         }
 
     } catch (error) {
@@ -451,7 +449,7 @@ module.exports = [
 },
 {
     command: ['block', 'blockuser'],
-    operate: async ({ Ridzcoder, m, reply, quoted, Access, mess }) => {
+    operate: async ({ ridzcoder, m, reply, quoted, Access, mess }) => {
         if (!Access) return reply(mess.owner);
         
         if (!m.quoted) {
@@ -461,7 +459,7 @@ module.exports = [
         const userId = m.quoted.sender;
         
         try {
-            await Ridzcoder.updateBlockStatus(userId, 'block');
+            await ridzcoder.updateBlockStatus(userId, 'block');
             reply(`✅ Blocked @${userId.split('@')[0]}`, { mentions: [userId] });
         } catch (error) {
             console.error('Block error:', error);
@@ -471,7 +469,7 @@ module.exports = [
 },
 {
     command: ['unblock', 'unblockuser'],
-    operate: async ({ Ridzcoder, m, reply, quoted, text, mentionedJid, Access, mess }) => {
+    operate: async ({ ridzcoder, m, reply, quoted, text, mentionedJid, Access, mess }) => {
           if (!Access) return reply(global.mess.owner);
         
         if (!m.quoted && !mentionedJid[0] && !text) return reply("Reply to a message or mention/user ID to unblock");
@@ -480,7 +478,7 @@ module.exports = [
         
         try {
             // React with ✅ emoji
-            await Ridzcoder.sendMessage(m.chat, {
+            await ridzcoder.sendMessage(m.chat, {
                 react: {
                     text: "✅",
                     key: m.key
@@ -488,7 +486,7 @@ module.exports = [
             });
             
             // Unblock the user
-            await Ridzcoder.updateBlockStatus(userId, "unblock");
+            await ridzcoder.updateBlockStatus(userId, "unblock");
             reply(`✅ Successfully unblocked @${userId.split('@')[0]}`);
         } catch (error) {
             console.error('Error unblocking user:', error);
@@ -498,15 +496,15 @@ module.exports = [
 },
 {
     command: ['unblockall'],
-    operate: async ({ Ridzcoder, m, reply, Access, mess }) => {
+    operate: async ({ ridzcoder, m, reply, Access, mess }) => {
           if (!Access) return reply(global.mess.owner);
         
         try {
-            const blockedList = await Ridzcoder.fetchBlocklist();
+            const blockedList = await ridzcoder.fetchBlocklist();
             if (!blockedList.length) return reply("✅ No blocked contacts to unblock.");
             
             for (const user of blockedList) {
-                await Ridzcoder.updateBlockStatus(user, "unblock");
+                await ridzcoder.updateBlockStatus(user, "unblock");
             }
             
             reply(`✅ Successfully unblocked *${blockedList.length}* contacts.`);
@@ -518,18 +516,18 @@ module.exports = [
 },
 {
     command: ['listblocked', 'blockedlist', 'showblocked'],
-    operate: async ({ Ridzcoder, m, reply, Access, mess }) => {
+    operate: async ({ ridzcoder, m, reply, Access, mess }) => {
           if (!Access) return reply(global.mess.owner);
         
         try {
-            const blockedList = await Ridzcoder.fetchBlocklist();
+            const blockedList = await ridzcoder.fetchBlocklist();
             
             if (!blockedList.length) {
                 return reply('✅ No contacts are currently blocked.');
             }
             
             // React with 🚫 emoji
-            await Ridzcoder.sendMessage(m.chat, {
+            await ridzcoder.sendMessage(m.chat, {
                 react: {
                     text: "🚫",
                     key: m.key
@@ -538,7 +536,7 @@ module.exports = [
             
             let blockedUsers = blockedList.map((user, index) => `🔹 *${index + 1}.* @${user.split('@')[0]}`).join('\n');
             
-            await Ridzcoder.sendMessage(m.chat, {
+            await ridzcoder.sendMessage(m.chat, {
                 text: `🚫 *Blocked Contacts:*\n\n${blockedUsers}`,
                 mentions: blockedList
             }, { quoted: m });
@@ -551,7 +549,7 @@ module.exports = [
 },
 {
     command: ['listchats', 'privates', 'pchats'],
-    operate: async ({ Ridzcoder, m, reply, Access, mess, store }) => {
+    operate: async ({ ridzcoder, m, reply, Access, mess, store }) => {
         if (!Access) return reply(mess.owner);
         
         try {
@@ -599,12 +597,12 @@ module.exports = [
 },
 {
     command: [ 'delpp', 'removepfp', 'deleteprofilepic'],
-    operate: async ({ Ridzcoder, m, reply, Access, mess }) => {
+    operate: async ({ ridzcoder, m, reply, Access, mess }) => {
           if (!Access) return reply(global.mess.owner);
         
         try {
             
-            await Ridzcoder.removeProfilePicture(Ridzcoder.user.id);
+            await ridzcoder.removeProfilePicture(ridzcoder.user.id);
             reply("✅ Successfully deleted profile picture");
         } catch (error) {
             console.error('Error removing profile picture:', error);
@@ -614,7 +612,7 @@ module.exports = [
 },
 {
     command: ['restart', 'reboot'],
-    operate: async ({ Ridzcoder, m, reply, Access, botNumber, pushname }) => {
+    operate: async ({ ridzcoder, m, reply, Access, botNumber, pushname }) => {
           if (!Access) return reply(global.mess.owner);
         
         try {
@@ -629,7 +627,7 @@ module.exports = [
             console.log(chalk.yellow.bold(`Bot restart initiated by ${pushname} (${m.sender})`));
             
             // Send a goodbye message
-            await Ridzcoder.sendMessage(m.chat, {
+            await ridzcoder.sendMessage(m.chat, {
                 text: '*Bot is restarting...*\n\nPlease wait a moment while I restart.',
                 mentions: [m.sender]
             });
@@ -638,8 +636,8 @@ module.exports = [
             await sleep(1000);
             
             // Close the connection gracefully if available
-            if (Ridzcoder && typeof Ridzcoder.end === 'function') {
-                await Ridzcoder.end();
+            if (ridzcoder && typeof ridzcoder.end === 'function') {
+                await ridzcoder.end();
             }
             
             // Restart the process
@@ -653,7 +651,7 @@ module.exports = [
 },
 {
     command: ['join', 'joingroup'],
-    operate: async ({ Ridzcoder, m, reply, prefix, args, Access, text, isUrl }) => {
+    operate: async ({ ridzcoder, m, reply, prefix, args, Access, text, isUrl }) => {
           if (!Access) return reply(global.mess.owner);
         
         if (!text) return reply("Enter group link");
@@ -661,7 +659,7 @@ module.exports = [
 
         try {
             const link = args[0].split("https://chat.whatsapp.com/")[1];
-            await Ridzcoder.groupAcceptInvite(link);
+            await ridzcoder.groupAcceptInvite(link);
             reply("✅ Joined successfully");
         } catch (error) {
             console.error(error);
@@ -671,13 +669,13 @@ module.exports = [
 },
 {
     command: ['fetchgroups', 'gjids', 'allgroups', 'groupslist'],
-    operate: async ({ Ridzcoder, m, reply, prefix, args, Access, text }) => {
+    operate: async ({ ridzcoder, m, reply, prefix, args, Access, text }) => {
           if (!Access) return reply(global.mess.owner);
         
         reply("📝 Fetching all groups...");
         
         try {
-            const groups = await Ridzcoder.groupFetchAllParticipating();
+            const groups = await ridzcoder.groupFetchAllParticipating();
             const groupList = Object.keys(groups);
             
             if (groupList.length === 0) {
@@ -716,7 +714,7 @@ module.exports = [
 },
 {
     command: ['request'],
-    operate: async ({ Ridzcoder, m, reply, prefix, args, Access, text, sender, pushname }) => {
+    operate: async ({ ridzcoder, m, reply, prefix, args, Access, text, sender, pushname }) => {
           if (!Access) return reply(global.mess.owner);
         
         if (!text) return reply(`Example: ${prefix}request I would like a new feature (specify) to be added.`);
@@ -739,13 +737,13 @@ module.exports = [
 │┃ ♛${requestMsg}
 ╰────────────────≽       `;
 
-        await Ridzcoder.sendMessage("255611199851@s.whatsapp.net", { text: requestMsg, mentions: [sender] }, { quoted: m });
-        await Ridzcoder.sendMessage(m.chat, { text: confirmationMsg, mentions: [sender] }, { quoted: m });
+        await ridzcoder.sendMessage("255611199851@s.whatsapp.net", { text: requestMsg, mentions: [sender] }, { quoted: m });
+        await ridzcoder.sendMessage(m.chat, { text: confirmationMsg, mentions: [sender] }, { quoted: m });
     }
 },
 {
     command: ['reportbug'],
-    operate: async ({ Ridzcoder, m, reply, prefix, args, Access, text, sender, pushname }) => {
+    operate: async ({ ridzcoder, m, reply, prefix, args, Access, text, sender, pushname }) => {
           if (!Access) return reply(global.mess.owner);
         
         if (!text) return reply(`Example: ${prefix}reportbug Hey, play command isn't working`);
@@ -769,20 +767,20 @@ module.exports = [
 ╰────────────────≽
         `;
 
-        await Ridzcoder.sendMessage("255611199851@s.whatsapp.net", { text: bugReportMsg, mentions: [sender] }, { quoted: m });
-        await Ridzcoder.sendMessage(m.chat, { text: confirmationMsg, mentions: [sender] }, { quoted: m });
+        await ridzcoder.sendMessage("255611199851@s.whatsapp.net", { text: bugReportMsg, mentions: [sender] }, { quoted: m });
+        await ridzcoder.sendMessage(m.chat, { text: confirmationMsg, mentions: [sender] }, { quoted: m });
     }
 },
 {
     command: ['delete', 'del'],
-    operate: async ({ Ridzcoder, m, reply, prefix, args, Access, quoted }) => {
+    operate: async ({ ridzcoder, m, reply, prefix, args, Access, quoted }) => {
           if (!Access) return reply(global.mess.owner);
         
         if (!quoted) return reply(`*Please reply to a message*`);
 
         try {
             // Delete the quoted message
-            await Ridzcoder.sendMessage(m.chat, {
+            await ridzcoder.sendMessage(m.chat, {
                 delete: {
                     remoteJid: quoted.fakeObj.key.remoteJid,
                     fromMe: quoted.fakeObj.key.fromMe,
@@ -792,7 +790,7 @@ module.exports = [
             });
 
             // Delete the command message
-            await Ridzcoder.sendMessage(m.chat, {
+            await ridzcoder.sendMessage(m.chat, {
                 delete: {
                     remoteJid: m.key.remoteJid,
                     fromMe: m.key.fromMe,
@@ -809,70 +807,70 @@ module.exports = [
 },
 {
     command: ['online'],
-    operate: async ({ Ridzcoder, m, reply, prefix, args, Access, text, botNumber }) => {
+    operate: async ({ ridzcoder, m, reply, prefix, args, Access, text, botNumber }) => {
           if (!Access) return reply(global.mess.owner);
         if (!text) return reply(`Options: all/match_last_seen\nExample: ${prefix + command} all`);
 
         const validOptions = ["all", "match_last_seen"];
         if (!validOptions.includes(args[0])) return reply("Invalid option");
 
-        await Ridzcoder.updateOnlinePrivacy(text);
+        await ridzcoder.updateOnlinePrivacy(text);
         await reply(global.mess.done);
     }
 },
 {
     command: ['readreceipts'],
-    operate: async ({ Ridzcoder, m, reply, prefix, args, Access, text }) => {
+    operate: async ({ ridzcoder, m, reply, prefix, args, Access, text }) => {
           if (!Access) return reply(global.mess.owner);
         if (!text) return reply(`Options: all/none\nExample: ${prefix + command} all`);
 
         const validOptions = ["all", "none"];
         if (!validOptions.includes(args[0])) return reply("Invalid option");
 
-        await Ridzcoder.updateReadReceiptsPrivacy(text);
+        await ridzcoder.updateReadReceiptsPrivacy(text);
         await reply(global.mess.done);
     }
 },
 {
     command: ['setpp', 'setownerpp', 'setmypp'],
-    operate: async ({ Ridzcoder, m, reply, prefix, args, Access, quoted, mime, botNumber }) => {
+    operate: async ({ ridzcoder, m, reply, prefix, args, Access, quoted, mime, botNumber }) => {
         
         if (!Access) return reply(global.mess.owner);
         if (!quoted) return reply(`*Reply to an image*\nExample: ${prefix}setpp`);
         if (!/image/.test(mime)) return reply(`*Please reply to an image!*`);
-        const mediaPath = await Ridzcoder.downloadAndSaveMediaMessage(quoted, "botpp");
+        const mediaPath = await ridzcoder.downloadAndSaveMediaMessage(quoted, "botpp");
         
         try {
-            await Ridzcoder.sendMessage(m.chat, { react: { text: "⏳", key: m.key } });
+            await ridzcoder.sendMessage(m.chat, { react: { text: "⏳", key: m.key } });
             
             if (args[0] === "full") {
                 const img = await Jimp.read(mediaPath);
                 const size = Math.min(img.getWidth(), img.getHeight());
                 const cropped = await img.crop(0, 0, size, size).scaleToFit(720, 720).getBufferAsync(Jimp.MIME_JPEG);
                 
-                await Ridzcoder.query({
+                await ridzcoder.query({
                     tag: "iq",
                     attrs: { to: botNumber, type: "set", xmlns: "w:profile:picture" },
                     content: [{ tag: "picture", attrs: { type: "image" }, content: cropped }]
                 });
             } else {
-                await Ridzcoder.updateProfilePicture(botNumber, { url: mediaPath });
+                await ridzcoder.updateProfilePicture(botNumber, { url: mediaPath });
             }
             
             fs.unlinkSync(mediaPath);
-            await Ridzcoder.sendMessage(m.chat, { react: { text: "✅", key: m.key } });
+            await ridzcoder.sendMessage(m.chat, { react: { text: "✅", key: m.key } });
             reply(`*✅ Profile picture updated successfully*!`);
             
         } catch (error) {
             fs.unlinkSync(mediaPath);
-            await Ridzcoder.sendMessage(m.chat, { react: { text: "❌", key: m.key } });
+            await ridzcoder.sendMessage(m.chat, { react: { text: "❌", key: m.key } });
             reply(`❌ Error: ${error.message}`);
         }
     }
 },
 {
     command: ['readreceipt', 'readprivacy'],
-    operate: async ({ Ridzcoder, m, reply, prefix, args, Access, text }) => {
+    operate: async ({ ridzcoder, m, reply, prefix, args, Access, text }) => {
           if (!Access) return reply(global.mess.owner);
         if (!text) return reply(`*Usage:* ${prefix}readprivacy [option]\n\n*Options:* all, contacts, none\n*Example:* ${prefix}readprivacy all`);
 
@@ -884,7 +882,7 @@ module.exports = [
         }
 
         try {
-            await Ridzcoder.updateReadReceiptsPrivacy(option);
+            await ridzcoder.updateReadReceiptsPrivacy(option);
             
             const getReadReceiptDescription = (opt) => {
                 const descriptions = {
@@ -904,11 +902,11 @@ module.exports = [
 },
 {
     command: ['deletepp', 'delpp'],
-    operate: async ({ Ridzcoder, m, reply, Access }) => {
+    operate: async ({ ridzcoder, m, reply, Access }) => {
           if (!Access) return reply(global.mess.owner);
         
         try {
-            await Ridzcoder.removeProfilePicture(Ridzcoder.user.id);
+            await ridzcoder.removeProfilePicture(ridzcoder.user.id);
             reply("*Successfully deleted profile pic*");
         } catch (error) {
             console.error(error);
@@ -918,7 +916,7 @@ module.exports = [
 },
 {
     command: ['setprefix'],
-    operate: async ({ Ridzcoder, m, reply, args, prefix, botNumber, db, Access, mess }) => {
+    operate: async ({ ridzcoder, m, reply, args, prefix, botNumber, db, Access, mess }) => {
        if (!Access) return reply(global.mess.owner);
     
     const newPrefix = args[0];
@@ -933,7 +931,7 @@ module.exports = [
 },
 {
     command: ['setownername'],
-    operate: async ({ Ridzcoder, m, reply, args, text, prefix, botNumber, db, Access, mess }) => {
+    operate: async ({ ridzcoder, m, reply, args, text, prefix, botNumber, db, Access, mess }) => {
          if (!Access) return reply(mess.owner);
     
     if (!text) {
@@ -967,7 +965,7 @@ module.exports = [
 },
 {
     command: ['setownernumber'],
-    operate: async ({ Ridzcoder, m, reply, args, prefix, command, db, botNumber, Access, mess }) => {
+    operate: async ({ ridzcoder, m, reply, args, prefix, command, db, botNumber, Access, mess }) => {
           if (!Access) return reply(mess.owner);
     
     if (args.length < 1) return reply(`Example: ${prefix + command} 256755585369\n\nThis will change the owner's number in the database`);
@@ -1016,7 +1014,7 @@ module.exports = [
 },
 {
     command: ['removeowner', 'delsudo'],
-    operate: async ({ Ridzcoder, m, reply, text, mentionedJid, quoted, ownerFile, Access, args, mess }) => {
+    operate: async ({ ridzcoder, m, reply, text, mentionedJid, quoted, ownerFile, Access, args, mess }) => {
          if (!Access) return reply(global.mess.owner);
     
     let user = m.mentionedJid[0] || args[0];
@@ -1038,7 +1036,7 @@ module.exports = [
 },
 {
     command: ['addowner', 'addsudo'],
-    operate: async ({ Ridzcoder, m, args, reply, text, mentionedJid, ownerFile, quoted, botNumber, Access, mess, }) => {
+    operate: async ({ ridzcoder, m, args, reply, text, mentionedJid, ownerFile, quoted, botNumber, Access, mess, }) => {
         if (!Access) return reply(global.mess.owner);
     
     let user = m.mentionedJid[0] || args[0];
@@ -1062,7 +1060,7 @@ module.exports = [
 },
 {
     command: ['listowners', 'listsudo'],
-    operate: async ({ Ridzcoder, m, reply, botNumber, ownerFile, Access, mess, }) => {
+    operate: async ({ ridzcoder, m, reply, botNumber, ownerFile, Access, mess, }) => {
     if (!Access) return reply(global.mess.owner);
       let data = JSON.parse(fs.readFileSync(ownerFile));
     const ownerList = data.owner || [];
@@ -1078,7 +1076,7 @@ module.exports = [
     });
     message += `\n📊 Total: ${ownerList.length} owner(s)`;
     
-    await Ridzcoder.sendMessage(m.chat, {
+    await ridzcoder.sendMessage(m.chat, {
         text: message,
         mentions: mentions
     }, { quoted: m });
@@ -1086,7 +1084,7 @@ module.exports = [
 },
 {
     command: ['settings', 'config'],
-    operate: async ({ Ridzcoder, m, reply, botNumber, db, Access, mess }) => {
+    operate: async ({ ridzcoder, m, reply, botNumber, db, Access, mess }) => {
         if (!Access) return reply(global.mess.owner);
     
     // Fetch all settings from SQLite
@@ -1161,7 +1159,7 @@ module.exports = [
 },
 {
         command: ['tostatus'],
-        operate: async ({ Ridzcoder, m, reply, Access, mess }) => {
+        operate: async ({ ridzcoder, m, reply, Access, mess }) => {
         try {
     if (!Access) return reply(global.mess.owner);
 
@@ -1195,7 +1193,7 @@ module.exports = [
         : { audio: buffer, mimetype: "audio/mp4", ptt: mediaMsg?.ptt || false };
 
     // Send to status
-    await Ridzcoder.sendMessage("status@broadcast", content);
+    await ridzcoder.sendMessage("status@broadcast", content);
     reply("✅ *Status posted successfully!*");
 
   } catch (e) {
@@ -1206,12 +1204,12 @@ module.exports = [
 },
 {
     command: ['update', 'botupdate', 'upgrade'],
-    operate: async ({ Ridzcoder, m, reply, Access }) => {
+    operate: async ({ ridzcoder, m, reply, Access }) => {
         try {
             if (!Access) return reply(global.mess.owner);
             
             // Send initial status message
-            let statusMsg = await Ridzcoder.sendMessage(m.chat, { 
+            let statusMsg = await ridzcoder.sendMessage(m.chat, { 
                 text: '🔄 *NEMESIS-MD*\n\nInitializing update process...' 
             }, { quoted: m });
 
@@ -1219,7 +1217,7 @@ module.exports = [
             const GITHUB_REPO = 'https://github.com/ridzcoder/NEMESIS-MD/archive/refs/heads/main.zip';
             
             // Update status
-            await Ridzcoder.sendMessage(m.chat, { 
+            await ridzcoder.sendMessage(m.chat, { 
                 text: '*NEMESIS-MD*\n\n📥 Downloading latest files from repository...',
                 edit: statusMsg.key 
             });
@@ -1228,7 +1226,7 @@ module.exports = [
             const { copiedFiles } = await updateViaZip(GITHUB_REPO);
             
             // Update status
-            await Ridzcoder.sendMessage(m.chat, { 
+            await ridzcoder.sendMessage(m.chat, { 
                 text: `* NEMESIS-MD*\n\n✅ Downloaded ${copiedFiles.length} files\n📦 Installing dependencies...`,
                 edit: statusMsg.key 
             });
@@ -1237,7 +1235,7 @@ module.exports = [
             await run('npm install --no-audit --no-fund');
             
             // Final status and restart
-            await Ridzcoder.sendMessage(m.chat, { 
+            await ridzcoder.sendMessage(m.chat, { 
                 text: `✅ *UPDATE COMPLETE!*\n\n📁 Files updated: ${copiedFiles.length}\n📦 Dependencies installed\n\n♻️ Restarting bot in 3 seconds...`,
                 edit: statusMsg.key 
             });
