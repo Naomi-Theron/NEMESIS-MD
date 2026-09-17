@@ -244,7 +244,8 @@ module.exports = [
                 m.chat, 
                 { 
                     image: { url: imageUrl },
-                    caption: `*🌹Hi. There ${global.botname}, a friendly WhatsApp bot.*${botInfo}`
+                    caption: `*🌹Hi. There ${global.botname}, 
+Time teaches you things you can not learn from the books`
                 },
                 { quoted: m }
             );
@@ -335,7 +336,8 @@ module.exports = [
 │┃ ♛ https://github.com/${repoOwner}/${repoName}
 ╰────────────────≽
 
-✨ @${m.sender.split("@")[0]} *Don't forget to ⭐ star the repo!* ✨`;
+> @${m.sender.split("@")[0]} 
+Time teaches you things you can not learn from the books`;
 
             const thumbnailUrl = 'https://files.catbox.moe/dynze8.png';
             
