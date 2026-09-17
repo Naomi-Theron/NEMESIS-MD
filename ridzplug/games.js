@@ -1,3 +1,4 @@
+const axios = require('axios');
 const { getBuffer } = require('../start/lib/myfunction');
 
 function getCompatibilityMessage(score) {
