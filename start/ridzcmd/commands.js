@@ -7,11 +7,11 @@ const crypto = require('crypto');
 const axios = require("axios");
 const yts = require("yt-search");
 
-async function playCommand(Ridzcoder, chatId, message, args) {
+async function playCommand(ridzcoder, chatId, message, args) {
     try {
         const text = args.join(' ').trim();
         
-        if (!text) return Ridzcoder.sendMessage(chatId, { 
+        if (!text) return ridzcoder.sendMessage(chatId, { 
             text: '🎵 Please provide a song name or YouTube URL\nExample: .play shape of you\nExample: .play https://youtube.com/watch?v=60ItHLz5WEA' 
         }, { quoted: message });
 
@@ -21,7 +21,7 @@ async function playCommand(Ridzcoder, chatId, message, args) {
         if (/youtu\.?be/.test(text)) {
             videoUrl = text;
             const id = (text.match(/(?:v=|\/)([0-9A-Za-z_-]{11})/) || [])[1];
-            if (!id) return Ridzcoder.sendMessage(chatId, { 
+            if (!id) return ridzcoder.sendMessage(chatId, { 
                 text: '❌ Invalid YouTube link. Please provide a valid YouTube URL.' 
             }, { quoted: message });
             
@@ -31,13 +31,13 @@ async function playCommand(Ridzcoder, chatId, message, args) {
         // Search YouTube for song name
         else {
             // Send initial processing message
-            await Ridzcoder.sendMessage(chatId, { 
+            await ridzcoder.sendMessage(chatId, { 
                 text: `🔍 Searching for: ${text}\n⏳ Please wait...` 
             }, { quoted: message });
             
             const searchResults = await yts(text);
             if (!searchResults.videos || searchResults.videos.length === 0) {
-                return await Ridzcoder.sendMessage(chatId, { 
+                return await ridzcoder.sendMessage(chatId, { 
                     text: `❌ No results found for: ${text}` 
                 }, { quoted: message });
             }
@@ -49,12 +49,12 @@ async function playCommand(Ridzcoder, chatId, message, args) {
         }
 
         // Send thumbnail preview
-        const previewMsg = await Ridzcoder.sendMessage(chatId, {
+        const previewMsg = await ridzcoder.sendMessage(chatId, {
             image: { url: thumbnail },
             caption: `🎵 *${title}*\n\n⌛ Downloading audio... Please wait...`
         }, { quoted: message });
 
-        await Ridzcoder.sendMessage(chatId, { react: { text: '⏳', key: message.key } });
+        await ridzcoder.sendMessage(chatId, { react: { text: '⏳', key: message.key } });
 
           const apiUrl = `https://apiskeith.top/download/audio?url=${encodeURIComponent(videoUrl)}`;
         
@@ -79,7 +79,7 @@ async function playCommand(Ridzcoder, chatId, message, args) {
                           `_Reply with 1, 2 or 3 to this message to download the format you prefer._`;
         
         // Send format selection menu
-        const songmsg = await Ridzcoder.sendMessage(chatId, { 
+        const songmsg = await ridzcoder.sendMessage(chatId, { 
             text: formatMenu 
         }, { quoted: message });
 
@@ -97,13 +97,13 @@ async function playCommand(Ridzcoder, chatId, message, args) {
                     mp3msg.message.extendedTextMessage.contextInfo.stanzaId === songmsg.key.id
                 ) {
                     // Remove the listener to prevent multiple responses
-                    Ridzcoder.ev.off('messages.upsert', selectionHandler);
+                    ridzcoder.ev.off('messages.upsert', selectionHandler);
                     
-                    await Ridzcoder.sendMessage(chatId, { react: { text: "⬇️", key: mp3msg.key } });
+                    await ridzcoder.sendMessage(chatId, { react: { text: "⬇️", key: mp3msg.key } });
 
                     switch (selectedOption) {
                         case "1":   
-                            await Ridzcoder.sendMessage(chatId, { 
+                            await ridzcoder.sendMessage(chatId, { 
                                 document: { url: audioUrl }, 
                                 mimetype: "audio/mpeg", 
                                 fileName: `${title}.mp3`.replace(/[<>:"/\\|?*]/g, '_'),
@@ -112,7 +112,7 @@ async function playCommand(Ridzcoder, chatId, message, args) {
                             break;
                             
                         case "2":   
-                            await Ridzcoder.sendMessage(chatId, { 
+                            await ridzcoder.sendMessage(chatId, { 
                                 audio: { url: audioUrl }, 
                                 mimetype: "audio/mp4",
                                 fileName: `${title}.mp3`.replace(/[<>:"/\\|?*]/g, '_'),
@@ -130,7 +130,7 @@ async function playCommand(Ridzcoder, chatId, message, args) {
                             break;
                             
                         case "3":   
-                            await Ridzcoder.sendMessage(chatId, { 
+                            await ridzcoder.sendMessage(chatId, { 
                                 audio: { url: audioUrl }, 
                                 mimetype: "audio/mp4", 
                                 ptt: true,
@@ -139,7 +139,7 @@ async function playCommand(Ridzcoder, chatId, message, args) {
                             break;
 
                         default:
-                            await Ridzcoder.sendMessage(
+                            await ridzcoder.sendMessage(
                                 chatId,
                                 {
                                     text: "*❌ Invalid selection! Please reply with 1, 2 or 3*",
@@ -149,29 +149,29 @@ async function playCommand(Ridzcoder, chatId, message, args) {
                     }
                     
                     // Success reaction
-                    await Ridzcoder.sendMessage(chatId, { react: { text: '✅', key: mp3msg.key } });
+                    await ridzcoder.sendMessage(chatId, { react: { text: '✅', key: mp3msg.key } });
                 }
             } catch (error) {
                 console.error('Selection handler error:', error);
-                await Ridzcoder.sendMessage(chatId, { 
+                await ridzcoder.sendMessage(chatId, { 
                     text: '❌ Error sending audio. Please try again.' 
                 }, { quoted: mp3msg });
             }
         };
 
         // Add the listener for format selection
-        Ridzcoder.ev.on('messages.upsert', selectionHandler);
+        ridzcoder.ev.on('messages.upsert', selectionHandler);
 
         // Set timeout to remove listener after 2 minutes
         setTimeout(() => {
-            Ridzcoder.ev.off('messages.upsert', selectionHandler);
+            ridzcoder.ev.off('messages.upsert', selectionHandler);
         }, 120000);
         
     } catch (error) {
         console.error('Play command error:', error);
         
         // Add error reaction
-        await Ridzcoder.sendMessage(chatId, { react: { text: '❌', key: message.key } });
+        await ridzcoder.sendMessage(chatId, { react: { text: '❌', key: message.key } });
         
         let errorMessage = '❌ Error fetching audio. ';
         
@@ -187,18 +187,18 @@ async function playCommand(Ridzcoder, chatId, message, args) {
             errorMessage += 'Please try again later.';
         }
         
-        await Ridzcoder.sendMessage(chatId, { 
+        await ridzcoder.sendMessage(chatId, { 
             text: errorMessage 
         }, { quoted: message });
     }
 }
 
-async function takeCommand(Ridzcoder, chatId, message, args) {
+async function takeCommand(ridzcoder, chatId, message, args) {
     try {
         // Check if message is a reply to a sticker
         const quotedMessage = message.message?.extendedTextMessage?.contextInfo?.quotedMessage;
         if (!quotedMessage?.stickerMessage) {
-            await Ridzcoder.sendMessage(chatId, { text: '❌ Reply to a sticker with .take <packname>' });
+            await ridzcoder.sendMessage(chatId, { text: '❌ Reply to a sticker with .take <packname>' });
             return;
         }
 
@@ -217,12 +217,12 @@ async function takeCommand(Ridzcoder, chatId, message, args) {
                 {},
                 {
                     logger: console,
-                    reuploadRequest: Ridzcoder.updateMediaMessage
+                    reuploadRequest: ridzcoder.updateMediaMessage
                 }
             );
 
             if (!stickerBuffer) {
-                await Ridzcoder.sendMessage(chatId, { text: '❌ Failed to download sticker' });
+                await ridzcoder.sendMessage(chatId, { text: '❌ Failed to download sticker' });
                 return;
             }
 
@@ -250,7 +250,7 @@ async function takeCommand(Ridzcoder, chatId, message, args) {
             const finalBuffer = await img.save(null);
 
             // Send the sticker
-            await Ridzcoder.sendMessage(chatId, {
+            await ridzcoder.sendMessage(chatId, {
                 sticker: finalBuffer
             }, {
                 quoted: message
@@ -258,38 +258,38 @@ async function takeCommand(Ridzcoder, chatId, message, args) {
 
         } catch (error) {
             console.error('Sticker processing error:', error);
-            await Ridzcoder.sendMessage(chatId, { text: '❌ Error processing sticker' });
+            await ridzcoder.sendMessage(chatId, { text: '❌ Error processing sticker' });
         }
 
     } catch (error) {
         console.error('Error in take command:', error);
-        await Ridzcoder.sendMessage(chatId, { text: '❌ Error processing command' });
+        await ridzcoder.sendMessage(chatId, { text: '❌ Error processing command' });
     }
 }
 
-async function videoCommand(Ridzcoder, chatId, message) {
+async function videoCommand(ridzcoder, chatId, message) {
     try {
         const text = message.message?.conversation || message.message?.extendedTextMessage?.text;
         const args = text.split(' ').slice(1); // Remove command prefix
         const youtubeUrl = args.join(' ').trim();
 
         if (!youtubeUrl) {
-            return await Ridzcoder.sendMessage(chatId, { 
+            return await ridzcoder.sendMessage(chatId, { 
                 text: '*⚠️ Please provide a YouTube Url!*' 
             }, { quoted: message });
         }
 
         if (!youtubeUrl.includes('youtu')) {
-            return await Ridzcoder.sendMessage(chatId, { 
+            return await ridzcoder.sendMessage(chatId, { 
                 text: '*Please provide a YouTube Url!*' 
             }, { quoted: message });
         }
 
         // Start reaction
-        await Ridzcoder.sendMessage(chatId, { react: { text: '⏳', key: message.key } });
+        await ridzcoder.sendMessage(chatId, { react: { text: '⏳', key: message.key } });
 
         // Send processing message
-        const processingMsg = await Ridzcoder.sendMessage(chatId, { 
+        const processingMsg = await ridzcoder.sendMessage(chatId, { 
             text: '⏳ Downloading YouTube video... Please wait...' 
         }, { quoted: message });
 
@@ -336,11 +336,11 @@ async function videoCommand(Ridzcoder, chatId, message) {
         caption += `*🔗 Source:* ${youtubeUrl}\n\n`;
         caption += `_Downloading video..._`;
 
-        const infoMsg = await Ridzcoder.sendMessage(chatId, { text: caption }, { quoted: message });
+        const infoMsg = await ridzcoder.sendMessage(chatId, { text: caption }, { quoted: message });
 
         // Download and send the video
         try {
-            await Ridzcoder.sendMessage(chatId, {
+            await ridzcoder.sendMessage(chatId, {
                 video: { url: videoData.url },
                 caption: `*${videoData.title}*\n\n` +
                         `✅ Successfully downloaded!\n` +
@@ -354,7 +354,7 @@ async function videoCommand(Ridzcoder, chatId, message) {
        
 
             // Success reaction
-            await Ridzcoder.sendMessage(chatId, { react: { text: '✅', key: message.key } });
+            await ridzcoder.sendMessage(chatId, { react: { text: '✅', key: message.key } });
 
         } catch (videoError) {
             console.error('Video sending error:', videoError);
@@ -362,15 +362,15 @@ async function videoCommand(Ridzcoder, chatId, message) {
             
             // If video sending fails, try to send the direct download link
             if (videoData.url) {
-                await Ridzcoder.sendMessage(chatId, { 
+                await ridzcoder.sendMessage(chatId, { 
                     text: `❌ Video is too large to send directly.\n\n📥 *Download Link:*\n${videoData.url}\n\n*Title:* ${videoData.title}\n*Quality:* ${videoData.quality}` 
                 }, { quoted: message });
             } else {
-                await Ridzcoder.sendMessage(chatId, { 
+                await ridzcoder.sendMessage(chatId, { 
                     text: '❌ Error sending video. The video might be too large or unavailable.' 
                 }, { quoted: message });
             }
-            await Ridzcoder.sendMessage(chatId, { react: { text: '❌', key: message.key } });
+            await ridzcoder.sendMessage(chatId, { react: { text: '❌', key: message.key } });
         }
 
     } catch (error) {
@@ -388,14 +388,14 @@ async function videoCommand(Ridzcoder, chatId, message) {
             errorMessage += 'Please check the URL and try again.';
         }
         
-        await Ridzcoder.sendMessage(chatId, { text: errorMessage }, { quoted: message });
-        await Ridzcoder.sendMessage(chatId, { react: { text: '❌', key: message.key } });
+        await ridzcoder.sendMessage(chatId, { text: errorMessage }, { quoted: message });
+        await ridzcoder.sendMessage(chatId, { react: { text: '❌', key: message.key } });
     }
 }
-async function ytplayCommand(Ridzcoder, chatId, query, message) {
+async function ytplayCommand(ridzcoder, chatId, query, message) {
     try {
         if (!query) {
-            return await Ridzcoder.sendMessage(chatId, {
+            return await ridzcoder.sendMessage(chatId, {
                 text: "⚠️ Please provide a YouTube link or song name.\n\nExample:\n```.ytplay another love```\n```.ytplay https://youtube.com/watch?v=...```"
             });
         }
@@ -407,7 +407,7 @@ async function ytplayCommand(Ridzcoder, chatId, query, message) {
             videoUrl = query;
             const id = (query.match(/(?:v=|\/)([0-9A-Za-z_-]{11})/) || [])[1];
             if (!id) {
-                return await Ridzcoder.sendMessage(chatId, {
+                return await ridzcoder.sendMessage(chatId, {
                     text: "❌ Invalid YouTube link. Please provide a valid YouTube URL."
                 });
             }
@@ -418,7 +418,7 @@ async function ytplayCommand(Ridzcoder, chatId, query, message) {
         else {
             const searchResults = await yts(query);
             if (!searchResults.videos || searchResults.videos.length === 0) {
-                return await Ridzcoder.sendMessage(chatId, {
+                return await ridzcoder.sendMessage(chatId, {
                     text: `❌ No results found for: ${query}`
                 });
             }
@@ -429,13 +429,13 @@ async function ytplayCommand(Ridzcoder, chatId, query, message) {
         }
 
         // Send initial processing message with thumbnail
-        const processingMsg = await Ridzcoder.sendMessage(chatId, {
+        const processingMsg = await ridzcoder.sendMessage(chatId, {
             image: { url: thumbnail },
             caption: `🎵 *${title}*\n\n⌛ Downloading audio... Please wait...`
         }, { quoted: message });
 
         // Add loading reaction
-        await Ridzcoder.sendMessage(chatId, { react: { text: '⏳', key: message.key } });
+        await ridzcoder.sendMessage(chatId, { react: { text: '⏳', key: message.key } });
 
         // Use the API from your example
         const apiUrl = `https://apiskeith.vercel.app/download/audio?url=${encodeURIComponent(videoUrl)}`;
@@ -454,7 +454,7 @@ async function ytplayCommand(Ridzcoder, chatId, query, message) {
         }
 
         // Send the audio
-        await Ridzcoder.sendMessage(chatId, {
+        await ridzcoder.sendMessage(chatId, {
             audio: { url: audioUrl },
             mimetype: 'audio/mpeg',
             fileName: `${title}.mp3`.replace(/[<>:"/\\|?*]/g, '_'),
@@ -463,13 +463,13 @@ async function ytplayCommand(Ridzcoder, chatId, query, message) {
         }, { quoted: message });
 
         // Success reaction
-        await Ridzcoder.sendMessage(chatId, { react: { text: '✅', key: message.key } });
+        await ridzcoder.sendMessage(chatId, { react: { text: '✅', key: message.key } });
 
     } catch (error) {
         console.error('YTPlay Error:', error.message);
         
         // Add error reaction
-        await Ridzcoder.sendMessage(chatId, { react: { text: '❌', key: message.key } });
+        await ridzcoder.sendMessage(chatId, { react: { text: '❌', key: message.key } });
         
         let errorMessage = '❌ Error downloading audio. ';
         
@@ -485,36 +485,36 @@ async function ytplayCommand(Ridzcoder, chatId, query, message) {
             errorMessage += 'Please try again with a different song or link.';
         }
         
-        await Ridzcoder.sendMessage(chatId, { 
+        await ridzcoder.sendMessage(chatId, { 
             text: errorMessage 
         }, { quoted: message });
     }
 }
 
 
-async function InstagramCommand(Ridzcoder, chatId, message) {
+async function InstagramCommand(ridzcoder, chatId, message) {
     try {
         const text = message.message?.conversation || message.message?.extendedTextMessage?.text;
         const args = text.split(' ').slice(1); // Remove command prefix
         const instagramUrl = args.join(' ').trim();
 
         if (!instagramUrl) {
-            return await Ridzcoder.sendMessage(chatId, { 
+            return await ridzcoder.sendMessage(chatId, { 
                 text: '*⚠️ Please provide a MediaFire Url!*' 
             }, { quoted: message });
         }
 
         if (!instagramUrl.includes('instagram.com')) {
-            return await Ridzcoder.sendMessage(chatId, { 
+            return await ridzcoder.sendMessage(chatId, { 
                 text: '❌ Please provide a valid Instagram URL\n\nSupported formats:\n• https://www.instagram.com/reel/VIDEO_ID/\n• https://www.instagram.com/p/POST_ID/\n• https://www.instagram.com/stories/USERNAME/STORY_ID/' 
             }, { quoted: message });
         }
 
         // Start reaction
-        await Ridzcoder.sendMessage(chatId, { react: { text: '⏳', key: message.key } });
+        await ridzcoder.sendMessage(chatId, { react: { text: '⏳', key: message.key } });
 
         // Send processing message
-        const processingMsg = await Ridzcoder.sendMessage(chatId, { 
+        const processingMsg = await ridzcoder.sendMessage(chatId, { 
             text: '⏳ Downloading Instagram media... Please wait...' 
         }, { quoted: message });
 
@@ -561,13 +561,13 @@ async function InstagramCommand(Ridzcoder, chatId, message) {
         caption += `*🎥 Type:* ${metadata.isVideo ? 'Video' : 'Image'}\n\n`;
         caption += `_Downloading media..._`;
 
-        const infoMsg = await Ridzcoder.sendMessage(chatId, { text: caption }, { quoted: message });
+        const infoMsg = await ridzcoder.sendMessage(chatId, { text: caption }, { quoted: message });
 
         // Download and send the media
         try {
             if (metadata.isVideo) {
                 // Send as video
-                await Ridzcoder.sendMessage(chatId, {
+                await ridzcoder.sendMessage(chatId, {
                     video: { url: mediaUrl },
                     caption: `*Instagram Video* - @${metadata.username || 'unknown'}\n\n` +
                             `✅ Successfully downloaded!\n` +
@@ -580,7 +580,7 @@ async function InstagramCommand(Ridzcoder, chatId, message) {
                 }, { quoted: message });
             } else {
                 // Send as image
-                await Ridzcoder.sendMessage(chatId, {
+                await ridzcoder.sendMessage(chatId, {
                     image: { url: mediaUrl },
                     caption: `*Instagram Photo* - @${metadata.username || 'unknown'}\n\n` +
                             `✅ Successfully downloaded!\n` +
@@ -596,7 +596,7 @@ async function InstagramCommand(Ridzcoder, chatId, message) {
           
 
             // Success reaction
-            await Ridzcoder.sendMessage(chatId, { react: { text: '✅', key: message.key } });
+            await ridzcoder.sendMessage(chatId, { react: { text: '✅', key: message.key } });
 
         } catch (mediaError) {
             console.error('Media sending error:', mediaError);
@@ -604,15 +604,15 @@ async function InstagramCommand(Ridzcoder, chatId, message) {
             
             // If media sending fails, try to send the direct download link
             if (mediaUrl) {
-                await Ridzcoder.sendMessage(chatId, { 
+                await ridzcoder.sendMessage(chatId, { 
                     text: `❌ Media is too large to send directly.\n\n📥 *Download Link:*\n${mediaUrl}\n\n*Username:* @${metadata.username || 'unknown'}\n*Type:* ${metadata.isVideo ? 'Video' : 'Image'}\n*Likes:* ${metadata.like || 0}` 
                 }, { quoted: message });
             } else {
-                await Ridzcoder.sendMessage(chatId, { 
+                await ridzcoder.sendMessage(chatId, { 
                     text: '❌ Error sending media. The file might be too large or unavailable.' 
                 }, { quoted: message });
             }
-            await Ridzcoder.sendMessage(chatId, { react: { text: '❌', key: message.key } });
+            await ridzcoder.sendMessage(chatId, { react: { text: '❌', key: message.key } });
         }
 
     } catch (error) {
@@ -632,34 +632,34 @@ async function InstagramCommand(Ridzcoder, chatId, message) {
             errorMessage += 'Please check the URL and try again.';
         }
         
-        await Ridzcoder.sendMessage(chatId, { text: errorMessage }, { quoted: message });
-        await Ridzcoder.sendMessage(chatId, { react: { text: '❌', key: message.key } });
+        await ridzcoder.sendMessage(chatId, { text: errorMessage }, { quoted: message });
+        await ridzcoder.sendMessage(chatId, { react: { text: '❌', key: message.key } });
     }
 }
 
-async function handleMediafireDownload(Ridzcoder, chatId, message) {
+async function handleMediafireDownload(ridzcoder, chatId, message) {
     try {
         const text = message.message?.conversation || message.message?.extendedTextMessage?.text;
         const args = text.split(' ').slice(1); // Remove command prefix
         const mediafireUrl = args.join(' ').trim();
 
         if (!mediafireUrl) {
-            return await Ridzcoder.sendMessage(chatId, { 
+            return await ridzcoder.sendMessage(chatId, { 
                 text: '*Please provide a MediaFire url!*' 
             }, { quoted: message });
         }
 
         if (!mediafireUrl.includes('mediafire.com')) {
-            return await Ridzcoder.sendMessage(chatId, { 
+            return await ridzcoder.sendMessage(chatId, { 
                 text: '❌ Please provide a valid MediaFire URL\n\nSupported formats:\n• https://www.mediafire.com/file/FILE_ID/filename.ext\n• https://www.mediafire.com/download/FILE_ID' 
             }, { quoted: message });
         }
 
         // Start reaction
-        await Ridzcoder.sendMessage(chatId, { react: { text: '⏳', key: message.key } });
+        await ridzcoder.sendMessage(chatId, { react: { text: '⏳', key: message.key } });
 
         // Send processing message
-        const processingMsg = await Ridzcoder.sendMessage(chatId, { 
+        const processingMsg = await ridzcoder.sendMessage(chatId, { 
             text: '⏳ Processing MediaFire download... Please wait...' 
         }, { quoted: message });
 
@@ -698,7 +698,7 @@ async function handleMediafireDownload(Ridzcoder, chatId, message) {
         }
         caption += `\n_Downloading file..._`;
 
-        const infoMsg = await Ridzcoder.sendMessage(chatId, { text: caption }, { quoted: message });
+        const infoMsg = await ridzcoder.sendMessage(chatId, { text: caption }, { quoted: message });
 
         // Determine file type and send accordingly
         try {
@@ -728,7 +728,7 @@ async function handleMediafireDownload(Ridzcoder, chatId, message) {
 
             if (isLargeFile) {
                 // For large files, send as text with download link
-                await Ridzcoder.sendMessage(chatId, { 
+                await ridzcoder.sendMessage(chatId, { 
                     text: `*📦 File Too Large for Direct Download*\n\n` +
                           `*📁 File Name:* ${fileInfo.filename}\n` +
                           `*📊 File Size:* ${fileInfo.filesize}\n` +
@@ -738,7 +738,7 @@ async function handleMediafireDownload(Ridzcoder, chatId, message) {
                 }, { quoted: message });
             } else if (mimeType.startsWith('video/')) {
                 // Send as video
-                await Ridzcoder.sendMessage(chatId, {
+                await ridzcoder.sendMessage(chatId, {
                     video: { url: fileInfo.download_url },
                     caption: `*📹 ${fileInfo.filename}*\n\n` +
                             `✅ Successfully downloaded from MediaFire!\n` +
@@ -750,7 +750,7 @@ async function handleMediafireDownload(Ridzcoder, chatId, message) {
                 }, { quoted: message });
             } else if (mimeType.startsWith('image/')) {
                 // Send as image
-                await Ridzcoder.sendMessage(chatId, {
+                await ridzcoder.sendMessage(chatId, {
                     image: { url: fileInfo.download_url },
                     caption: `*🖼️ ${fileInfo.filename}*\n\n` +
                             `✅ Successfully downloaded from MediaFire!\n` +
@@ -762,7 +762,7 @@ async function handleMediafireDownload(Ridzcoder, chatId, message) {
                 }, { quoted: message });
             } else if (mimeType.startsWith('audio/')) {
                 // Send as audio
-                await Ridzcoder.sendMessage(chatId, {
+                await ridzcoder.sendMessage(chatId, {
                     audio: { url: fileInfo.download_url },
                     mimetype: mimeType,
                     fileName: fileName,
@@ -773,7 +773,7 @@ async function handleMediafireDownload(Ridzcoder, chatId, message) {
                 }, { quoted: message });
             } else {
                 // Send as document for other file types
-                await Ridzcoder.sendMessage(chatId, {
+                await ridzcoder.sendMessage(chatId, {
                     document: { url: fileInfo.download_url },
                     mimetype: mimeType,
                     fileName: fileName,
@@ -788,14 +788,14 @@ async function handleMediafireDownload(Ridzcoder, chatId, message) {
             
 
             // Success reaction
-            await Ridzcoder.sendMessage(chatId, { react: { text: '✅', key: message.key } });
+            await ridzcoder.sendMessage(chatId, { react: { text: '✅', key: message.key } });
 
         } catch (downloadError) {
             console.error('MediaFire download error:', downloadError);
            
             
             // If download fails, send the direct download link
-            await Ridzcoder.sendMessage(chatId, { 
+            await ridzcoder.sendMessage(chatId, { 
                 text: `╭──⧼♛ ❌ Error sending file directly.\n\n📥 `+
                 `│┃ ♛*Direct Download Link:*\n${fileInfo.download_url}\n\n` +
                       `│┃ ♛*File Info:*\n` +
@@ -805,7 +805,7 @@ async function handleMediafireDownload(Ridzcoder, chatId, message) {
                           `╰────────────────≽\n` +
                       `_Use the link above to download the file._`
             }, { quoted: message });
-            await Ridzcoder.sendMessage(chatId, { react: { text: '❌', key: message.key } });
+            await ridzcoder.sendMessage(chatId, { react: { text: '❌', key: message.key } });
         }
 
     } catch (error) {
@@ -825,8 +825,8 @@ async function handleMediafireDownload(Ridzcoder, chatId, message) {
             errorMessage += 'Please check the URL and try again.';
         }
         
-        await Ridzcoder.sendMessage(chatId, { text: errorMessage }, { quoted: message });
-        await Ridzcoder.sendMessage(chatId, { react: { text: '❌', key: message.key } });
+        await ridzcoder.sendMessage(chatId, { text: errorMessage }, { quoted: message });
+        await ridzcoder.sendMessage(chatId, { react: { text: '❌', key: message.key } });
     }
 }
 
