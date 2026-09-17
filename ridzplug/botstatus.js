@@ -50,10 +50,10 @@ module.exports = [
         
         // Array of image URLs
         const imageUrls = [
-            './start/lib/Media/Images/Nemesis1.jpg',
-            './start/lib/Media/Images/Nemesis2.jpg',
-            './start/lib/Media/Images/Nemesis3.jpg',
-            './start/lib/Media/Images/Nemesis4.jpg'
+            './start/lib/Media/Images/nemesis1.jpg',
+            './start/lib/Media/Images/nemesis2.jpg',
+            './start/lib/Media/Images/nemesis3.jpg',
+            './start/lib/Media/Images/nemesis4.jpg'
         ];
         
         const audioUrls = [
@@ -202,106 +202,7 @@ module.exports = [
         }
     }
 },
-        {
-        command: ['botinfo', 'info', 'about'],
-        operate: async ({ ridzcoder, m, reply, botNumber }) => {
-            const botname = `${global.botname}`;
-            const ownername = "Ridz Coder";
-            
-            const botInfo = `
-╭──⧼♛  BOT INFORMATION ♛⧽──≽
-│┃ ♛
-│┃ ♛ *Name*    : ${global.botname || 'NEMESIS-MD'}
-│┃ ♛ *Owner*   : Ridz Coder 
-│┃ ♛ *Version* : ${global.versions || '2.1.0'}
-│┃ ♛ *Runtime* : ${runtime(process.uptime())}
-╰─────────────────────≽`;
-
-            const imageUrl = [
-                './start/lib/Media/Images/Nemesis1.jpg',
-                './start/lib/Media/Images/Nemesis2.jpg',
-                './start/lib/Media/Images/Nemesis3.jpg',
-                './start/lib/Media/Images/Nemesis4.jpg'
-                
-            ];
-            
-           const audioUrls = [
-    './start/lib/Media/JexAudio1.mp3',
-    './start/lib/Media/JexAudio2.mp3',
-    './start/lib/Media/JexAudio3.mp3',
-    './start/lib/Media/JexAudio8.mp3',
-    './start/lib/Media/JexAudio4.mp3',
-    './start/lib/Media/JexAudio5.mp3',
-    './start/lib/Media/JexAudio6.mp3',
-    './start/lib/Media/JexAudio7.mp3'
-];
-            
-            // Randomly select an audio URL
-            const randomAudioUrl = audioUrls[Math.floor(Math.random() * audioUrls.length)];
-            
-            // Send the image with caption
-            await ridzcoder.sendMessage(
-                m.chat, 
-                { 
-                    image: { url: imageUrl },
-                    caption: `*🌹Hi. There ${global.botname}, 
-Time teaches you things you can not learn from the books`
-                },
-                { quoted: m }
-            );
-            
-            // Send the randomly selected audio as PTT
-            await ridzcoder.sendMessage(
-                m.chat,
-                {
-                    audio: { url: randomAudioUrl },
-                    mp3: true,
-                    mimetype: 'audio/mp4'
-                },
-                { quoted: m }
-            );
-        }
-    },
-   {
-    command: ['botstatus', 'systeminfo', 'stats'],
-    operate: async ({ ridzcoder, m, reply, getHostPlatform, getServerUptime }) => {
-        const used = process.memoryUsage();
-        const totalRam = os.totalmem();
-        const freeRam = os.freemem();
-        const usedRam = totalRam - freeRam;
-        const ramPercent = ((usedRam / totalRam) * 100).toFixed(1);
-        
-        const disk = await checkDiskSpace(process.cwd());
-        const diskUsed = disk.size - disk.free;
-        const diskPercent = ((diskUsed / disk.size) * 100).toFixed(1);
-        
-        const start = performance.now();
-        await reply("⏳ *Calculating system Info...*");
-        const ping = (performance.now() - start).toFixed(2);
-        
-        const serverUptime = getServerUptime();
-        
-        const cpus = os.cpus();
-        const cpuModel = cpus[0].model;
-        const cpuCores = cpus.length;
-        const loadAvg = os.loadavg();
-        
-        const status = `
-╭──⧼♛  BOT STATUS ♛⧽──≽
-│┃ ♛ *Ping*          : ${ping}ms
-│┃ ♛ *Server Uptime* : ${serverUptime}
-│┃ ♛ *RAM*           : ${formatSize(usedRam)} / ${formatSize(totalRam)} (${ramPercent}%)
-│┃ ♛ *Disk*          : ${formatSize(diskUsed)} / ${formatSize(disk.size)} (${diskPercent}%)
-│┃ ♛ *CPU*           : ${cpuModel.substring(0, 25)}... (${cpuCores} cores)
-│┃ ♛ *Load*          : ${loadAvg[0].toFixed(2)}%, ${loadAvg[1].toFixed(2)}%, ${loadAvg[2].toFixed(2)}%
-│┃ ♛ *Platform*      : ${getHostPlatform()} ${os.release()}
-│┃ ♛ *Node*          : ${process.version}
-│┃ ♛ *Host*          : ${os.hostname()}
-╰────────────────≽`;
-
-        await ridzcoder.sendMessage(m.chat, { text: status }, { quoted: m });
-    }
-},
+    
     {
     command: ['repo', 'source', 'sourcecode', 'repository'],
     operate: async ({ ridzcoder, m, reply }) => {
@@ -317,7 +218,6 @@ Time teaches you things you can not learn from the books`
 
             const repoInfo = `
 ╭──⧼♛  *NEMESIS-MD Repository* ♛⧽──≽
-│
 │┃ ♛ *Repository*  : ${data.name || repoName}
 │┃ ♛ *Owner*       : ${repoOwner}
 │┃ ♛ *Description* : ${data.description || 'No description'}
@@ -326,12 +226,10 @@ Time teaches you things you can not learn from the books`
 │┃ ♛ *Forks*       :  ${data.forks_count || 0}
 │┃ ♛ *Issues*      :  ${data.open_issues_count || 0}
 │┃ ♛ *Watchers*    : 👀 ${data.watchers_count || 0}
-│
 │┃ ♛ *Language*    : ${data.language || 'N/A'}
 │┃ ♛ *License*     : ${data.license?.name || 'None'}
 │┃ ♛ *Created*     : ${new Date(data.created_at).toLocaleDateString()}
 │┃ ♛ *Updated*     :  ${new Date(data.updated_at).toLocaleDateString()}
-│
 │┃ ♛ *GitHub Link* :
 │┃ ♛ https://github.com/${repoOwner}/${repoName}
 ╰────────────────≽
