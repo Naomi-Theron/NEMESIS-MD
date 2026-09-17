@@ -19,7 +19,7 @@ async function convertToSticker(mediaBuffer) {
 }
 
 // FIXED: Properly download image from Faa API
-async function fetchAndSendSticker(Ridzcoder, from, endpoint, m) {
+async function fetchAndSendSticker(ridzcoder, from, endpoint, m) {
     try {
         const { data } = await axios.get(endpoint);
         
@@ -37,7 +37,7 @@ async function fetchAndSendSticker(Ridzcoder, from, endpoint, m) {
             const stickerBuf = await convertToSticker(imageBuffer);
             
             if (stickerBuf) {
-                await Ridzcoder.sendMessage(from, { sticker: stickerBuf }, { quoted: m });
+                await ridzcoder.sendMessage(from, { sticker: stickerBuf }, { quoted: m });
                 return true;
             }
         }
@@ -49,7 +49,7 @@ async function fetchAndSendSticker(Ridzcoder, from, endpoint, m) {
 }
 
 // FIXED: For Waifu API that returns JSON with image URL
-async function sendWaifu(Ridzcoder, from, type, m) {
+async function sendWaifu(ridzcoder, from, type, m) {
     try {
         const apiUrl = `${WAIFU_BASE}/${type}`;
         console.log(`Fetching from: ${apiUrl}`);
@@ -62,7 +62,7 @@ async function sendWaifu(Ridzcoder, from, type, m) {
             const imageBuffer = await getBuffer(data.url);
             
             if (!imageBuffer) {
-                await Ridzcoder.sendMessage(from, { text: `❌ Failed to fetch ${type} image` }, { quoted: m });
+                await ridzcoder.sendMessage(from, { text: `❌ Failed to fetch ${type} image` }, { quoted: m });
                 return;
             }
             
@@ -70,22 +70,22 @@ async function sendWaifu(Ridzcoder, from, type, m) {
             const stickerBuf = await convertToSticker(imageBuffer);
             
             if (stickerBuf) {
-                await Ridzcoder.sendMessage(from, { sticker: stickerBuf }, { quoted: m });
+                await ridzcoder.sendMessage(from, { sticker: stickerBuf }, { quoted: m });
             } else {
                 // Fallback: send as image
-                await Ridzcoder.sendMessage(from, { image: imageBuffer }, { quoted: m });
+                await ridzcoder.sendMessage(from, { image: imageBuffer }, { quoted: m });
             }
         } else {
-            await Ridzcoder.sendMessage(from, { text: `❌ No ${type} image found` }, { quoted: m });
+            await ridzcoder.sendMessage(from, { text: `❌ No ${type} image found` }, { quoted: m });
         }
     } catch (error) {
         console.error(`Error in ${type} command:`, error.message);
-        await Ridzcoder.sendMessage(from, { text: `❌ Error: ${error.message}` }, { quoted: m });
+        await ridzcoder.sendMessage(from, { text: `❌ Error: ${error.message}` }, { quoted: m });
     }
 }
 
 // For Animu API (works the same)
-async function sendAnimu(Ridzcoder, from, type, m) {
+async function sendAnimu(ridzcoder, from, type, m) {
     try {
         const apiUrl = `${ANIMU_BASE}/${type}`;
         const { data } = await axios.get(apiUrl);
@@ -95,19 +95,19 @@ async function sendAnimu(Ridzcoder, from, type, m) {
             const stickerBuf = await convertToSticker(imageBuffer);
             
             if (stickerBuf) {
-                await Ridzcoder.sendMessage(from, { sticker: stickerBuf }, { quoted: m });
+                await ridzcoder.sendMessage(from, { sticker: stickerBuf }, { quoted: m });
             } else {
-                await Ridzcoder.sendMessage(from, { image: imageBuffer }, { quoted: m });
+                await ridzcoder.sendMessage(from, { image: imageBuffer }, { quoted: m });
             }
         }
     } catch (error) {
         console.error(`Error in animu ${type}:`, error.message);
-        await Ridzcoder.sendMessage(from, { text: `❌ Error fetching ${type}` }, { quoted: m });
+        await ridzcoder.sendMessage(from, { text: `❌ Error fetching ${type}` }, { quoted: m });
     }
 }
 
-// Fix the sendWaifu function to work with Ridzcoder.sendImageAsSticker properly
-async function sendWaifuAsSticker(Ridzcoder, from, type, m) {
+// Fix the sendWaifu function to work with ridzcoder.sendImageAsSticker properly
+async function sendWaifuAsSticker(ridzcoder, from, type, m) {
     try {
         const apiUrl = `${WAIFU_BASE}/${type}`;
         const { data } = await axios.get(apiUrl);
@@ -119,16 +119,16 @@ async function sendWaifuAsSticker(Ridzcoder, from, type, m) {
             const stickerBuf = await convertToSticker(imageBuffer);
             
             if (stickerBuf) {
-                await Ridzcoder.sendMessage(from, { sticker: stickerBuf }, { quoted: m });
+                await ridzcoder.sendMessage(from, { sticker: stickerBuf }, { quoted: m });
             } else {
-                await Ridzcoder.sendMessage(from, { image: imageBuffer, caption: `💕 ${type}` }, { quoted: m });
+                await ridzcoder.sendMessage(from, { image: imageBuffer, caption: `💕 ${type}` }, { quoted: m });
             }
         } else {
-            await Ridzcoder.sendMessage(from, { text: `❌ No ${type} found` }, { quoted: m });
+            await ridzcoder.sendMessage(from, { text: `❌ No ${type} found` }, { quoted: m });
         }
     } catch (error) {
         console.error(`Error in ${type}:`, error.message);
-        await Ridzcoder.sendMessage(from, { text: `❌ Error: ${error.message}` }, { quoted: m });
+        await ridzcoder.sendMessage(from, { text: `❌ Error: ${error.message}` }, { quoted: m });
     }
 }
 
@@ -136,211 +136,211 @@ module.exports = [
     // Animu commands
     {
         command: ['animu', 'animequote'],
-        operate: async ({ Ridzcoder, m, args }) => {
+        operate: async ({ ridzcoder, m, args }) => {
             const type = args[0]?.toLowerCase() || 'quote';
             let normalized = type;
             if (type === 'facepalm' || type === 'face_palm') normalized = 'face-palm';
             if (type === 'quote') normalized = 'quote';
-            await sendAnimu(Ridzcoder, m.chat, normalized, m);
+            await sendAnimu(ridzcoder, m.chat, normalized, m);
         }
     },
     {
         command: ['animuwink'],
-        operate: async ({ Ridzcoder, m }) => {
-            await sendAnimu(Ridzcoder, m.chat, 'wink', m);
+        operate: async ({ ridzcoder, m }) => {
+            await sendAnimu(ridzcoder, m.chat, 'wink', m);
         }
     },
     {
         command: ['animupat'],
-        operate: async ({ Ridzcoder, m }) => {
-            await sendAnimu(Ridzcoder, m.chat, 'pat', m);
+        operate: async ({ ridzcoder, m }) => {
+            await sendAnimu(ridzcoder, m.chat, 'pat', m);
         }
     },
     {
         command: ['animuhug'],
-        operate: async ({ Ridzcoder, m }) => {
-            await sendAnimu(Ridzcoder, m.chat, 'hug', m);
+        operate: async ({ ridzcoder, m }) => {
+            await sendAnimu(ridzcoder, m.chat, 'hug', m);
         }
     },
     // Waifu.pics commands (FIXED - using sendWaifu)
     {
         command: ['kiss', 'cium', 'beso'],
-        operate: async ({ Ridzcoder, m }) => {
-            await sendWaifu(Ridzcoder, m.chat, 'kiss', m);
+        operate: async ({ ridzcoder, m }) => {
+            await sendWaifu(ridzcoder, m.chat, 'kiss', m);
         }
     },
     {
         command: ['cry'],
-        operate: async ({ Ridzcoder, m }) => {
-            await sendWaifu(Ridzcoder, m.chat, 'cry', m);
+        operate: async ({ ridzcoder, m }) => {
+            await sendWaifu(ridzcoder, m.chat, 'cry', m);
         }
     },
     {
         command: ['blush'],
-        operate: async ({ Ridzcoder, m }) => {
-            await sendWaifu(Ridzcoder, m.chat, 'blush', m);
+        operate: async ({ ridzcoder, m }) => {
+            await sendWaifu(ridzcoder, m.chat, 'blush', m);
         }
     },
     {
         command: ['dance'],
-        operate: async ({ Ridzcoder, m }) => {
-            await sendWaifu(Ridzcoder, m.chat, 'dance', m);
+        operate: async ({ ridzcoder, m }) => {
+            await sendWaifu(ridzcoder, m.chat, 'dance', m);
         }
     },
     {
         command: ['kill'],
-        operate: async ({ Ridzcoder, m }) => {
-            await sendWaifu(Ridzcoder, m.chat, 'kill', m);
+        operate: async ({ ridzcoder, m }) => {
+            await sendWaifu(ridzcoder, m.chat, 'kill', m);
         }
     },
     {
         command: ['hug'],
-        operate: async ({ Ridzcoder, m }) => {
-            await sendWaifu(Ridzcoder, m.chat, 'hug', m);
+        operate: async ({ ridzcoder, m }) => {
+            await sendWaifu(ridzcoder, m.chat, 'hug', m);
         }
     },
     {
         command: ['kick'],
-        operate: async ({ Ridzcoder, m }) => {
-            await sendWaifu(Ridzcoder, m.chat, 'kick', m);
+        operate: async ({ ridzcoder, m }) => {
+            await sendWaifu(ridzcoder, m.chat, 'kick', m);
         }
     },
     {
         command: ['slap'],
-        operate: async ({ Ridzcoder, m }) => {
-            await sendWaifu(Ridzcoder, m.chat, 'slap', m);
+        operate: async ({ ridzcoder, m }) => {
+            await sendWaifu(ridzcoder, m.chat, 'slap', m);
         }
     },
     {
         command: ['happy'],
-        operate: async ({ Ridzcoder, m }) => {
-            await sendWaifu(Ridzcoder, m.chat, 'happy', m);
+        operate: async ({ ridzcoder, m }) => {
+            await sendWaifu(ridzcoder, m.chat, 'happy', m);
         }
     },
     {
         command: ['bully'],
-        operate: async ({ Ridzcoder, m }) => {
-            await sendWaifu(Ridzcoder, m.chat, 'bully', m);
+        operate: async ({ ridzcoder, m }) => {
+            await sendWaifu(ridzcoder, m.chat, 'bully', m);
         }
     },
     {
         command: ['pat', 'headpat'],
-        operate: async ({ Ridzcoder, m }) => {
-            await sendWaifu(Ridzcoder, m.chat, 'pat', m);
+        operate: async ({ ridzcoder, m }) => {
+            await sendWaifu(ridzcoder, m.chat, 'pat', m);
         }
     },
     {
         command: ['poke'],
-        operate: async ({ Ridzcoder, m }) => {
-            await sendWaifu(Ridzcoder, m.chat, 'poke', m);
+        operate: async ({ ridzcoder, m }) => {
+            await sendWaifu(ridzcoder, m.chat, 'poke', m);
         }
     },
     {
         command: ['cuddle'],
-        operate: async ({ Ridzcoder, m }) => {
-            await sendWaifu(Ridzcoder, m.chat, 'cuddle', m);
+        operate: async ({ ridzcoder, m }) => {
+            await sendWaifu(ridzcoder, m.chat, 'cuddle', m);
         }
     },
     {
         command: ['smile'],
-        operate: async ({ Ridzcoder, m }) => {
-            await sendWaifu(Ridzcoder, m.chat, 'smile', m);
+        operate: async ({ ridzcoder, m }) => {
+            await sendWaifu(ridzcoder, m.chat, 'smile', m);
         }
     },
     {
         command: ['wave'],
-        operate: async ({ Ridzcoder, m }) => {
-            await sendWaifu(Ridzcoder, m.chat, 'wave', m);
+        operate: async ({ ridzcoder, m }) => {
+            await sendWaifu(ridzcoder, m.chat, 'wave', m);
         }
     },
     {
         command: ['bite'],
-        operate: async ({ Ridzcoder, m }) => {
-            await sendWaifu(Ridzcoder, m.chat, 'bite', m);
+        operate: async ({ ridzcoder, m }) => {
+            await sendWaifu(ridzcoder, m.chat, 'bite', m);
         }
     },
     {
         command: ['lick'],
-        operate: async ({ Ridzcoder, m }) => {
-            await sendWaifu(Ridzcoder, m.chat, 'lick', m);
+        operate: async ({ ridzcoder, m }) => {
+            await sendWaifu(ridzcoder, m.chat, 'lick', m);
         }
     },
     {
         command: ['bonk'],
-        operate: async ({ Ridzcoder, m }) => {
-            await sendWaifu(Ridzcoder, m.chat, 'bonk', m);
+        operate: async ({ ridzcoder, m }) => {
+            await sendWaifu(ridzcoder, m.chat, 'bonk', m);
         }
     },
     {
         command: ['yeet'],
-        operate: async ({ Ridzcoder, m }) => {
-            await sendWaifu(Ridzcoder, m.chat, 'yeet', m);
+        operate: async ({ ridzcoder, m }) => {
+            await sendWaifu(ridzcoder, m.chat, 'yeet', m);
         }
     },
     {
         command: ['nom'],
-        operate: async ({ Ridzcoder, m }) => {
-            await sendWaifu(Ridzcoder, m.chat, 'nom', m);
+        operate: async ({ ridzcoder, m }) => {
+            await sendWaifu(ridzcoder, m.chat, 'nom', m);
         }
     },
     {
         command: ['tickle'],
-        operate: async ({ Ridzcoder, m }) => {
-            await sendWaifu(Ridzcoder, m.chat, 'tickle', m);
+        operate: async ({ ridzcoder, m }) => {
+            await sendWaifu(ridzcoder, m.chat, 'tickle', m);
         }
     },
     {
         command: ['facepalm'],
-        operate: async ({ Ridzcoder, m }) => {
-            await sendWaifu(Ridzcoder, m.chat, 'facepalm', m);
+        operate: async ({ ridzcoder, m }) => {
+            await sendWaifu(ridzcoder, m.chat, 'facepalm', m);
         }
     },
     {
         command: ['handhold', 'holdhands'],
-        operate: async ({ Ridzcoder, m }) => {
-            await sendWaifu(Ridzcoder, m.chat, 'handhold', m);
+        operate: async ({ ridzcoder, m }) => {
+            await sendWaifu(ridzcoder, m.chat, 'handhold', m);
         }
     },
     {
         command: ['stare'],
-        operate: async ({ Ridzcoder, m }) => {
-            await sendWaifu(Ridzcoder, m.chat, 'stare', m);
+        operate: async ({ ridzcoder, m }) => {
+            await sendWaifu(ridzcoder, m.chat, 'stare', m);
         }
     },
     {
         command: ['shrug'],
-        operate: async ({ Ridzcoder, m }) => {
-            await sendWaifu(Ridzcoder, m.chat, 'shrug', m);
+        operate: async ({ ridzcoder, m }) => {
+            await sendWaifu(ridzcoder, m.chat, 'shrug', m);
         }
     },
     {
         command: ['scream'],
-        operate: async ({ Ridzcoder, m }) => {
-            await sendWaifu(Ridzcoder, m.chat, 'scream', m);
+        operate: async ({ ridzcoder, m }) => {
+            await sendWaifu(ridzcoder, m.chat, 'scream', m);
         }
     },
     {
         command: ['pout'],
-        operate: async ({ Ridzcoder, m }) => {
-            await sendWaifu(Ridzcoder, m.chat, 'pout', m);
+        operate: async ({ ridzcoder, m }) => {
+            await sendWaifu(ridzcoder, m.chat, 'pout', m);
         }
     },
     {
         command: ['shy'],
-        operate: async ({ Ridzcoder, m }) => {
-            await sendWaifu(Ridzcoder, m.chat, 'shy', m);
+        operate: async ({ ridzcoder, m }) => {
+            await sendWaifu(ridzcoder, m.chat, 'shy', m);
         }
     },
     {
         command: ['thinking'],
-        operate: async ({ Ridzcoder, m }) => {
-            await sendWaifu(Ridzcoder, m.chat, 'thinking', m);
+        operate: async ({ ridzcoder, m }) => {
+            await sendWaifu(ridzcoder, m.chat, 'thinking', m);
         }
     },
     {
         command: ['love'],
-        operate: async ({ Ridzcoder, m }) => {
-            await sendWaifu(Ridzcoder, m.chat, 'love', m);
+        operate: async ({ ridzcoder, m }) => {
+            await sendWaifu(ridzcoder, m.chat, 'love', m);
         }
     }
 ];
