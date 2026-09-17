@@ -2,7 +2,7 @@ module.exports = [
 
     {
         command: ['luxurygold', 'goldtext', 'goldfx'],
-        operate: async ({ Ridzcoder, m, reply, args, prefix, ephoto }) => {
+        operate: async ({ ridzcoder, m, reply, args, prefix, ephoto }) => {
             const q = args.join(" ");
             
             if (!q) {
@@ -13,7 +13,7 @@ module.exports = [
 
             try {
                 const result = await ephoto(link, q);
-                await Ridzcoder.sendMessage(
+                await ridzcoder.sendMessage(
                     m.chat,
                     { 
                         image: { url: result }, 
@@ -31,7 +31,7 @@ module.exports = [
     // Advanced Glow
     {
         command: ['advancedglow', 'aglow'],
-        operate: async ({ Ridzcoder, m, reply, args, prefix, ephoto }) => {
+        operate: async ({ ridzcoder, m, reply, args, prefix, ephoto }) => {
             const q = args.join(" ");
             if (!q) return reply(`*Example: ${prefix}advancedglow Ridz coder*`);
             
@@ -39,7 +39,7 @@ module.exports = [
             
             try {
                 const result = await ephoto(link, q);
-                await Ridzcoder.sendMessage(
+                await ridzcoder.sendMessage(
                     m.chat,
                     { image: { url: result }, caption: `${global.wm}` },
                     { quoted: m }
@@ -54,7 +54,7 @@ module.exports = [
     // Blackpink Logo
     {
         command: ['blackpinklogo', 'bplogo'],
-        operate: async ({ Ridzcoder, m, reply, args, prefix, ephoto }) => {
+        operate: async ({ ridzcoder, m, reply, args, prefix, ephoto }) => {
             const q = args.join(" ");
             if (!q) return reply(`*Example: ${prefix}blackpinklogo Ridz coder*`);
             
@@ -62,7 +62,7 @@ module.exports = [
             
             try {
                 const result = await ephoto(link, q);
-                await Ridzcoder.sendMessage(
+                await ridzcoder.sendMessage(
                     m.chat,
                     { image: { url: result }, caption: `${global.wm}` },
                     { quoted: m }
@@ -77,7 +77,7 @@ module.exports = [
     // Blackpink Style
     {
         command: ['blackpinkstyle', 'bpstyle'],
-        operate: async ({ Ridzcoder, m, reply, args, prefix, ephoto }) => {
+        operate: async ({ ridzcoder, m, reply, args, prefix, ephoto }) => {
             const q = args.join(" ");
             if (!q) return reply(`*Example: ${prefix}blackpinkstyle Ridz coder*`);
             
@@ -85,7 +85,7 @@ module.exports = [
             
             try {
                 const result = await ephoto(link, q);
-                await Ridzcoder.sendMessage(
+                await ridzcoder.sendMessage(
                     m.chat,
                     { image: { url: result }, caption: `${global.wm}` },
                     { quoted: m }
@@ -100,7 +100,7 @@ module.exports = [
     // Cartoon Style
     {
         command: ['cartoonstyle', 'cartoonfx'],
-        operate: async ({ Ridzcoder, m, reply, args, prefix, ephoto }) => {
+        operate: async ({ ridzcoder, m, reply, args, prefix, ephoto }) => {
             const q = args.join(" ");
             if (!q) return reply(`*Example: ${prefix}cartoonstyle Ridz coder*`);
             
@@ -108,7 +108,7 @@ module.exports = [
             
             try {
                 const result = await ephoto(link, q);
-                await Ridzcoder.sendMessage(
+                await ridzcoder.sendMessage(
                     m.chat,
                     { image: { url: result }, caption: `> ${global.wm}` },
                     { quoted: m }
@@ -122,7 +122,7 @@ module.exports = [
   
     {
         command: ['deadpool', 'deadpoolfx'],
-        operate: async ({ Ridzcoder, m, reply, args, prefix, ephoto }) => {
+        operate: async ({ ridzcoder, m, reply, args, prefix, ephoto }) => {
             const q = args.join(" ");
             if (!q) return reply(`*Example: ${prefix}deadpool Ridz coder*`);
             
@@ -130,7 +130,7 @@ module.exports = [
             
             try {
                 const result = await ephoto(link, q);
-                await Ridzcoder.sendMessage(
+                await ridzcoder.sendMessage(
                     m.chat,
                     { image: { url: result }, caption: `> ${global.wm}` },
                     { quoted: m }
@@ -145,7 +145,7 @@ module.exports = [
     // Effect Clouds
     {
         command: ['effectclouds', 'cloudsfx'],
-        operate: async ({ Ridzcoder, m, reply, args, prefix, ephoto }) => {
+        operate: async ({ ridzcoder, m, reply, args, prefix, ephoto }) => {
             const q = args.join(" ");
             if (!q) return reply(`*Example: ${prefix}effectclouds Ridz coder*`);
             
@@ -153,7 +153,7 @@ module.exports = [
             
             try {
                 const result = await ephoto(link, q);
-                await Ridzcoder.sendMessage(
+                await ridzcoder.sendMessage(
                     m.chat,
                     { image: { url: result }, caption: `> ${global.wm}` },
                     { quoted: m }
@@ -168,7 +168,7 @@ module.exports = [
     // Flag Text
     {
         command: ['flagtext', 'flagfx'],
-        operate: async ({ Ridzcoder, m, reply, args, prefix, ephoto }) => {
+        operate: async ({ ridzcoder, m, reply, args, prefix, ephoto }) => {
             const q = args.join(" ");
             if (!q) return reply(`*Example: ${prefix}flagtext Ridz coder*`);
             
@@ -176,7 +176,7 @@ module.exports = [
             
             try {
                 const result = await ephoto(link, q);
-                await Ridzcoder.sendMessage(
+                await ridzcoder.sendMessage(
                     m.chat,
                     { image: { url: result }, caption: `${global.wm}` },
                     { quoted: m }
@@ -191,7 +191,7 @@ module.exports = [
     // Free Create
     {
         command: ['freecreate', 'freefx'],
-        operate: async ({ Ridzcoder, m, reply, args, prefix, ephoto }) => {
+        operate: async ({ ridzcoder, m, reply, args, prefix, ephoto }) => {
             const q = args.join(" ");
             if (!q) return reply(`*Example: ${prefix}freecreate Ridz coder*`);
             
@@ -199,7 +199,7 @@ module.exports = [
             
             try {
                 const result = await ephoto(link, q);
-                await Ridzcoder.sendMessage(
+                await ridzcoder.sendMessage(
                     m.chat,
                     { image: { url: result }, caption: `${global.wm}` },
                     { quoted: m }
@@ -214,7 +214,7 @@ module.exports = [
     // Galaxy Style
     {
         command: ['galaxystyle', 'galaxyfx'],
-        operate: async ({ Ridzcoder, m, reply, args, prefix, ephoto }) => {
+        operate: async ({ ridzcoder, m, reply, args, prefix, ephoto }) => {
             const q = args.join(" ");
             if (!q) return reply(`*Example: ${prefix}galaxystyle Ridz coder*`);
             
@@ -222,7 +222,7 @@ module.exports = [
             
             try {
                 const result = await ephoto(link, q);
-                await Ridzcoder.sendMessage(
+                await ridzcoder.sendMessage(
                     m.chat,
                     { image: { url: result }, caption: `${global.wm}` },
                     { quoted: m }
@@ -237,7 +237,7 @@ module.exports = [
     // Galaxy Wallpaper
     {
         command: ['galaxywallpaper', 'galaxywp'],
-        operate: async ({ Ridzcoder, m, reply, args, prefix, ephoto }) => {
+        operate: async ({ ridzcoder, m, reply, args, prefix, ephoto }) => {
             const q = args.join(" ");
             if (!q) return reply(`*Example: ${prefix}galaxywallpaper Ridz coder*`);
             
@@ -245,7 +245,7 @@ module.exports = [
             
             try {
                 const result = await ephoto(link, q);
-                await Ridzcoder.sendMessage(
+                await ridzcoder.sendMessage(
                     m.chat,
                     { image: { url: result }, caption: `${global.wm}` },
                     { quoted: m }
@@ -260,7 +260,7 @@ module.exports = [
     // Making Neon
     {
         command: ['makingneon', 'makeneon'],
-        operate: async ({ Ridzcoder, m, reply, args, prefix, ephoto }) => {
+        operate: async ({ ridzcoder, m, reply, args, prefix, ephoto }) => {
             const q = args.join(" ");
             if (!q) return reply(`*Example: ${prefix}makingneon Ridz coder*`);
             
@@ -268,7 +268,7 @@ module.exports = [
             
             try {
                 const result = await ephoto(link, q);
-                await Ridzcoder.sendMessage(
+                await ridzcoder.sendMessage(
                     m.chat,
                     { image: { url: result }, caption: `${global.wm}` },
                     { quoted: m }
@@ -283,7 +283,7 @@ module.exports = [
     // Matrix
     {
         command: ['matrix', 'matrixfx'],
-        operate: async ({ Ridzcoder, m, reply, args, prefix, ephoto }) => {
+        operate: async ({ ridzcoder, m, reply, args, prefix, ephoto }) => {
             const q = args.join(" ");
             if (!q) return reply(`*Example: ${prefix}matrix Ridz coder*`);
             
@@ -291,7 +291,7 @@ module.exports = [
             
             try {
                 const result = await ephoto(link, q);
-                await Ridzcoder.sendMessage(
+                await ridzcoder.sendMessage(
                     m.chat,
                     { image: { url: result }, caption: `${global.wm}` },
                     { quoted: m }
@@ -306,7 +306,7 @@ module.exports = [
     // Royal Text
     {
         command: ['royaltext', 'royalfx'],
-        operate: async ({ Ridzcoder, m, reply, args, prefix, ephoto }) => {
+        operate: async ({ ridzcoder, m, reply, args, prefix, ephoto }) => {
             const q = args.join(" ");
             if (!q) return reply(`*Example: ${prefix}royaltext Ridz coder*`);
             
@@ -314,7 +314,7 @@ module.exports = [
             
             try {
                 const result = await ephoto(link, q);
-                await Ridzcoder.sendMessage(
+                await ridzcoder.sendMessage(
                     m.chat,
                     { image: { url: result }, caption: `${global.wm}` },
                     { quoted: m }
@@ -329,7 +329,7 @@ module.exports = [
     // Sand
     {
         command: ['sand', 'sandfx'],
-        operate: async ({ Ridzcoder, m, reply, args, prefix, ephoto }) => {
+        operate: async ({ ridzcoder, m, reply, args, prefix, ephoto }) => {
             const q = args.join(" ");
             if (!q) return reply(`*Example: ${prefix}sand Ridz coder*`);
             
@@ -337,7 +337,7 @@ module.exports = [
             
             try {
                 const result = await ephoto(link, q);
-                await Ridzcoder.sendMessage(
+                await ridzcoder.sendMessage(
                     m.chat,
                     { image: { url: result }, caption: `${global.wm}` },
                     { quoted: m }
@@ -352,7 +352,7 @@ module.exports = [
     // Summer Beach
     {
         command: ['summerbeach', 'beachfx'],
-        operate: async ({ Ridzcoder, m, reply, args, prefix, ephoto }) => {
+        operate: async ({ ridzcoder, m, reply, args, prefix, ephoto }) => {
             const q = args.join(" ");
             if (!q) return reply(`*Example: ${prefix}summerbeach Ridz coder*`);
             
@@ -360,7 +360,7 @@ module.exports = [
             
             try {
                 const result = await ephoto(link, q);
-                await Ridzcoder.sendMessage(
+                await ridzcoder.sendMessage(
                     m.chat,
                     { image: { url: result }, caption: `${global.wm}` },
                     { quoted: m }
@@ -375,7 +375,7 @@ module.exports = [
     // Topography
     {
         command: ['topography', 'topofx'],
-        operate: async ({ Ridzcoder, m, reply, args, prefix, ephoto }) => {
+        operate: async ({ ridzcoder, m, reply, args, prefix, ephoto }) => {
             const q = args.join(" ");
             if (!q) return reply(`*Example: ${prefix}topography Ridz coder*`);
             
@@ -383,7 +383,7 @@ module.exports = [
             
             try {
                 const result = await ephoto(link, q);
-                await Ridzcoder.sendMessage(
+                await ridzcoder.sendMessage(
                     m.chat,
                     { image: { url: result }, caption: `${global.wm}` },
                     { quoted: m }
@@ -398,7 +398,7 @@ module.exports = [
     // Typography
     {
         command: ['typography', 'typefx'],
-        operate: async ({ Ridzcoder, m, reply, args, prefix, ephoto }) => {
+        operate: async ({ ridzcoder, m, reply, args, prefix, ephoto }) => {
             const q = args.join(" ");
             if (!q) return reply(`*Example: ${prefix}typography Ridz coder*`);
             
@@ -406,7 +406,7 @@ module.exports = [
             
             try {
                 const result = await ephoto(link, q);
-                await Ridzcoder.sendMessage(
+                await ridzcoder.sendMessage(
                     m.chat,
                     { image: { url: result }, caption: `${global.wm}` },
                     { quoted: m }
@@ -421,7 +421,7 @@ module.exports = [
     // Royal (using external API)
     {
         command: ['royal', 'royal2'],
-        operate: async ({ Ridzcoder, m, reply, text, prefix }) => {
+        operate: async ({ ridzcoder, m, reply, text, prefix }) => {
             if (!text) return reply(`*Example: ${prefix}royal Kelvin*`);
             
             try {
@@ -429,7 +429,7 @@ module.exports = [
                 
                 const apiUrl = `https://api.nekolabs.my.id/ephoto/royal-text?text=${encodeURIComponent(text)}`;
                 
-                await Ridzcoder.sendMessage(m.chat, {
+                await ridzcoder.sendMessage(m.chat, {
                     image: { url: apiUrl },
                     caption: `${global.wm}`
                 }, { quoted: m });
@@ -444,7 +444,7 @@ module.exports = [
     // Text on Wet Glass
     {
         command: ['textonwetglass', 'wetglass', 'wetfx'],
-        operate: async ({ Ridzcoder, m, reply, text, prefix }) => {
+        operate: async ({ ridzcoder, m, reply, text, prefix }) => {
             if (!text) return reply(`*Example: ${prefix}textonwetglass Kelvin*`);
             
             try {
@@ -452,7 +452,7 @@ module.exports = [
                 
                 const apiUrl = `https://api.nekolabs.web.id/ephoto/text-on-wet-glass?text=${encodeURIComponent(text)}`;
                 
-                await Ridzcoder.sendMessage(m.chat, {
+                await ridzcoder.sendMessage(m.chat, {
                     image: { url: apiUrl },
                     caption: `> ${global.wm}`
                 }, { quoted: m });
@@ -467,7 +467,7 @@ module.exports = [
     // Bear
     {
         command: ['bear', 'bearlogo'],
-        operate: async ({ Ridzcoder, m, reply, text, prefix }) => {
+        operate: async ({ ridzcoder, m, reply, text, prefix }) => {
             if (!text) return reply(`*Example: ${prefix}bear Kelvin*`);
             
             try {
@@ -475,7 +475,7 @@ module.exports = [
                 
                 const apiUrl = `https://api.nekolabs.my.id/ephoto/bear-logo?text=${encodeURIComponent(text)}`;
                 
-                await Ridzcoder.sendMessage(m.chat, {
+                await ridzcoder.sendMessage(m.chat, {
                     image: { url: apiUrl },
                     caption: `${global.wm}`
                 }, { quoted: m });
@@ -490,7 +490,7 @@ module.exports = [
     // Papercut / 3D Paper
     {
         command: ['papercut', '3dpaper', 'paper3d'],
-        operate: async ({ Ridzcoder, m, reply, text, prefix }) => {
+        operate: async ({ ridzcoder, m, reply, text, prefix }) => {
             if (!text) return reply(`*Example: ${prefix}papercut Kelvin*`);
             
             try {
@@ -498,7 +498,7 @@ module.exports = [
                 
                 const apiUrl = `https://api.nekolabs.my.id/ephoto/3d-paper-cut-style?text=${encodeURIComponent(text)}`;
                 
-                await Ridzcoder.sendMessage(m.chat, {
+                await ridzcoder.sendMessage(m.chat, {
                     image: { url: apiUrl },
                     caption: `${global.wm}`
                 }, { quoted: m });
@@ -513,7 +513,7 @@ module.exports = [
     // Hologram / 3D Hologram
     {
         command: ['hologram', '3dhologram', 'hologram3d'],
-        operate: async ({ Ridzcoder, m, reply, text, prefix }) => {
+        operate: async ({ ridzcoder, m, reply, text, prefix }) => {
             if (!text) return reply(`*Example: ${prefix}hologram Kelvin*`);
             
             try {
@@ -521,7 +521,7 @@ module.exports = [
                 
                 const apiUrl = `https://api.nekolabs.my.id/ephoto/3d-hologram-text?text=${encodeURIComponent(text)}`;
                 
-                await Ridzcoder.sendMessage(m.chat, {
+                await ridzcoder.sendMessage(m.chat, {
                     image: { url: apiUrl },
                     caption: `${global.wm}`
                 }, { quoted: m });
@@ -534,7 +534,7 @@ module.exports = [
     },
     {
   command: ["flag3dtext"],
-  operate: async ({ m, args, reply, Ridzcoder, prefix, mess, ephoto }) => {
+  operate: async ({ m, args, reply, ridzcoder, prefix, mess, ephoto }) => {
     let q = args.join(" ");
     if (!q) {
       return reply(`*Example: ${prefix}flag3dtext Kelvin*`);
@@ -544,7 +544,7 @@ module.exports = [
 
     try {
       let result = await ephoto(link, q);
-      await Ridzcoder.sendMessage(
+      await ridzcoder.sendMessage(
         m.chat,
         { image: { url: result }, caption: `> ${global.wm}` },
         { quoted: m }
@@ -557,7 +557,7 @@ module.exports = [
 },
 {
   command: ["glitchtext"],
-  operate: async ({ m, args, reply, Ridzcoder, prefix, mess, ephoto }) => {
+  operate: async ({ m, args, reply, ridzcoder, prefix, mess, ephoto }) => {
     let q = args.join(" ");
     if (!q) {
       return reply(`*Example: ${prefix}glitchtext Kelvin*`);
@@ -567,7 +567,7 @@ module.exports = [
 
     try {
       let result = await ephoto(link, q);
-      await Ridzcoder.sendMessage(
+      await ridzcoder.sendMessage(
         m.chat,
         { image: { url: result }, caption: `> ${global.wm}` },
         { quoted: m }
@@ -580,7 +580,7 @@ module.exports = [
 }, 
 {
   command: ["dragonball"],
-  operate: async ({ m, args, reply, Ridzcoder, prefix, mess, ephoto }) => {
+  operate: async ({ m, args, reply, ridzcoder, prefix, mess, ephoto }) => {
     let q = args.join(" ");
     if (!q) {
       return reply(`*Example: ${prefix}dragonball Kelvin*`);
@@ -590,7 +590,7 @@ module.exports = [
 
     try {
       let result = await ephoto(link, q);
-      await Ridzcoder.sendMessage(
+      await ridzcoder.sendMessage(
         m.chat,
         { image: { url: result }, caption: `> ${global.wm}` },
         { quoted: m }
@@ -603,7 +603,7 @@ module.exports = [
 },
 {
   command: ["multicoloredneon"],
-  operate: async ({ m, args, reply, Ridzcoder, prefix, mess, ephoto }) => {
+  operate: async ({ m, args, reply, ridzcoder, prefix, mess, ephoto }) => {
     let q = args.join(" ");
     if (!q) {
       return reply(`*Example: ${prefix}multicoloredneon Ridz coder*`);
@@ -613,7 +613,7 @@ module.exports = [
 
     try {
       let result = await ephoto(link, q);
-      await Ridzcoder.sendMessage(
+      await ridzcoder.sendMessage(
         m.chat,
         { image: { url: result }, caption: `> ${global.wm}` },
         { quoted: m }
@@ -626,7 +626,7 @@ module.exports = [
 },
 {
   command: ["neonglitch"],
-  operate: async ({ m, args, reply, Ridzcoder, prefix, mess, ephoto }) => {
+  operate: async ({ m, args, reply, ridzcoder, prefix, mess, ephoto }) => {
     let q = args.join(" ");
     if (!q) {
       return reply(`*Example: ${prefix}neonglitch Kelvin*`);
@@ -636,7 +636,7 @@ module.exports = [
 
     try {
       let result = await ephoto(link, q);
-      await Ridzcoder.sendMessage(
+      await ridzcoder.sendMessage(
         m.chat,
         { image: { url: result }, caption: `> ${global.wm}` },
         { quoted: m }
@@ -649,7 +649,7 @@ module.exports = [
 },
 {
   command: ["papercutstyle"],
-  operate: async ({ m, args, reply, Ridzcoder, prefix, mess, ephoto }) => {
+  operate: async ({ m, args, reply, ridzcoder, prefix, mess, ephoto }) => {
     let q = args.join(" ");
     if (!q) {
       return reply(`*Example: ${prefix}papercutstyle Ridz coder*`);
@@ -659,7 +659,7 @@ module.exports = [
 
     try {
       let result = await ephoto(link, q);
-      await Ridzcoder.sendMessage(
+      await ridzcoder.sendMessage(
         m.chat,
         { image: { url: result }, caption: `> ${global.wm}` },
         { quoted: m }
@@ -672,7 +672,7 @@ module.exports = [
 },
 {
   command: ["pixelglitch"],
-  operate: async ({ m, args, reply, Ridzcoder, prefix, mess, ephoto }) => {
+  operate: async ({ m, args, reply, ridzcoder, prefix, mess, ephoto }) => {
     let q = args.join(" ");
     if (!q) {
       return reply(`*Example: ${prefix}pixelglitch Kelvin*`);
@@ -682,7 +682,7 @@ module.exports = [
 
     try {
       let result = await ephoto(link, q);
-      await Ridzcoder.sendMessage(
+      await ridzcoder.sendMessage(
         m.chat,
         { image: { url: result }, caption: `> ${global.wm}` },
         { quoted: m }
@@ -695,7 +695,7 @@ module.exports = [
 },
 {
   command: ["glowingtext"],
-  operate: async ({ m, args, reply, Ridzcoder, prefix, mess, ephoto }) => {
+  operate: async ({ m, args, reply, ridzcoder, prefix, mess, ephoto }) => {
     let q = args.join(" ");
     if (!q) {
       return reply(`*Example: ${prefix}glowingtext Ridz coder*`);
@@ -705,7 +705,7 @@ module.exports = [
 
     try {
       let result = await ephoto(link, q);
-      await Ridzcoder.sendMessage(
+      await ridzcoder.sendMessage(
         m.chat,
         { image: { url: result }, caption: `> ${global.wm}` },
         { quoted: m }
@@ -718,7 +718,7 @@ module.exports = [
 },
 {
   command: ["gradienttext"],
-  operate: async ({ m, args, reply, Ridzcoder, prefix, mess, ephoto }) => {
+  operate: async ({ m, args, reply, ridzcoder, prefix, mess, ephoto }) => {
     let q = args.join(" ");
     if (!q) {
       return reply(`*Example: ${prefix}gradienttext Kelvin*`);
@@ -728,7 +728,7 @@ module.exports = [
 
     try {
       let result = await ephoto(link, q);
-      await Ridzcoder.sendMessage(
+      await ridzcoder.sendMessage(
         m.chat,
         { image: { url: result }, caption: `> ${global.wm}` },
         { quoted: m }
@@ -741,7 +741,7 @@ module.exports = [
 },
 {
   command: ["graffiti"],
-  operate: async ({ m, args, reply, Ridzcoder, prefix, mess, ephoto }) => {
+  operate: async ({ m, args, reply, ridzcoder, prefix, mess, ephoto }) => {
     let q = args.join(" ");
     if (!q) {
       return reply(`*Example: ${prefix}graffiti Ridz coder*`);
@@ -751,7 +751,7 @@ module.exports = [
 
     try {
       let result = await ephoto(link, q);
-      await Ridzcoder.sendMessage(
+      await ridzcoder.sendMessage(
         m.chat,
         { image: { url: result }, caption: `> ${global.wm}` },
         { quoted: m }
@@ -764,7 +764,7 @@ module.exports = [
 },
 {
   command: ["incandescent"],
-  operate: async ({ m, args, reply, Ridzcoder, prefix, mess, ephoto }) => {
+  operate: async ({ m, args, reply, ridzcoder, prefix, mess, ephoto }) => {
     let q = args.join(" ");
     if (!q) {
       return reply(`*Example: ${prefix}incandescent Kelvin*`);
@@ -774,7 +774,7 @@ module.exports = [
 
     try {
       let result = await ephoto(link, q);
-      await Ridzcoder.sendMessage(
+      await ridzcoder.sendMessage(
         m.chat,
         { image: { url: result }, caption: `> ${global.wm}` },
         { quoted: m }
@@ -787,7 +787,7 @@ module.exports = [
 },
 {
   command: ["lighteffects"],
-  operate: async ({ m, args, reply, Ridzcoder, prefix, mess, ephoto }) => {
+  operate: async ({ m, args, reply, ridzcoder, prefix, mess, ephoto }) => {
     let q = args.join(" ");
     if (!q) {
       return reply(`*Example: ${prefix}lighteffects Ridz coder*`);
@@ -797,7 +797,7 @@ module.exports = [
 
     try {
       let result = await ephoto(link, q);
-      await Ridzcoder.sendMessage(
+      await ridzcoder.sendMessage(
         m.chat,
         { image: { url: result }, caption: `${global.wm}` },
         { quoted: m }
@@ -810,7 +810,7 @@ module.exports = [
 },
 {
   command: ["logomaker"],
-  operate: async ({ m, args, reply, Ridzcoder, prefix, mess, ephoto }) => {
+  operate: async ({ m, args, reply, ridzcoder, prefix, mess, ephoto }) => {
     let q = args.join(" ");
     if (!q) {
       return reply(`*Example: ${prefix}logomaker Kelvin*`);
@@ -820,7 +820,7 @@ module.exports = [
 
     try {
       let result = await ephoto(link, q);
-      await Ridzcoder.sendMessage(
+      await ridzcoder.sendMessage(
         m.chat,
         { image: { url: result }, caption: `> ${globalwm}` },
         { quoted: m }
@@ -833,7 +833,7 @@ module.exports = [
 },
 {
     command: ["shadowtext", "shadowsky"],
-    operate: async ({ Ridzcoder, m, reply, args, prefix }) => {
+    operate: async ({ ridzcoder, m, reply, args, prefix }) => {
         const text = args.join(" ");
         if (!text) return reply(`*Example: ${prefix}shadowtext Kelvin*`);
         
@@ -842,7 +842,7 @@ module.exports = [
             
             const apiUrl = `https://api.siputzx.my.id/api/m/photooxy?url=https://photooxy.com/logo-and-text-effects/shadow-text-effect-in-the-sky-394.html&text1=${encodeURIComponent(text)}&text2=`;
             
-            await Ridzcoder.sendMessage(m.chat, {
+            await ridzcoder.sendMessage(m.chat, {
                 image: { url: apiUrl },
                 caption: `> ${global.wm}`
             }, { quoted: m });
@@ -854,7 +854,7 @@ module.exports = [
 },
 {
     command: ["corntext", "cornkernels", "cornfx"],
-    operate: async ({ Ridzcoder, m, reply, args, prefix }) => {
+    operate: async ({ ridzcoder, m, reply, args, prefix }) => {
         const text = args.join(" ");
         if (!text) return reply(`*Example: ${prefix}corntext Kelvin*`);
         
@@ -863,7 +863,7 @@ module.exports = [
             
             const apiUrl = `https://api.siputzx.my.id/api/m/textpro?url=https://textpro.me/create-artistic-3d-text-effects-from-corn-kernels-1177.html&text=${encodeURIComponent(text)}`;
             
-            await Ridzcoder.sendMessage(m.chat, {
+            await ridzcoder.sendMessage(m.chat, {
                 image: { url: apiUrl },
                 caption: `> ${global.wm}`
             }, { quoted: m });
@@ -875,7 +875,7 @@ module.exports = [
 },
 {
     command: ["glossysilver", "silvertext", "silverfx"],
-    operate: async ({ Ridzcoder, m, reply, args, prefix }) => {
+    operate: async ({ ridzcoder, m, reply, args, prefix }) => {
         const text = args.join(" ");
         if (!text) return reply(`*Example: ${prefix}glossysilver Ridz coder*`);
         
@@ -888,7 +888,7 @@ module.exports = [
             const response = await axios.get(apiUrl);
             
             if (response.data && response.data.success && response.data.result && response.data.result.image_url) {
-                await Ridzcoder.sendMessage(m.chat, {
+                await ridzcoder.sendMessage(m.chat, {
                     image: { url: response.data.result.image_url },
                     caption: `> ${global.wm}`
                 }, { quoted: m });
@@ -903,7 +903,7 @@ module.exports = [
 },
 {
     command: ["underwater", "watertext", "underwaterfx"],
-    operate: async ({ Ridzcoder, m, reply, args, prefix }) => {
+    operate: async ({ ridzcoder, m, reply, args, prefix }) => {
         const text = args.join(" ");
         if (!text) return reply(`*Example: ${prefix}underwater Ridz coder*`);
         
@@ -916,7 +916,7 @@ module.exports = [
             const response = await axios.get(apiUrl);
             
             if (response.data && response.data.success && response.data.result && response.data.result.image_url) {
-                await Ridzcoder.sendMessage(m.chat, {
+                await ridzcoder.sendMessage(m.chat, {
                     image: { url: response.data.result.image_url },
                     caption: `> ${global.wm}`
                 }, { quoted: m });
