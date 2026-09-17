@@ -7,7 +7,7 @@ const axios = require('axios');
 module.exports = [
     {
         command: ['shazam', 'identifymusic', 'musicid'],
-        operate: async ({ kelvin, m, reply, quoted, acr, mime }) => {
+        operate: async ({ ridzcoder, m, reply, quoted, acr, mime }) => {
             
             if (!quoted || !/audio|video/.test(mime)) {
                 return reply("Reply to an audio or video to identify music.");
@@ -42,7 +42,7 @@ module.exports = [
     },
         {
         command: ['ytsearch', 'youtubesearch', 'yts'],
-        operate: async ({ kelvin, m, reply, text, prefix, command }) => {
+        operate: async ({ ridzcoder, m, reply, text, prefix, command }) => {
             if (!text) return reply(`📌 *Example: ${prefix + command} Eminem Godzilla*`);
 
             try {
@@ -54,7 +54,7 @@ module.exports = [
                     responseText += `□ *${index + 1}.* ${video.title}\n□ *Uploaded:* ${video.ago}\n□ *Views:* ${video.views}\n□ *Duration:* ${video.timestamp}\n□ *URL:* ${video.url}\n\n─────────────────\n\n`;
                 });
 
-                await kelvin.sendMessage(
+                await ridzcoder.sendMessage(
                     m.chat,
                     { image: { url: searchResults.all[0].thumbnail }, caption: responseText },
                     { quoted: m }
@@ -67,7 +67,7 @@ module.exports = [
     },
     {
   command: ['yts2', 'ytsearch2', 'youtubesearch2'],
-  operate: async ({ m, reply, args, kelvin }) => {
+  operate: async ({ m, reply, args, ridzcoder }) => {
     const query = args.join(' ');
     
     if (!query) return reply("*Please provide a search term. Example: `.yts2 JEXPLOIT-BOT*`");
@@ -105,7 +105,7 @@ module.exports = [
 },
         {
         command: ['imdb', 'movie'],
-        operate: async ({ kelvin, m, reply, text }) => {
+        operate: async ({ ridzcoder, m, reply, text }) => {
             if (!text) return reply("Provide a movie or series name.");
             
             try {
@@ -118,7 +118,7 @@ module.exports = [
                     + `*Director:* ${data.Director}\n*Actors:* ${data.Actors}\n*Plot:* ${data.Plot}\n`
                     + `*IMDB Rating:* ${data.imdbRating} ⭐\n*Votes:* ${data.imdbVotes}`;
 
-                kelvin.sendMessage(m.chat, { image: { url: data.Poster }, caption: imdbText }, { quoted: m });
+                ridzcoder.sendMessage(m.chat, { image: { url: data.Poster }, caption: imdbText }, { quoted: m });
             } catch (error) {
                 reply("❌ Unable to fetch IMDb data.");
             }
@@ -126,7 +126,7 @@ module.exports = [
     },
 {
         command: ['apksearch', 'playstore', 'searchapp'],
-        operate: async ({ kelvin, m, reply, args, prefix }) => {
+        operate: async ({ ridzcoder, m, reply, args, prefix }) => {
             const query = args.join(" ");
             if (!query) return reply(`Example: ${prefix}apksearch WhatsApp`);
 
@@ -163,7 +163,7 @@ module.exports = [
  
 {
     command: ['lyrics', 'lyric'],
-    operate: async ({ kelvin, m, reply, text, prefix }) => {
+    operate: async ({ ridzcoder, m, reply, text, prefix }) => {
        if (!text) {
             return reply(`🎵 *Lyrics Finder*\n\nUsage: ${prefix}lyrics <song name>\n\nExamples:\n• ${prefix}lyrics shape of you\n• ${prefix}lyrics Sekkle down by bunnie Gunter\n• ${prefix}lyrics Blinding Lights The Weeknd`);
         }
@@ -209,7 +209,7 @@ module.exports = [
             // Send image first if available
             if (image && typeof image === 'string' && image.includes('http') && !image.includes('default_cover_image')) {
                 try {
-                    await kelvin.sendMessage(m.chat, {
+                    await ridzcoder.sendMessage(m.chat, {
                         image: { url: image },
                         caption: `🎵 *${title}*\n🎤 *Artist:* ${artist}`
                     }, { quoted: m });
@@ -222,7 +222,7 @@ module.exports = [
             }
 
             // Send lyrics
-            await kelvin.sendMessage(m.chat, { text: message }, { quoted: m });
+            await ridzcoder.sendMessage(m.chat, { text: message }, { quoted: m });
 
         } catch (error) {
             console.error('Lyrics error:', error);
@@ -270,7 +270,7 @@ module.exports = [
     },
         {
         command: ['weather'],
-        operate: async ({ reply, m, kelvin, text }) => {
+        operate: async ({ reply, m, ridzcoder, text }) => {
             if (!text) return reply("Provide a location.");
             
             try {
@@ -283,7 +283,7 @@ module.exports = [
                     + `📍 *Coordinates:* ${data.coord.lat}, ${data.coord.lon}\n`
                     + `🌍 *Country:* ${data.sys.country}`;
 
-                kelvin.sendMessage(m.chat, { text: weatherInfo }, { quoted: m });
+                ridzcoder.sendMessage(m.chat, { text: weatherInfo }, { quoted: m });
             } catch (error) {
                 reply("❌ Unable to fetch weather data.");
             }
@@ -329,7 +329,7 @@ module.exports = [
 },
 {
   command: ['imagesearch', 'imgsearch', 'image', 'img'],
-  operate: async ({ m, reply, args, kelvin }) => {
+  operate: async ({ m, reply, args, ridzcoder }) => {
     const query = args.join(' ');
     
     if (!query) return reply("*Please provide a search term. Example: `.imagesearch dog*`");
@@ -359,7 +359,7 @@ module.exports = [
       // Send first 2 images
       for (let i = 0; i < Math.min(2, uniqueUrls.length); i++) {
         const img = uniqueUrls[i];
-        await kelvin.sendMessage(m.chat, {
+        await ridzcoder.sendMessage(m.chat, {
           image: { url: img.url },
           caption: `*📸 Image ${i + 1}*\n ${img.width} x ${img.height}`
         }, { quoted: m });
@@ -377,7 +377,7 @@ module.exports = [
 },
         {
         command: ['define'],
-        operate: async ({ kelvin, mek, m, reply, text, q }) => {
+        operate: async ({ ridzcoder, mek, m, reply, text, q }) => {
         try {
         if (!q) return reply("Please provide a word to define.\n\n📌 *Usage:* .define [word]");
 
@@ -403,7 +403,7 @@ module.exports = [
 > ${global.wm}`;
 
         if (audio) {
-            await kelvin.sendMessage(from, { audio: { url: audio }, mimetype: 'audio/mpeg' }, { quoted: mek });
+            await ridzcoder.sendMessage(from, { audio: { url: audio }, mimetype: 'audio/mpeg' }, { quoted: mek });
         }
 
         return reply(wordInfo);
@@ -418,7 +418,7 @@ module.exports = [
 },
 {
         command: ['news'],
-        operate: async ({ kelvin, mek, m, from, reply, text, q }) => {
+        operate: async ({ ridzcoder, mek, m, from, reply, text, q }) => {
         try {
         const apiKey="0f2c43ab11324578a7b1709651736382";
         const response = await axios.get(`https://newsapi.org/v2/top-headlines?country=us&apiKey=${apiKey}`);
@@ -441,10 +441,10 @@ module.exports = [
 
             if (article.urlToImage) {
                 // Send image with caption
-                await kelvin.sendMessage(from, { image: { url: article.urlToImage }, caption: message });
+                await ridzcoder.sendMessage(from, { image: { url: article.urlToImage }, caption: message });
             } else {
                 
-                await kelvin.sendMessage(from, { text: message });
+                await ridzcoder.sendMessage(from, { text: message });
             }
         };
     } catch (e) {
@@ -455,7 +455,7 @@ module.exports = [
 },
 {
         command: ['searchrepo', 'srepo'],
-        operate: async ({ kelvin, mek, m, args, store, from, reply, text, q }) => {
+        operate: async ({ ridzcoder, mek, m, args, store, from, reply, text, q }) => {
         try {
     const repoName = args.join(" ");
     if (!repoName) {
@@ -475,7 +475,7 @@ module.exports = [
     responseMsg += `*Created At*: ${new Date(data.created_at).toLocaleDateString()}\n`;
     responseMsg += `\n> ${global.wm}`;
 
-    await kelvin.sendMessage(from, { text: responseMsg }, { quoted: m });
+    await ridzcoder.sendMessage(from, { text: responseMsg }, { quoted: m });
   } catch (error) {
     console.error("GitHub API Error:", error);
     reply(`❌ Error fetching repository data: ${error.response?.data?.message || error.message}`);
@@ -484,7 +484,7 @@ module.exports = [
 },
 {
         command: ['ytstalk'],
-        operate: async ({ kelvin, mek, m, args, reply, from, text, q }) => {
+        operate: async ({ ridzcoder, mek, m, args, reply, from, text, q }) => {
         try {
     const username = args.join(" ");
     if (!username) {
@@ -530,7 +530,7 @@ ${index + 1}. *${video.title}*
     `;
 
 
-    await kelvin.sendMessage(from, {
+    await ridzcoder.sendMessage(from, {
       image: { url: avatarUrl }, 
       caption: ytMessage, 
     });
@@ -542,13 +542,13 @@ ${index + 1}. *${video.title}*
 },
 {
         command: ['twitterstalk', 'xstalk'],
-        operate: async ({ kelvin, mek, m, q, reply, from, text }) => {
+        operate: async ({ ridzcoder, mek, m, q, reply, from, text }) => {
         try {
     if (!q) {
       return reply("Please provide a valid Twitter/X username.");
     }
 
-    await kelvin.sendMessage(from, {
+    await ridzcoder.sendMessage(from, {
       react: { text: "⏳", key: m.key }
     });
 
@@ -574,7 +574,7 @@ ${index + 1}. *${video.title}*
       + `╰━━━⪼\n\n`
       + `🔹 > ${global.wm}`;
 
-    await kelvin.sendMessage(from, {
+    await ridzcoder.sendMessage(from, {
       image: { url: user.avatar },
       caption: caption
     }, { quoted: m });
@@ -587,7 +587,7 @@ ${index + 1}. *${video.title}*
 },
 {
     command: ['iguser', 'igprofile', 'instagramuser'],
-    operate: async ({ m, reply, args, kelvin }) => {
+    operate: async ({ m, reply, args, ridzcoder }) => {
         const username = args[0];
         
         if (!username) return reply("*Please provide an Instagram username. Example: `.iguser siputzx_*`");
@@ -616,7 +616,7 @@ ${index + 1}. *${video.title}*
             message += `✅ *Verified:* ${user.is_verified ? 'Yes' : 'No'}\n\n`;
             
             if (user.profile_pic_url) {
-                await kelvin.sendMessage(m.chat, {
+                await ridzcoder.sendMessage(m.chat, {
                     image: { url: user.profile_pic_url },
                     caption: message
                 }, { quoted: m });
@@ -624,12 +624,12 @@ ${index + 1}. *${video.title}*
                 reply(message);
             }
             
-            await kelvin.sendMessage(m.chat, { react: { text: "✅", key: m.key } });
+            await ridzcoder.sendMessage(m.chat, { react: { text: "✅", key: m.key } });
             
         } catch (error) {
             console.error('Instagram user error:', error);
             reply("❌ Error fetching Instagram profile. Try again later.");
-            await kelvin.sendMessage(m.chat, { react: { text: "❌", key: m.key } });
+            await ridzcoder.sendMessage(m.chat, { react: { text: "❌", key: m.key } });
         }
     }
 }
