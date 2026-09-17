@@ -4,7 +4,7 @@ const fg = require('api-dylux')
 const path = require('path');
 const fetch = require('node-fetch');
 const yts = require('yt-search');
-const { KelvinVideo } = require('../start/ridzcmd/video');
+const { ridzVideo } = require('../start/ridzcmd/video');
 const {  } = require('../start/lib/myfunction');
 const { 
     playCommand, 
@@ -23,7 +23,7 @@ module.exports = [
 
 {
     command: ['song', 'music', 'audio'],
-    operate: async ({ Ridzcoder, m, reply, args, prefix }) => {
+    operate: async ({ ridzcoder, m, reply, args, prefix }) => {
         const query = args.join(" ");
         if (!query) return reply(`Example: ${prefix}song Faded`);
 
@@ -38,7 +38,7 @@ module.exports = [
                     return reply(`No audio found for "${query}"`);
                 }
                 
-                await Ridzcoder.sendMessage(m.chat, {
+                await ridzcoder.sendMessage(m.chat, {
                     audio: { url: audio.download_url },
                     mimetype: 'audio/mpeg',
                     fileName: `${title.replace(/[^\w\s]/gi, '')}.mp3`,
@@ -56,7 +56,7 @@ module.exports = [
 },
 {
     command: ['play2',],
-    operate: async ({ Ridzcoder, m, reply, text, prefix,  mess, command }) => {
+    operate: async ({ ridzcoder, m, reply, text, prefix,  mess, command }) => {
         
         if (!text) return reply("*Please provide a song name!*\nExample: `.play2 despacito`");
         
@@ -68,7 +68,7 @@ module.exports = [
             }
             
             // React with 🎵 emoji
-            await Ridzcoder.sendMessage(m.chat, {
+            await ridzcoder.sendMessage(m.chat, {
                 react: {
                     text: "🎵",
                     key: m.key
@@ -88,7 +88,7 @@ module.exports = [
             // Send video info before download
             await reply("⏳ *Searching and downloading audio... Please wait*");
             
-            await Ridzcoder.sendMessage(m.chat, {
+            await ridzcoder.sendMessage(m.chat, {
                 image: { url: video.thumbnail },
                 caption: `*${video.title}*\n⏱ *Duration:* ${video.timestamp}\n👁 *Views:* ${video.views.toLocaleString()}\n\n⏳ *Downloading audio...*`
             }, { quoted: m });
@@ -111,7 +111,7 @@ module.exports = [
             }
             
             // Send the audio file
-            await Ridzcoder.sendMessage(m.chat, {
+            await ridzcoder.sendMessage(m.chat, {
                 audio: { url: audioUrl },
                 mimetype: "audio/mpeg",
                 fileName: `${title.replace(/[^\w\s]/gi, '')}.mp3`,
@@ -126,13 +126,13 @@ module.exports = [
 },
 {
         command: ['play'],
-        operate: async ({ Ridzcoder, m, reply, args, text }) => {
-            await playCommand(Ridzcoder, m.chat, m, args);
+        operate: async ({ ridzcoder, m, reply, args, text }) => {
+            await playCommand(ridzcoder, m.chat, m, args);
         }
     },
 {
     command: ['play3'],
-    operate: async ({ Ridzcoder, m, reply, args, prefix }) => {
+    operate: async ({ ridzcoder, m, reply, args, prefix }) => {
         const query = args.join(" ");
         if (!query) return reply(`Example: ${prefix}play3 Faded`);
 
@@ -149,7 +149,7 @@ module.exports = [
                 
                 const caption = `*${title}*\n⏱ ${duration} | 👁 ${views?.toLocaleString()} | 📅 ${published}`;
                 
-                await Ridzcoder.sendMessage(m.chat, {
+                await ridzcoder.sendMessage(m.chat, {
                     audio: { url: download_url },
                     mimetype: 'audio/mpeg',
                     fileName: `${title.replace(/[^\w\s]/gi, '')}.mp3`,
@@ -168,7 +168,7 @@ module.exports = [
 },
 {
   command: ['instadl', 'igdl', 'instagramdl', 'reeldl'],
-  operate: async ({ m, reply, args, Ridzcoder }) => {
+  operate: async ({ m, reply, args, ridzcoder }) => {
     const url = args[0];
     
     if (!url) return reply("*Please provide an Instagram URL.*`");
@@ -183,7 +183,7 @@ module.exports = [
       
       const videoUrl = data.result;
       
-      await Ridzcoder.sendMessage(m.chat, {
+      await ridzcoder.sendMessage(m.chat, {
         video: { url: videoUrl },
         caption: "✅ *Instagram Video Downloaded*",
       }, { quoted: m });
@@ -196,7 +196,7 @@ module.exports = [
 },
 {
     command: ['mediafire', 'mf', 'mfdl'],
-    operate: async ({ Ridzcoder, m, reply, args, prefix }) => {
+    operate: async ({ ridzcoder, m, reply, args, prefix }) => {
         const url = args[0];
         
         if (!url) return reply(`*Please provide mediafire url!*`);
@@ -212,7 +212,7 @@ module.exports = [
             if (response.data?.success && response.data?.result) {
                 const { downloadUrl, fileName } = response.data.result;
                 
-                await Ridzcoder.sendMessage(m.chat, {
+                await ridzcoder.sendMessage(m.chat, {
                     document: { url: downloadUrl },
                     fileName: fileName
                 }, { quoted: m });
@@ -228,7 +228,7 @@ module.exports = [
 },
 {
     command: ['ytmp3'],
-    operate: async ({ Ridzcoder, m, reply, text, prefix, command }) => {
+    operate: async ({ ridzcoder, m, reply, text, prefix, command }) => {
         if (!text) return reply(`📌 Example: ${prefix + command} shape of you or ${prefix + command} https://youtube.com/watch?v=...`);
         
         await reply("🎵 Fetching audio...");
@@ -246,23 +246,23 @@ module.exports = [
                 return reply("❌ Couldn't get audio. Try a different song or URL.");
             }
             
-            await Ridzcoder.sendMessage(m.chat, {
+            await ridzcoder.sendMessage(m.chat, {
                 audio: { url: data.result },
                 mimetype: "audio/mpeg"
             }, { quoted: m });
             
-            await Ridzcoder.sendMessage(m.chat, { react: { text: "✅", key: m.key } });
+            await ridzcoder.sendMessage(m.chat, { react: { text: "✅", key: m.key } });
             
         } catch (error) {
             console.error('Song error:', error);
             reply("❌ Error fetching audio");
-            await Ridzcoder.sendMessage(m.chat, { react: { text: "❌", key: m.key } });
+            await ridzcoder.sendMessage(m.chat, { react: { text: "❌", key: m.key } });
         }
     }
 },
     {
         command: ['song2',  'music'],
-        operate: async ({ Ridzcoder, m, reply, text, fetchMp3DownloadUrl }) => {
+        operate: async ({ ridzcoder, m, reply, text, fetchMp3DownloadUrl }) => {
             if (!text) return reply('*Please provide a song name!*');
 
             try {
@@ -272,7 +272,7 @@ module.exports = [
                 const video = search.all[0];
                 const downloadUrl = await fetchMp3DownloadUrl(video.url);
 
-                await Ridzcoder.sendMessage(m.chat, {
+                await ridzcoder.sendMessage(m.chat, {
                     audio: { url: downloadUrl },
                     mimetype: 'audio/mpeg',
                     fileName: `${video.title}.mp3`
@@ -286,7 +286,7 @@ module.exports = [
     },
     {
         command: ['gitclone', 'githubclone', 'gitdl'],
-        operate: async ({ Ridzcoder, m, reply, args, text }) => {
+        operate: async ({ ridzcoder, m, reply, args, text }) => {
             if (!text) return reply("*Please provide gitHub repository link*");
             
             let regex = /(?:https|git)(?::\/\/|@)github\.com[\/:]([^\/:]+)\/(.+)/i;
@@ -299,7 +299,7 @@ module.exports = [
                 
                 let filename = (await fetch(url, {method: 'HEAD'})).headers.get('content-disposition').match(/attachment; filename=(.*)/)[1];
                 
-                Ridzcoder.sendMessage(m.chat, { 
+                ridzcoder.sendMessage(m.chat, { 
                     document: { url: url }, 
                     mimetype: 'application/zip', 
                     fileName: `${filename}`
@@ -312,7 +312,7 @@ module.exports = [
     },
     {
         command: ['download', 'dl', 'filedownload'],
-        operate: async ({ Ridzcoder, m, reply, text }) => {
+        operate: async ({ ridzcoder, m, reply, text }) => {
             if (!text) return reply('Enter download URL');
             
             try {
@@ -352,7 +352,7 @@ module.exports = [
                         mimeType = 'application/octet-stream';
                 }
 
-                Ridzcoder.sendMessage(m.chat, { 
+                ridzcoder.sendMessage(m.chat, { 
                     document: Buffer.from(buffer), 
                     mimetype: mimeType, 
                     fileName: filename 
@@ -365,7 +365,7 @@ module.exports = [
     },
     {
         command: ['gdrive', 'googledrive', 'gdrivedl'],
-        operate: async ({ Ridzcoder, m, reply, text }) => {
+        operate: async ({ ridzcoder, m, reply, text }) => {
             if (!text) return reply("*Please provide a Google Drive file URL*");
 
             try {
@@ -390,7 +390,7 @@ module.exports = [
                 fileResponse.data.pipe(writer);
 
                 writer.on('finish', async () => {
-                    await Ridzcoder.sendMessage(m.chat, {
+                    await ridzcoder.sendMessage(m.chat, {
                         document: fs.readFileSync(filePath),
                         fileName: data.data.name,
                         mimetype: fileResponse.headers['content-type'] || 'application/octet-stream'
@@ -412,7 +412,7 @@ module.exports = [
     },
     {
         command: ['savestatus', 'save', 'savestatis'],
-        operate: async ({ Ridzcoder, m, saveStatusMessage }) => {
+        operate: async ({ ridzcoder, m, saveStatusMessage }) => {
           
                 await saveStatusMessage(m);
             
@@ -420,7 +420,7 @@ module.exports = [
     },
     {
         command: ['ringtone', 'rtone', 'ringtones'],
-        operate: async ({ Ridzcoder, m, reply, args, from }) => {
+        operate: async ({ ridzcoder, m, reply, args, from }) => {
             try {
                 const query = args.join(" ");
                 if (!query) {
@@ -435,7 +435,7 @@ module.exports = [
 
                 const randomRingtone = data.result[Math.floor(Math.random() * data.result.length)];
 
-                await Ridzcoder.sendMessage(
+                await ridzcoder.sendMessage(
                     from,
                     {
                         audio: { url: randomRingtone.dl_link },
@@ -452,7 +452,7 @@ module.exports = [
     },
     {
         command: ['playdoc', 'songdoc', 'musicdoc'],
-        operate: async ({ Ridzcoder, m, reply, text, fetchMp3DownloadUrl }) => {
+        operate: async ({ ridzcoder, m, reply, text, fetchMp3DownloadUrl }) => {
             if (!text) return reply('*Please provide a song name!*');
 
             try {
@@ -462,7 +462,7 @@ module.exports = [
                 const video = search.all[0];
                 const downloadUrl = await fetchMp3DownloadUrl(video.url);
 
-                await Ridzcoder.sendMessage(m.chat, {
+                await ridzcoder.sendMessage(m.chat, {
                     document: { url: downloadUrl },
                     mimetype: 'audio/mpeg',
                     fileName: `${video.title}.mp3`
@@ -476,7 +476,7 @@ module.exports = [
     },
     {
         command: ['itunes', 'applemusic', 'apple'],
-        operate: async ({ Ridzcoder, m, reply, text }) => {
+        operate: async ({ ridzcoder, m, reply, text }) => {
             if (!text) return reply("*Please provide a song name*");
             
             try {
@@ -488,7 +488,7 @@ module.exports = [
                 let songInfo = `*Song Information:*\n\n• *Name:* ${json.name}\n• *Artist:* ${json.artist}\n• *Album:* ${json.album}\n• *Release Date:* ${json.release_date}\n• *Price:* ${json.price}\n• *Length:* ${json.length}\n• *Genre:* ${json.genre}\n• *URL:* ${json.url}`;
                 
                 if (json.thumbnail) {
-                    await Ridzcoder.sendMessage(
+                    await ridzcoder.sendMessage(
                         m.chat,
                         { image: { url: json.thumbnail }, caption: songInfo },
                         { quoted: m }
@@ -506,11 +506,11 @@ module.exports = [
     // TikTok command (version 1)
     {
         command: ['tiktok', 'tt'],
-        operate: async ({ Ridzcoder, m, reply, text, prefix, command, botNumber }) => {
+        operate: async ({ ridzcoder, m, reply, text, prefix, command, botNumber }) => {
             if (!text) return reply(`Use : ${prefix + command} link`)
             
             try {
-                await Ridzcoder.sendMessage(m.chat, { react: { text: "⏳", key: m.key } });
+                await ridzcoder.sendMessage(m.chat, { react: { text: "⏳", key: m.key } });
                 
                 let data = await fg.tiktok(text);
                 let json = data.result;
@@ -529,28 +529,28 @@ module.exports = [
                 
                 if (json.images) {
                     json.images.forEach(async (k) => {
-                        await Ridzcoder.sendMessage(m.chat, { image: { url: k }}, { quoted: m });
+                        await ridzcoder.sendMessage(m.chat, { image: { url: k }}, { quoted: m });
                     });
                 } else {
-                    Ridzcoder.sendMessage(m.chat, { 
+                    ridzcoder.sendMessage(m.chat, { 
                         video: { url: json.play }, 
                         mimetype: 'video/mp4', 
                         caption: caption 
                     }, { quoted: m });
                     
                     setTimeout(() => {
-                        Ridzcoder.sendMessage(m.chat, { 
+                        ridzcoder.sendMessage(m.chat, { 
                             audio: { url: json.music }, 
                             mimetype: 'audio/mpeg' 
                         }, { quoted: m });
                     }, 3000);
                 }
                 
-                await Ridzcoder.sendMessage(m.chat, { react: { text: "✅", key: m.key } });
+                await ridzcoder.sendMessage(m.chat, { react: { text: "✅", key: m.key } });
                 
             } catch (error) {
                 console.error('TikTok error:', error);
-                await Ridzcoder.sendMessage(m.chat, { react: { text: "❌", key: m.key } });
+                await ridzcoder.sendMessage(m.chat, { react: { text: "❌", key: m.key } });
                 reply('❌ Failed to download TikTok content.');
             }
         }
@@ -558,7 +558,7 @@ module.exports = [
 
    {
     command: ['facebook', 'fb', 'fbdl', 'facebookdl', 'fbvideo'],
-    operate: async ({ Ridzcoder, m, reply, text }) => {
+    operate: async ({ ridzcoder, m, reply, text }) => {
         if (!text) return reply('*Please provide a Facebook URL*');
         
         await reply('📥 Downloading...');
@@ -592,7 +592,7 @@ module.exports = [
             
             if (!videoUrl) return reply('No video download link found');
             
-            await Ridzcoder.sendMessage(m.chat, {
+            await ridzcoder.sendMessage(m.chat, {
                 video: { url: videoUrl },
                 caption: `${global.wm || ''}`,
                 contextInfo: { 
@@ -607,18 +607,18 @@ module.exports = [
                 }
             }, { quoted: m });
             
-            await Ridzcoder.sendMessage(m.chat, { react: { text: "✅", key: m.key } });
+            await ridzcoder.sendMessage(m.chat, { react: { text: "✅", key: m.key } });
             
         } catch (error) {
             console.error('Facebook error:', error);
             reply(`❌ Error: ${error.message}`);
-            await Ridzcoder.sendMessage(m.chat, { react: { text: "❌", key: m.key } });
+            await ridzcoder.sendMessage(m.chat, { react: { text: "❌", key: m.key } });
         }
     }
 },
 {
     command: ['twitter', 'tw', 'x'],
-    operate: async ({ Ridzcoder, m, reply, args, prefix }) => {
+    operate: async ({ ridzcoder, m, reply, args, prefix }) => {
         const url = args[0];
         
         if (!url) return reply(`*Please provide twitter URL!*`);
@@ -639,7 +639,7 @@ module.exports = [
                     return reply('No video found in this tweet.');
                 }
                 
-                await Ridzcoder.sendMessage(m.chat, {
+                await ridzcoder.sendMessage(m.chat, {
                     video: { url: videoUrl },
                     caption: response.data.description || 'Twitter Video'
                 }, { quoted: m });
@@ -655,7 +655,7 @@ module.exports = [
 },
 {
     command: ['tiktok2'],
-    operate: async ({ Ridzcoder, m, reply, args, prefix }) => {
+    operate: async ({ ridzcoder, m, reply, args, prefix }) => {
         const url = args[0];
         
         if (!url) return reply(`*Please provide tiktok video url!*`);
@@ -672,7 +672,7 @@ module.exports = [
                 const videoUrl = response.data.result.video;
                 const caption = `> ${global.wm || 'Vesper-Xmd'}`;
                 
-                await Ridzcoder.sendMessage(m.chat, {
+                await ridzcoder.sendMessage(m.chat, {
                     video: { url: videoUrl },
                     caption: caption
                 }, { quoted: m });
@@ -688,15 +688,15 @@ module.exports = [
 },
     {
         command: ['tiktokaudio', 'tta'],
-        operate: async ({ Ridzcoder, m, reply, args, fetchJson }) => {
+        operate: async ({ ridzcoder, m, reply, args, fetchJson }) => {
             if (!args[0]) return reply('*Please provide a TikTok audio url!*');
             
             try {
-                await Ridzcoder.sendMessage(m.chat, { react: { text: "⏳", key: m.key } });
+                await ridzcoder.sendMessage(m.chat, { react: { text: "⏳", key: m.key } });
                 
                 let apiUrl = await fetchJson(`https://api-aswin-sparky.koyeb.app/api/downloader/tiktok?url=${args[0]}`);
                 
-                await Ridzcoder.sendMessage(
+                await ridzcoder.sendMessage(
                     m.chat,
                     {
                         audio: { url: apiUrl.data.audio },
@@ -706,18 +706,18 @@ module.exports = [
                     { quoted: m }
                 );
                 
-                await Ridzcoder.sendMessage(m.chat, { react: { text: "✅", key: m.key } });
+                await ridzcoder.sendMessage(m.chat, { react: { text: "✅", key: m.key } });
                 
             } catch (error) {
                 console.error(error);
-                await Ridzcoder.sendMessage(m.chat, { react: { text: "❌", key: m.key } });
+                await ridzcoder.sendMessage(m.chat, { react: { text: "❌", key: m.key } });
                 reply(global.mess?.error || "*Failed to download TikTok audio*");
             }
         }
     },
    {
     command: ['ytmp4', 'ytv'],
-    operate: async ({ Ridzcoder, m, reply, text }) => {
+    operate: async ({ ridzcoder, m, reply, text }) => {
         if (!text) return reply('.ytmp4 <YouTube URL>');
         
         try {
@@ -728,7 +728,7 @@ module.exports = [
             const data = res.data;
             
             if (data.status && data.result) {
-                await Ridzcoder.sendMessage(m.chat, {
+                await ridzcoder.sendMessage(m.chat, {
                     video: { url: data.result },
                     caption: `📹 *YouTube Video*\n\n${global.wm || ''}`
                 }, { quoted: m });
@@ -744,14 +744,14 @@ module.exports = [
 },
 {
     command: ['video', 'videoplay', 'ytmp4'],
-    operate: async ({ Ridzcoder, m, reply, text, prefix, mess, fetchVideoDownloadUrl }) => {
+    operate: async ({ ridzcoder, m, reply, text, prefix, mess, fetchVideoDownloadUrl }) => {
         
         if (!text) return reply("*Please provide a song or video URL*");
         
         try {
             const searchQuery = text.trim();
             
-            await Ridzcoder.sendMessage(m.chat, {
+            await ridzcoder.sendMessage(m.chat, {
                 react: { text: "🎬", key: m.key }
             });
             
@@ -765,7 +765,7 @@ module.exports = [
             
             await reply("⏳ *Searching and downloading video... Please wait*");
             
-            await Ridzcoder.sendMessage(m.chat, {
+            await ridzcoder.sendMessage(m.chat, {
                 image: { url: video.thumbnail },
                 caption: `*${video.title}*\n⏱ *Duration:* ${video.timestamp}\n👁 *Views:* ${video.views.toLocaleString()}\n\n⏳ *Downloading video...*`
             }, { quoted: m });
@@ -777,20 +777,20 @@ module.exports = [
                 return reply("🚫 *Failed to fetch video. Try again later.*");
             }
             
-            await Ridzcoder.sendMessage(m.chat, {
+            await ridzcoder.sendMessage(m.chat, {
                 video: { url: videoDownloadUrl },
                 mimetype: "video/mp4",
                 fileName: `${video.title.replace(/[^\w\s]/gi, "")}.mp4`,
                 caption: `🎬 *${video.title}*\n⏱ *Duration:* ${video.timestamp}`
             }, { quoted: m });
             
-            await Ridzcoder.sendMessage(m.chat, {
+            await ridzcoder.sendMessage(m.chat, {
                 react: { text: "✅", key: m.key }
             });
             
         } catch (error) {
             console.error('Error in video command:', error);
-            await Ridzcoder.sendMessage(m.chat, {
+            await ridzcoder.sendMessage(m.chat, {
                 react: { text: "❌", key: m.key }
             });
             reply("❌ *Download failed. Please try again later.*");
@@ -799,7 +799,7 @@ module.exports = [
 },
 {
     command: ['video2'],
-    operate: async ({ Ridzcoder, m, reply, args, prefix }) => {
+    operate: async ({ ridzcoder, m, reply, args, prefix }) => {
         const query = args.join(" ");
         if (!query) return reply(`Example: ${prefix}video3 Gata Only`);
 
@@ -817,7 +817,7 @@ module.exports = [
                 
                 const caption = `*${title}*\n⏱ ${duration} | 👁 ${views?.toLocaleString()} | 📅 ${published}`;
                 
-                await Ridzcoder.sendMessage(m.chat, {
+                await ridzcoder.sendMessage(m.chat, {
                     video: { url: video.download_url },
                     mimetype: 'video/mp4',
                     fileName: `${title.replace(/[^\w\s]/gi, '')}.mp4`,
@@ -836,7 +836,7 @@ module.exports = [
 },
 {
   command: ['pindl', 'pinterestdl', 'pindownload'],
-  operate: async ({ m, reply, args, Ridzcoder }) => {
+  operate: async ({ m, reply, args, ridzcoder }) => {
     const url = args[0];
     
     if (!url) return reply("*Please provide a Pinterest URL. Example: `.pindl https://pin.it/1zdlg6EPT*`");
@@ -853,7 +853,7 @@ module.exports = [
       
       // If it's a video
       if (video) {
-        await Ridzcoder.sendMessage(m.chat, {
+        await ridzcoder.sendMessage(m.chat, {
           video: { url: video },
           caption: "✅ *Pinterest Video Downloaded*",
           thumbnail: { url: thumb }
@@ -861,7 +861,7 @@ module.exports = [
       }
       // If it's an image
       else if (image) {
-        await Ridzcoder.sendMessage(m.chat, {
+        await ridzcoder.sendMessage(m.chat, {
           image: { url: image },
           caption: "✅ *Pinterest Image Downloaded*"
         }, { quoted: m });
@@ -878,7 +878,7 @@ module.exports = [
 },
 {
   command: ['instaposts', 'igposts', 'instagramposts'],
-  operate: async ({ m, reply, args, Ridzcoder }) => {
+  operate: async ({ m, reply, args, ridzcoder }) => {
     const query = args.join(' ');
     
     if (!query) return reply("*Please provide a search term. Example: `.instaposts ronaldo*`");
@@ -916,7 +916,7 @@ module.exports = [
 },
 {
     command: ['spotify', 'sp', 'spotifydl'],
-    operate: async ({ Ridzcoder, m, reply, args, prefix }) => {
+    operate: async ({ ridzcoder, m, reply, args, prefix }) => {
         const url = args[0];
         
         if (!url) return reply(`Example: ${prefix}spotify https://open.spotify.com/track/xxxxx`);
@@ -935,13 +935,13 @@ module.exports = [
                 const caption = `🎵 ${title}\n> ${global.wm || 'Vesper-Xmd'}`;
                 
                 if (thumbnail) {
-                    await Ridzcoder.sendMessage(m.chat, {
+                    await ridzcoder.sendMessage(m.chat, {
                         image: { url: thumbnail },
                         caption: caption
                     }, { quoted: m });
                 }
                 
-                await Ridzcoder.sendMessage(m.chat, {
+                await ridzcoder.sendMessage(m.chat, {
                     audio: { url: DownloadLink },
                     mimetype: 'audio/mpeg',
                     fileName: `${title}.mp3`
@@ -958,7 +958,7 @@ module.exports = [
 },
 {
   command: ['capcut', 'cc', 'capcutdl'],
-  operate: async ({ m, reply, args, Ridzcoder }) => {
+  operate: async ({ m, reply, args, ridzcoder }) => {
     const url = args[0];
     
     if (!url) return reply("*Please provide a CapCut template URL.*`");
@@ -975,19 +975,19 @@ module.exports = [
       
       const { title, originalVideoUrl, authorName } = data.data;
       
-      await Ridzcoder.sendMessage(m.chat, {
+      await ridzcoder.sendMessage(m.chat, {
         video: { url: originalVideoUrl },
         caption: `📹 *CapCut Template*\n📝 ${title || 'No title'}\n👤 By: ${authorName || 'Unknown'}\n\n> ${global.wm || ''}`
       }, { quoted: m });
       
-      await Ridzcoder.sendMessage(m.chat, { 
+      await ridzcoder.sendMessage(m.chat, { 
         react: { text: "✅", key: m.key } 
       });
       
     } catch (error) {
       console.error('CapCut download error:', error);
       reply("*Error downloading CapCut template. Try again later.*");
-      await Ridzcoder.sendMessage(m.chat, { 
+      await ridzcoder.sendMessage(m.chat, { 
         react: { text: "❌", key: m.key } 
       });
     }
@@ -995,7 +995,7 @@ module.exports = [
 },
 {
     command: ['apkdl', 'apk', 'downloadapk'],
-    operate: async ({ Ridzcoder, m, reply, args, prefix }) => {
+    operate: async ({ ridzcoder, m, reply, args, prefix }) => {
         const appName = args.join(" ");
         
         if (!appName) return reply(`Example: ${prefix}apkdl Apk Editor`);
@@ -1009,13 +1009,13 @@ module.exports = [
                 const { name, icon, downloadLink } = response.data.apk;
                 
                 if (icon) {
-                    await Ridzcoder.sendMessage(m.chat, {
+                    await ridzcoder.sendMessage(m.chat, {
                         image: { url: icon },
                         caption: name
                     }, { quoted: m });
                 }
                 
-                await Ridzcoder.sendMessage(m.chat, {
+                await ridzcoder.sendMessage(m.chat, {
                     document: { url: downloadLink },
                     mimetype: 'application/vnd.android.package-archive'
                 }, { quoted: m });
