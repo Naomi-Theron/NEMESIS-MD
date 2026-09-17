@@ -12,12 +12,12 @@ claudeAICommand
 module.exports = [
     {
         command: ['generate', 'genimage', 'aiimage'],
-        operate: async ({ Ridzcoder, m, reply, text }) => {
+        operate: async ({ ridzcoder, m, reply, text }) => {
             if (!text) return reply(global.mess?.notext || '*Please provide text to generate image*');
             
             const apiUrl = `https://api.gurusensei.workers.dev/dream?prompt=${encodeURIComponent(text)}`;
             try {
-                await Ridzcoder.sendMessage(m.chat, { image: { url: apiUrl } }, { quoted: m });
+                await ridzcoder.sendMessage(m.chat, { image: { url: apiUrl } }, { quoted: m });
             } catch (error) {
                 console.error('Error generating image:', error);
                 reply(global.mess?.error || '*Failed to generate image*');
@@ -27,7 +27,7 @@ module.exports = [
 
 {
     command: ['copilot'],
-    operate: async ({ Ridzcoder, m, reply, args, prefix }) => {
+    operate: async ({ ridzcoder, m, reply, args, prefix }) => {
         const query = args.join(' ');
         
         if (!query) {
@@ -55,7 +55,7 @@ module.exports = [
 },
 {
     command: ['chatgpt'],
-    operate: async ({ Ridzcoder, m, reply, args, prefix }) => {
+    operate: async ({ ridzcoder, m, reply, args, prefix }) => {
         const query = args.join(' ');
         
         if (!query) {
@@ -63,7 +63,7 @@ module.exports = [
         }
 
         await reply(`⏳ *Thinking...*`);
-        await Ridzcoder.sendMessage(m.chat, { react: { text: "🤖", key: m.key } });
+        await ridzcoder.sendMessage(m.chat, { react: { text: "🤖", key: m.key } });
 
         try {
             const apiUrl = `https://api.nexray.eu.cc/ai/chatgpt?text=${encodeURIComponent(query)}`;
@@ -75,22 +75,22 @@ module.exports = [
             }
 
             await reply(data.result);
-            await Ridzcoder.sendMessage(m.chat, { react: { text: "✅", key: m.key } });
+            await ridzcoder.sendMessage(m.chat, { react: { text: "✅", key: m.key } });
 
         } catch (error) {
             console.error('ChatGPT error:', error);
-            await Ridzcoder.sendMessage(m.chat, { react: { text: "❌", key: m.key } });
+            await ridzcoder.sendMessage(m.chat, { react: { text: "❌", key: m.key } });
             reply(`❌ Error: ${error.message}`);
         }
     }
 },
     {
         command: ['gpt2', 'chatgpt'],
-        operate: async ({ Ridzcoder, m, reply, text, prefix, command }) => {
+        operate: async ({ ridzcoder, m, reply, text, prefix, command }) => {
             if (!text) return reply(`Please provide a query/question\n\nExample: ${prefix + command} what is artificial intelligence?`);
             
             try {
-                await Ridzcoder.sendPresenceUpdate('composing', m.chat);
+                await ridzcoder.sendPresenceUpdate('composing', m.chat);
                 
                 const query = encodeURIComponent(text);
                 const apiUrl = `https://api.giftedtech.co.ke/api/ai/ai?apikey=gifted&q=${query}`;
@@ -121,11 +121,11 @@ module.exports = [
     // Meta AI
     {
         command: ['metaai'],
-        operate: async ({ Ridzcoder, m, reply, text, prefix }) => {
+        operate: async ({ ridzcoder, m, reply, text, prefix }) => {
             if (!text) return reply(`❌ *Please provide a question!*\n\n📌 *Example:* ${prefix}metaai Hello, how are you?`);
 
             try {
-                await Ridzcoder.sendMessage(m.chat, { react: { text: "💭", key: m.key } });
+                await ridzcoder.sendMessage(m.chat, { react: { text: "💭", key: m.key } });
 
                 const apiUrl = `https://api.nekolabs.web.id/text-generation/ai4chat?text=${encodeURIComponent(text)}`;
                 
@@ -135,20 +135,20 @@ module.exports = [
                 if (data.success && data.result) {
                     const replyText = `🤖 *AI Response*\n\n${data.result}\n\n⏱️ *Response Time:* ${data.responseTime || 'N/A'}`;
                     
-                    await Ridzcoder.sendMessage(
+                    await ridzcoder.sendMessage(
                         m.chat,
                         { text: replyText },
                         { quoted: m }
                     );
                     
-                    await Ridzcoder.sendMessage(m.chat, { react: { text: "✅", key: m.key } });
+                    await ridzcoder.sendMessage(m.chat, { react: { text: "✅", key: m.key } });
                 } else {
                     throw new Error('No response from AI');
                 }
                 
             } catch (error) {
                 console.error('Meta AI command error:', error);
-                await Ridzcoder.sendMessage(m.chat, { react: { text: "❌", key: m.key } });
+                await ridzcoder.sendMessage(m.chat, { react: { text: "❌", key: m.key } });
                 reply('❌ *Failed to get AI response. Please try again later.*');
             }
         }
@@ -157,7 +157,7 @@ module.exports = [
     // Llama AI
     {
         command: ['llama', 'llamaai'],
-        operate: async ({ Ridzcoder, m, reply, text, q }) => {
+        operate: async ({ ridzcoder, m, reply, text, q }) => {
             const query = text || q;
             if (!query) return reply('*Please ask me something*');
             
@@ -181,7 +181,7 @@ module.exports = [
     // Blackbox AI
     {
         command: ['blackbox', 'bb'],
-        operate: async ({ Ridzcoder, m, reply, text, q }) => {
+        operate: async ({ ridzcoder, m, reply, text, q }) => {
             const query = text || q;
             if (!query) return reply('*Please ask me something*');
             
@@ -205,7 +205,7 @@ module.exports = [
     // DALL-E AI
     {
         command: ['dalle', 'luminai'],
-        operate: async ({ Ridzcoder, m, reply, text, q }) => {
+        operate: async ({ ridzcoder, m, reply, text, q }) => {
             const query = text || q;
             if (!query) return reply('*Please ask me something*');
             
@@ -229,7 +229,7 @@ module.exports = [
     // Summarize AI
     {
         command: ['summarize', 'summary'],
-        operate: async ({ Ridzcoder, m, reply, text, q }) => {
+        operate: async ({ ridzcoder, m, reply, text, q }) => {
             const query = text || q;
             if (!query) return reply('*Please ask me something*');
             
@@ -253,7 +253,7 @@ module.exports = [
     // Mistral AI
     {
         command: ['mistral', 'mistralai'],
-        operate: async ({ Ridzcoder, m, reply, text, q }) => {
+        operate: async ({ ridzcoder, m, reply, text, q }) => {
             const query = text || q;
             if (!query) return reply('❌ Ask me something');
             
@@ -269,7 +269,7 @@ module.exports = [
     },
     {
         command: ['think'],
-        operate: async ({ Ridzcoder, m, reply, text, q }) => {
+        operate: async ({ ridzcoder, m, reply, text, q }) => {
             try {
                 const query = text || q;
                 if (!query) {
@@ -283,7 +283,7 @@ module.exports = [
                 if (response.data && response.data.result) {
                     const answer = response.data.result;
                     
-                    await Ridzcoder.sendMessage(m.chat, {
+                    await ridzcoder.sendMessage(m.chat, {
                         text: `🧠 *Microsoft Copilot - Deep Thinking:*\n\n${answer}\n\n💭 *Deep analysis completed*`
                     }, { quoted: m });
                 } else {
@@ -306,49 +306,49 @@ module.exports = [
 
     {
         command: ['venice', 'vai'],
-        operate: async ({ Ridzcoder, m, reply, args, text }) => {
-            await veniceAICommand(Ridzcoder, m.chat, text, m);
+        operate: async ({ ridzcoder, m, reply, args, text }) => {
+            await veniceAICommand(ridzcoder, m.chat, text, m);
         }
     },
     {
         command: ['mistral'],
-        operate: async ({ Ridzcoder, m, reply, args, text }) => {
-            await mistralAICommand(Ridzcoder, m.chat, text, m);
+        operate: async ({ ridzcoder, m, reply, args, text }) => {
+            await mistralAICommand(ridzcoder, m.chat, text, m);
         }
     },
     {
         command: ['perplexity'],
-        operate: async ({ Ridzcoder, m, reply, args, text }) => {
-            await perplexityAICommand(Ridzcoder, m.chat, text, m);
+        operate: async ({ ridzcoder, m, reply, args, text }) => {
+            await perplexityAICommand(ridzcoder, m.chat, text, m);
         }
     },
     {
         command: ['bard'],
-        operate: async ({ Ridzcoder, m, reply, args, text }) => {
-            await bardAICommand(Ridzcoder, m.chat, text, m);
+        operate: async ({ ridzcoder, m, reply, args, text }) => {
+            await bardAICommand(ridzcoder, m.chat, text, m);
         }
     },
     {
         command: ['gpt4nano', 'gpt41nano'],
-        operate: async ({ Ridzcoder, m, reply, args, text }) => {
-            await gpt4NanoAICommand(Ridzcoder, m.chat, text, m);
+        operate: async ({ ridzcoder, m, reply, args, text }) => {
+            await gpt4NanoAICommand(ridzcoder, m.chat, text, m);
         }
     },
     {
         command: ['Ridzai'],
-        operate: async ({ Ridzcoder, m, reply, args, text }) => {
-            await RidzAICommand(Ridzcoder, m.chat, text, m);
+        operate: async ({ ridzcoder, m, reply, args, text }) => {
+            await RidzAICommand(ridzcoder, m.chat, text, m);
         }
     },
     {
         command: ['claude'],
-        operate: async ({ Ridzcoder, m, reply, args, text }) => {
-            await claudeAICommand(Ridzcoder, m.chat, text, m);
+        operate: async ({ ridzcoder, m, reply, args, text }) => {
+            await claudeAICommand(ridzcoder, m.chat, text, m);
         }
     },
     {
         command: ['gemini', 'geminai'],
-        operate: async ({ m, reply, args, Ridzcoder }) => {
+        operate: async ({ m, reply, args, ridzcoder }) => {
             const text = args.join(' ');
             
             if (!text) return reply("*Please provide a question. Example: `.gemini Explain quantum physics*`");
@@ -373,7 +373,7 @@ module.exports = [
     },
     {
         command: ['glm', 'glm47', 'glmflash'],
-        operate: async ({ m, reply, args, Ridzcoder }) => {
+        operate: async ({ m, reply, args, ridzcoder }) => {
             const text = args.join(' ');
             
             if (!text) return reply("*Please provide a question. Example: `.glm Introduction to JavaScript*`");
@@ -398,7 +398,7 @@ module.exports = [
     },
     {
         command: ['phi2', 'phiai'],
-        operate: async ({ m, reply, args, Ridzcoder }) => {
+        operate: async ({ m, reply, args, ridzcoder }) => {
             const text = args.join(' ');
             
             if (!text) return reply("*Please provide a question. Example: `.phi2 How are you*`");
