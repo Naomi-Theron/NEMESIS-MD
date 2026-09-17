@@ -743,10 +743,10 @@ case 'menu': {
     const menuImages = [Ridzcoder1, Ridzcoder2, Ridzcoder3, Ridzcoder4, Ridzcoder5];
     const randomImage = menuImages[Math.floor(Math.random() * menuImages.length)];
 
-    await clutch.sendMessage(
+    await ridzcoder.sendMessage(
         m.chat,
         {
-         image: randomImage,
+            image: randomImage,
             caption: menulist,
             contextInfo: {
                 mentionedJid: [m.sender],
@@ -772,76 +772,72 @@ case 'menu': {
     );
     break;
 }
+// ⚠️ NO extra } here — the switch continues with the next case
+case 'reloadplugins': {
+    if (!Access) return reply('Owner only command!');
+    try {
+        const pluginsDir = path.join(__dirname, 'ridzplug');
+        const count = global.pluginManager.reloadPlugins(pluginsDir);
+        reply(`✅ Reloaded ${count} plugins successfully!`);
+    } catch (error) {
+        reply(` Failed to reload plugins: ${error.message}`);
+    }
+    break;
 }
-            
-            case 'reloadplugins': {
-                if (!Access) return reply('Owner only command!');
-                try {
-                    const pluginsDir = path.join(__dirname, 'ridzplug');
-                    const count = global.pluginManager.reloadPlugins(pluginsDir);
-                    reply(`✅ Reloaded ${count} plugins successfully!`);
-                } catch (error) {
-                    reply(` Failed to reload plugins: ${error.message}`);
-                }
-                break;
-            }
-            
-            case 'plugins': {
-                if (!Access) return reply('Owner only command!');
-                const plugins = global.pluginManager.getAllPlugins();
-                let pluginList = '*LOADED PLUGINS*\n\n';
-                
-                for (const [category, pluginArray] of Object.entries(plugins)) {
-                    pluginList += `*${category.toUpperCase()}*:\n`;
-                    pluginArray.forEach(plugin => {
-                        pluginList += `• ${plugin.command[0]}`;
-                        if (plugin.command.length > 1) {
-                            pluginList += ` (${plugin.command.slice(1).join(', ')})`;
-                        }
-                        pluginList += '\n';
-                    });
-                    pluginList += '\n';
-                }
-                
-                reply(pluginList);
-                break;
-            }
-            
-            default: {
-                if (budy.startsWith('>')) {
-                    if (!Access) return;
-                    try {
-                        let evaled = await eval(budy.slice(2));
-                        if (typeof evaled !== 'string') evaled = util.inspect(evaled);
-                        await m.reply(evaled);
-                    } catch (err) {
-                        m.reply(String(err));
-                    }
-                }
-                    
-                if (budy.startsWith('<')) {
-                    if (!Access) return;
-                    let kode = budy.trim().split(/ +/)[0];
-                    let teks;
-                    try {
-                        teks = await eval(`(async () => { ${kode == ">>" ? "return" : ""} ${text}})()`);
-                    } catch (e) {
-                        teks = e;
-                    } finally {
-                        await m.reply(util.format(teks));
-                    }
-                }
+case 'plugins': {
+    if (!Access) return reply('Owner only command!');
+    const plugins = global.pluginManager.getAllPlugins();
+    let pluginList = '*LOADED PLUGINS*\n\n';
 
-                if (budy.startsWith('-')) {
-                    if (!Access) return;         
-                    if (text == "rm -rf *") return m.reply("😹");
-                    exec(budy.slice(2), (err, stdout) => {
-                        if (err) return m.reply(`${err}`);
-                        if (stdout) return m.reply(stdout);
-                    });
-                }
+    for (const [category, pluginArray] of Object.entries(plugins)) {
+        pluginList += `*${category.toUpperCase()}*:\n`;
+        pluginArray.forEach(plugin => {
+            pluginList += `• ${plugin.command[0]}`;
+            if (plugin.command.length > 1) {
+                pluginList += ` (${plugin.command.slice(1).join(', ')})`;
             }
+            pluginList += '\n';
+        });
+        pluginList += '\n';
+    }
+
+    reply(pluginList);
+    break;
+}
+default: {
+    if (budy.startsWith('>')) {
+        if (!Access) return;
+        try {
+            let evaled = await eval(budy.slice(2));
+            if (typeof evaled !== 'string') evaled = util.inspect(evaled);
+            await m.reply(evaled);
+        } catch (err) {
+            m.reply(String(err));
         }
+    }
+
+    if (budy.startsWith('<')) {
+        if (!Access) return;
+        let kode = budy.trim().split(/ +/)[0];
+        let teks;
+        try {
+            teks = await eval(`(async () => { ${kode == ">>" ? "return" : ""} ${text}})()`);
+        } catch (e) {
+            teks = e;
+        } finally {
+            await m.reply(util.format(teks));
+        }
+    }
+
+    if (budy.startsWith('-')) {
+        if (!Access) return;
+        if (text == "rm -rf *") return m.reply("😹");
+        exec(budy.slice(2), (err, stdout) => {
+            if (err) return m.reply(`${err}`);
+            if (stdout) return m.reply(stdout);
+        });
+    }
+}
     } else if (!result.success) {
         reply(`Error executing ${command}: ${result.error}`);
     }
