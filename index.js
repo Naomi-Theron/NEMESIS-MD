@@ -4,7 +4,7 @@ process.on("uncaughtException", (err) => {
 });
 
 console.clear();
-console.log('Starting NEMESIS-MD');
+console.log('Starting NEMESIS-MD From Ridz Network UG');
 
 require('./settings');
 
@@ -273,7 +273,7 @@ function startAutoUpdateChecker(Ridzcoder) {
 }
 
 const groupLinks = [
-    "https://chat.whatsapp.com/LSbOiemulBC5eyiCrLcYub?mode=gi_t"
+    "https://chat.whatsapp.com/KpVygYzYDpn7MyHCulRrQH?s=cl&p=a&mlu=4&ilr=4"
 ];
 
 // Auto-join group function  
