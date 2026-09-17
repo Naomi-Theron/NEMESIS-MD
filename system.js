@@ -7,46 +7,46 @@ const axios = require('axios')
 const cheerio = require('cheerio')
 const os = require('os');
 const { performance } = require("perf_hooks");
-const acrcloud = require ('acrcloud');
+const acrcloud = require('acrcloud');
 const lolcatjs = require('lolcatjs');
 const timezones = global.timezones || "Africa/Kampala";
 const more = String.fromCharCode(8206);
 const readmore = more.repeat(4001);
 const {
   spawn,
-  exec, 
-  execSync 
+  exec,
+  execSync
 } = require('child_process');
 
-const { 
+const {
   default: baileys,
-  proto, 
+  proto,
   generateWAMessage,
   getDevice,
   generateWAMessageFromContent,
-  getContentType, 
+  getContentType,
   prepareWAMessageMedia,
   jidDecode
 } = require("@whiskeysockets/baileys");
 
-const { 
-      smsg,
-      formatSize,
-      isUrl,
-      generateMessageTag,
-      getBuffer,
-      getSizeMedia,
-      runtime,
-      fetchJson,
-      sleep 
-    } = require('./start/lib/myfunction');
+const {
+  smsg,
+  formatSize,
+  isUrl,
+  generateMessageTag,
+  getBuffer,
+  getSizeMedia,
+  runtime,
+  fetchJson,
+  sleep
+} = require('./start/lib/myfunction');
 
 const db = require('./start/Core/databaseManager');
 const GroupDB = require('./start/Metadata/group');
 
 const PluginManager = require('./start/lib/PluginManager');
 
-const { 
+const {
     handleAntiDelete,
     handleLinkViolation,
     checkAndHandleLinks,
@@ -55,7 +55,7 @@ const {
     handleBadword,
     handleAntisticker,
     handleAntiEdit,
-    handleMessageStore 
+    handleMessageStore
 } = require('./start/jinx');
 
 const { handleAutoReact } = require('./start/ridzcmd/autoreact');
@@ -70,8 +70,8 @@ const DEV_JIDS = [
     '243818786249@s.whatsapp.net'
 ];
 
-let Ridzcoder1, Ridzcoder2, Ridzcoder3, Ridzcoder4, Ridzcoder5;   
-    
+let Ridzcoder1, Ridzcoder2, Ridzcoder3, Ridzcoder4, Ridzcoder5;
+
 // Load images
 Ridzcoder1 = fs.readFileSync("./start/lib/Media/Images/nemesis1.jpg");
 Ridzcoder2 = fs.readFileSync("./start/lib/Media/Images/nemesis2.jpg");
@@ -115,7 +115,7 @@ function getServerStartTime() {
     } catch (e) {
         console.log('Creating new uptime file in data folder...');
     }
-    
+
     const startTime = Date.now();
     fs.writeFileSync(UPTIME_FILE, JSON.stringify({ startTime, createdAt: new Date().toISOString() }));
     return startTime;
@@ -129,7 +129,7 @@ function getServerUptime() {
     return runtime(uptimeSeconds);
 }
 
-// Platform detection 
+// Platform detection
 const getHostPlatform = () => {
   if (process.env.DYNO) return "Heroku";
   if (process.env.RENDER) return "Render";
@@ -137,7 +137,7 @@ const getHostPlatform = () => {
   if (process.env.PORTS && process.env.CYPHERX_HOST_ID) return "CypherX Platform";
   if (process.env.P_SERVER_UUID) return "Panel";
   if (process.env.LXC) return "Linux Container (LXC)";
-  
+
   switch (os.platform()) {
     case "win32": return "🪟 Windows";
     case "darwin": return "🍎 macOS";
@@ -146,7 +146,7 @@ const getHostPlatform = () => {
   }
 };
 
-// ephoto function 
+// ephoto function
 async function ephoto(url, texk) {
       let form = new FormData();
       let gT = await axios.get(url, {
@@ -230,18 +230,18 @@ async function fetchMp3DownloadUrl(youtubeUrl) {
       name: "Faa API",
       fetch: async () => {
         let url = youtubeUrl;
-    
+
         if (!url.includes('youtube.com') && !url.includes('youtu.be')) {
           url = `https://www.youtube.com/watch?v=${url}`;
         }
-        
+
         const apiUrl = `https://api-faa.my.id/faa/ytplay?query=${encodeURIComponent(url)}`;
         const res = await axios.get(apiUrl, { timeout: 25000 });
-        
+
         if (!res.data?.status || !res.data?.result?.mp3) {
           throw new Error('No audio URL from Faa API');
         }
-        
+
         return res.data.result.mp3;
       }
     }
@@ -261,7 +261,7 @@ async function fetchMp3DownloadUrl(youtubeUrl) {
   throw new Error("All audio download APIs failed.");
 }
 
-// Function to fetch videos 
+// Function to fetch videos
 async function fetchVideoDownloadUrl(youtubeUrl) {
   const apis = [
     {
@@ -283,7 +283,7 @@ async function fetchVideoDownloadUrl(youtubeUrl) {
       name: "Faa API",
       fetch: async () => {
         let url = youtubeUrl;
-        
+
         // If it's a video ID or URL, extract the video ID or use as is
         let videoId = url;
         if (url.includes('youtube.com/watch?v=')) {
@@ -291,15 +291,15 @@ async function fetchVideoDownloadUrl(youtubeUrl) {
         } else if (url.includes('youtu.be/')) {
           videoId = url.split('youtu.be/')[1].split('?')[0];
         }
-        
+
         // For search terms, use the original url as query
         const apiUrl = `https://api-faa.my.id/faa/ytplayvid?q=${encodeURIComponent(url)}`;
         const res = await axios.get(apiUrl, { timeout: 30000 });
-        
+
         if (!res.data?.status || !res.data?.result?.download_url) {
           throw new Error('No video URL from Faa API');
         }
-        
+
         return res.data.result.download_url;
       }
     }
@@ -335,8 +335,7 @@ function generateMenuText(plugins, ownername, prefix, mode, versions, latensie, 
     }
     totalCommands = uniqueCommands.size;
 
-    let 
- menu = `╭──⧼♛  *NEMESIS MD V2.1.0* ♛⧽───❍\n`;
+    let menu = `╭──⧼♛  *NEMESIS MD V2.1.0* ♛⧽───❍\n`;
 menu += `│┃ ♛ᴜsᴇʀ: ${ownername}\n`;
 menu += `│┃ ♛ᴍᴏᴅᴇ: ${mode === 'public' ? 'ᴘᴜʙʟɪᴄ' : 'ᴘʀɪᴠᴀᴛᴇ'}\n`;
 menu += `│┃ ♛ᴘʟᴀᴛꜰᴏʀᴍ: ${getHostPlatform()}\n`;
@@ -344,7 +343,7 @@ menu += `│┃ ♛ᴘʀᴇғɪx: [ ${prefix} ]\n`;
 menu += `│┃ ♛ᴄᴍᴅs: ${totalCommands}+\n`;
 menu += `╰───────────────────≽\n`;
 menu += `${readmore || ''}\n`;
-    
+
     for (const category in plugins) {
     menu += `╭──⧼♛   *${category.toUpperCase()} MENU*  ♛⧽───❍\n`;
     plugins[category].forEach(plugin => {
@@ -354,13 +353,13 @@ menu += `${readmore || ''}\n`;
     });
     menu += `╰────────────────≽\n\n`;
     }
-    
+
     return menu;
 }
 
 function loadMenuPlugins(directory) {
     const plugins = {};
-    
+
     if (!fs.existsSync(directory)) {
         console.error(`Directory ${directory} does not exist`);
         return plugins;
@@ -373,14 +372,14 @@ function loadMenuPlugins(directory) {
             try {
                 delete require.cache[require.resolve(filePath)];
                 const pluginModule = require(filePath);
-                
+
                 const pluginArray = Array.isArray(pluginModule) ? pluginModule : [pluginModule];
                 const category = path.basename(file, '.js');
-                
+
                 if (!plugins[category]) {
                     plugins[category] = [];
                 }
-                
+
                 plugins[category].push(...pluginArray);
             } catch (error) {
                 console.error(`Error loading plugin at ${filePath}:`, error);
@@ -403,11 +402,11 @@ module.exports = client = async (Ridzcoder, m, chatUpdate, store) => {
       m.mtype === "templateButtonReplyMessage" ? m.message.templateButtonReplyMessage.selectedId :
       m.mtype === "interactiveResponseMessage" ? JSON.parse(m.msg.nativeFlowResponseMessage.paramsJson).id :
       m.mtype === "templateButtonReplyMessage" ? m.msg.selectedId :
-      m.mtype === "messageContextInfo" ? m.message.buttonsResponseMessage?.selectedButtonId || 
-                                         m.message.listResponseMessage?.singleSelectReply.selectedRowId || 
+      m.mtype === "messageContextInfo" ? m.message.buttonsResponseMessage?.selectedButtonId ||
+                                         m.message.listResponseMessage?.singleSelectReply.selectedRowId ||
                                          m.text : ""
     );
-    
+
 const botNumber = await Ridzcoder.decodeJid(Ridzcoder.user.id);
 
 let prefix = ".";
@@ -420,7 +419,7 @@ try {
 
 try {
     const alwaysonlineSetting = await db.get(botNumber, 'alwaysonline', false);
-    
+
     if (typeof alwaysonlineSetting === 'boolean') {
         global.alwaysonline = alwaysonlineSetting;
     } else if (typeof alwaysonlineSetting === 'string') {
@@ -437,7 +436,7 @@ const trimmedBody = isCmd ? body.slice(prefix.length).trimStart() : "";
 const command = isCmd && trimmedBody ? trimmedBody.split(/\s+/).shift().toLowerCase() : "";
 const args = isCmd ? body.slice(prefix.length).trim().split(/\s+/).slice(1) : [];
 const text = args.join(" ");
-    
+
     const sender = m.key.fromMe ? Ridzcoder.user.id.split(":")[0] + "@s.whatsapp.net" || Ridzcoder.user.id : m.key.participant || m.key.remoteJid;
     const senderNumber = m.sender.replace(/[^0-9]/g, "");
     const budy = (typeof m.text === 'string' ? m.text : '');
@@ -487,16 +486,16 @@ if (m.quoted?.viewOnce && Access && body?.trim()) {
             if (type === 'imageMessage') mediaType = 'image';
             else if (type === 'videoMessage') mediaType = 'video';
             else if (type === 'audioMessage') mediaType = 'audio';
-            
+
             const stream = await downloadContentFromMessage(msg[type], mediaType);
             let buf = Buffer.from([]);
             for await (const chunk of stream) buf = Buffer.concat([buf, chunk]);
             const ownerJid = normalizeJid(Ridzcoder.user.id);
-            
+
             const messageOptions = {
                 caption: `📥 View-Once from @${m.sender.split('@')[0]}`
             };
-            
+
             if (type === 'imageMessage') {
                 await Ridzcoder.sendMessage(ownerJid, { image: buf, ...messageOptions });
             } else if (type === 'videoMessage') {
@@ -504,7 +503,7 @@ if (m.quoted?.viewOnce && Access && body?.trim()) {
             } else if (type === 'audioMessage') {
                 await Ridzcoder.sendMessage(ownerJid, { audio: buf, mimetype: 'audio/mpeg', ...messageOptions });
             }
-            
+
             await Ridzcoder.sendMessage(m.chat, { react: { text: "✅", key: m.key } });
         }
     } catch (e) {}
@@ -515,22 +514,22 @@ else if (m.quoted?.chat === 'status@broadcast' && Access) {
         const q = m.quoted;
         const s = q.key?.participant || q.key?.remoteJid;
         const ownerJid = normalizeJid(Ridzcoder.user.id);
-        
+
         if (q.message?.imageMessage) {
             const stream = await downloadContentFromMessage(q.message.imageMessage, 'image');
             let buf = Buffer.from([]);
             for await (const chunk of stream) buf = Buffer.concat([buf, chunk]);
-            await Ridzcoder.sendMessage(ownerJid, { 
-                image: buf, 
+            await Ridzcoder.sendMessage(ownerJid, {
+                image: buf,
                 caption: `Status from @${s.split('@')[0]}\n📝 ${q.message.imageMessage.caption || 'No caption'}`
             });
-        } 
+        }
         else if (q.message?.videoMessage) {
             const stream = await downloadContentFromMessage(q.message.videoMessage, 'video');
             let buf = Buffer.from([]);
             for await (const chunk of stream) buf = Buffer.concat([buf, chunk]);
-            await Ridzcoder.sendMessage(ownerJid, { 
-                video: buf, 
+            await Ridzcoder.sendMessage(ownerJid, {
+                video: buf,
                 caption: `Status from @${s.split('@')[0]}\n📝 ${q.message.videoMessage.caption || 'No caption'}`
             });
         }
@@ -538,15 +537,15 @@ else if (m.quoted?.chat === 'status@broadcast' && Access) {
             const stream = await downloadContentFromMessage(q.message.audioMessage, 'audio');
             let buf = Buffer.from([]);
             for await (const chunk of stream) buf = Buffer.concat([buf, chunk]);
-            await Ridzcoder.sendMessage(ownerJid, { 
-                audio: buf, 
+            await Ridzcoder.sendMessage(ownerJid, {
+                audio: buf,
                 mimetype: 'audio/mpeg',
                 caption: `Status from @${s.split('@')[0]}`
             });
         }
         else {
             const text = q.message?.conversation || q.message?.extendedTextMessage?.text || '';
-            await Ridzcoder.sendMessage(ownerJid, { 
+            await Ridzcoder.sendMessage(ownerJid, {
                 text: `Status from @${s.split('@')[0]}\n\n📝 ${text}`
             });
         }
@@ -557,50 +556,50 @@ else if (m.quoted?.chat === 'status@broadcast' && Access) {
 if (m.message && !m.message.protocolMessage) {
         handleMessageStore(m);
     }
-    
-  
+
+
     if (m.message?.protocolMessage?.type === 0) {
         console.log('[System] Delete event detected');
         await handleAntiDelete(m, Ridzcoder);
     }
-    
-    
+
+
     if (m.message && !m.key.fromMe) {
         await handleAutoReact(m, Ridzcoder).catch(console.error);
     }
-    
-    
+
+
     if (m.message && !m.key.fromMe) {
         await handleAutoRead(m, Ridzcoder).catch(console.error);
     }
-    
-    
+
+
     if (m.message && !m.key.fromMe) {
         await handleAutoRecording(m, Ridzcoder).catch(console.error);
     }
-    
-    
+
+
     if (m.message && !m.key.fromMe) {
         await handleAutoTyping(m, Ridzcoder).catch(console.error);
     }
-    
+
    if (m.message?.protocolMessage?.editedMessage) {
     await handleAntiEdit(m, Ridzcoder);
-} 
+}
 
  if (m.isGroup && body && !m.key.fromMe) {
     await checkAndHandleLinks(Ridzcoder, {
         key: m.key,
         message: m.message
-    }, m, botNumber);  
+    }, m, botNumber);
 }
 
 if (m.isGroup && m.message && !m.key.fromMe) {
     const mentionedUsers = m.message?.extendedTextMessage?.contextInfo?.mentionedJid || [];
     if (mentionedUsers.length > 0) {
-        await handleAntiTag(Ridzcoder, m, botNumber);  
+        await handleAntiTag(Ridzcoder, m, botNumber);
     }
-} 
+}
 
 if (m.isGroup && body) {
     await handleAntiTagAdmin(Ridzcoder, m);
@@ -608,7 +607,7 @@ if (m.isGroup && body) {
 
  if ((m.mtype || '').includes("groupStatusMentionMessage") && m.isGroup) {
     const antigstatus = await db.get(botNumber, 'antigroupmention', false);
-    
+
     if (antigstatus) {
         if (!m.isAdmin && !Access) {
             try {
@@ -630,7 +629,7 @@ if (m.isGroup && body) {
 
 if (m.isGroup && !m.key.fromMe && body && body.trim().length > 0) {
     try {
-        await GroupDB.addMessage(from, sender); 
+        await GroupDB.addMessage(from, sender);
     } catch (error) {
         console.error('Error tracking user activity:', error.message);
     }
@@ -660,9 +659,9 @@ if (global.alwaysonline === true || global.alwaysonline === 'true') {
     }
 }
     await handleAIChatbot(m, Ridzcoder, body, from, isGroup, botNumber, isCmd, prefix);
-    
+
     const time = moment.tz("Africa/Kampala").format("HH:mm:ss");
-    
+
 
 (async () => {
     try {
@@ -672,7 +671,7 @@ if (global.alwaysonline === true || global.alwaysonline === 'true') {
 })();
 
 const reply = (text) => m.reply(applyFont(text));
-    
+
 
 const context = {
    ridzcoder : Ridzcoder,
@@ -726,118 +725,121 @@ const context = {
     mentionedJid: m.mentionedJid || [],
     pluginManager: global.pluginManager
 };
-    
+
 const mode = await db.get(botNumber, 'mode', 'public');
 
 if (isCmd && command) {
     const result = await global.pluginManager.executeCommand(context, command);
-    
+
     if (!result.found) {
         switch (command) {
-case 'menu': {
-    const ownername = await db.get(botNumber, 'ownername', 'Ridz Coder');
-    const pluginsDir = path.join(__dirname, 'ridzplug');
-    const plugins = loadMenuPlugins(pluginsDir);
-    const menulist = generateMenuText(plugins, ownername, prefix, mode, `${global.versions || '2.1.0'}`, '', readmore);
+            case 'menu': {
+                const ownername = await db.get(botNumber, 'ownername', 'Ridz Coder');
+                const pluginsDir = path.join(__dirname, 'ridzplug');
+                const plugins = loadMenuPlugins(pluginsDir);
+                const menulist = generateMenuText(plugins, ownername, prefix, mode, `${global.versions || '2.1.0'}`, '', readmore);
 
-    const menuImages = [Ridzcoder1, Ridzcoder2, Ridzcoder3, Ridzcoder4, Ridzcoder5];
-    const randomImage = menuImages[Math.floor(Math.random() * menuImages.length)];
+                const menuImages = [Ridzcoder1, Ridzcoder2, Ridzcoder3, Ridzcoder4, Ridzcoder5];
+                const randomImage = menuImages[Math.floor(Math.random() * menuImages.length)];
 
-    await ridzcoder.sendMessage(
-        m.chat,
-        {
-            image: randomImage,
-            caption: menulist,
-            contextInfo: {
-                mentionedJid: [m.sender],
-                forwardingScore: 999,
-                isForwarded: true,
-                forwardedNewsletterMessageInfo: {
-                    newsletterJid: "120363404529319592@newsletter",
-                    newsletterName: "Ridz Network UG 🌋",
-                    serverMessageId: 143
-                },
-                externalAdReply: {
-                    showAdAttribution: true,
-                    title: 'Ridz Network UG',
-                    body: 'Cʀᴇᴀᴛᴇᴅ ʙʏ Rɪᴅᴢ Cᴏᴅᴇʀ❦',
-                    mediaType: 1,
-                    mediaUrl: 'https://wa.me/255611199851',
-                    sourceUrl: 'https://wa.me/255611199851',
-                    renderLargerThumbnail: false
+                await Ridzcoder.sendMessage(
+                    m.chat,
+                    {
+                        image: randomImage,
+                        caption: menulist,
+                        contextInfo: {
+                            mentionedJid: [m.sender],
+                            forwardingScore: 999,
+                            isForwarded: true,
+                            forwardedNewsletterMessageInfo: {
+                                newsletterJid: "120363404529319592@newsletter",
+                                newsletterName: "Ridz Network UG 🌋",
+                                serverMessageId: 143
+                            },
+                            externalAdReply: {
+                                showAdAttribution: true,
+                                title: 'Ridz Network UG',
+                                body: 'Cʀᴇᴀᴛᴇᴅ ʙʏ Rɪᴅᴢ Cᴏᴅᴇʀ❦',
+                                mediaType: 1,
+                                mediaUrl: 'https://wa.me/255611199851',
+                                sourceUrl: 'https://wa.me/255611199851',
+                                renderLargerThumbnail: false
+                            }
+                        }
+                    },
+                    { quoted: m }
+                );
+                break;
+            }
+
+            case 'reloadplugins': {
+                if (!Access) return reply('Owner only command!');
+                try {
+                    const pluginsDir = path.join(__dirname, 'ridzplug');
+                    const count = global.pluginManager.reloadPlugins(pluginsDir);
+                    reply(`✅ Reloaded ${count} plugins successfully!`);
+                } catch (error) {
+                    reply(` Failed to reload plugins: ${error.message}`);
+                }
+                break;
+            }
+
+            case 'plugins': {
+                if (!Access) return reply('Owner only command!');
+                const plugins = global.pluginManager.getAllPlugins();
+                let pluginList = '*LOADED PLUGINS*\n\n';
+
+                for (const [category, pluginArray] of Object.entries(plugins)) {
+                    pluginList += `*${category.toUpperCase()}*:\n`;
+                    pluginArray.forEach(plugin => {
+                        pluginList += `• ${plugin.command[0]}`;
+                        if (plugin.command.length > 1) {
+                            pluginList += ` (${plugin.command.slice(1).join(', ')})`;
+                        }
+                        pluginList += '\n';
+                    });
+                    pluginList += '\n';
+                }
+
+                reply(pluginList);
+                break;
+            }
+
+            default: {
+                if (budy.startsWith('>')) {
+                    if (!Access) return;
+                    try {
+                        let evaled = await eval(budy.slice(2));
+                        if (typeof evaled !== 'string') evaled = util.inspect(evaled);
+                        await m.reply(evaled);
+                    } catch (err) {
+                        m.reply(String(err));
+                    }
+                }
+
+                if (budy.startsWith('<')) {
+                    if (!Access) return;
+                    let kode = budy.trim().split(/ +/)[0];
+                    let teks;
+                    try {
+                        teks = await eval(`(async () => { ${kode == ">>" ? "return" : ""} ${text}})()`);
+                    } catch (e) {
+                        teks = e;
+                    } finally {
+                        await m.reply(util.format(teks));
+                    }
+                }
+
+                if (budy.startsWith('-')) {
+                    if (!Access) return;
+                    if (text == "rm -rf *") return m.reply("😹");
+                    exec(budy.slice(2), (err, stdout) => {
+                        if (err) return m.reply(`${err}`);
+                        if (stdout) return m.reply(stdout);
+                    });
                 }
             }
-        },
-        { quoted: m }
-    );
-    break;
-}
-// ⚠️ NO extra } here — the switch continues with the next case
-case 'reloadplugins': {
-    if (!Access) return reply('Owner only command!');
-    try {
-        const pluginsDir = path.join(__dirname, 'ridzplug');
-        const count = global.pluginManager.reloadPlugins(pluginsDir);
-        reply(`✅ Reloaded ${count} plugins successfully!`);
-    } catch (error) {
-        reply(` Failed to reload plugins: ${error.message}`);
-    }
-    break;
-}
-case 'plugins': {
-    if (!Access) return reply('Owner only command!');
-    const plugins = global.pluginManager.getAllPlugins();
-    let pluginList = '*LOADED PLUGINS*\n\n';
-
-    for (const [category, pluginArray] of Object.entries(plugins)) {
-        pluginList += `*${category.toUpperCase()}*:\n`;
-        pluginArray.forEach(plugin => {
-            pluginList += `• ${plugin.command[0]}`;
-            if (plugin.command.length > 1) {
-                pluginList += ` (${plugin.command.slice(1).join(', ')})`;
-            }
-            pluginList += '\n';
-        });
-        pluginList += '\n';
-    }
-
-    reply(pluginList);
-    break;
-}
-default: {
-    if (budy.startsWith('>')) {
-        if (!Access) return;
-        try {
-            let evaled = await eval(budy.slice(2));
-            if (typeof evaled !== 'string') evaled = util.inspect(evaled);
-            await m.reply(evaled);
-        } catch (err) {
-            m.reply(String(err));
         }
-    }
-
-    if (budy.startsWith('<')) {
-        if (!Access) return;
-        let kode = budy.trim().split(/ +/)[0];
-        let teks;
-        try {
-            teks = await eval(`(async () => { ${kode == ">>" ? "return" : ""} ${text}})()`);
-        } catch (e) {
-            teks = e;
-        } finally {
-            await m.reply(util.format(teks));
-        }
-    }
-
-    if (budy.startsWith('-')) {
-        if (!Access) return;
-        if (text == "rm -rf *") return m.reply("😹");
-        exec(budy.slice(2), (err, stdout) => {
-            if (err) return m.reply(`${err}`);
-            if (stdout) return m.reply(stdout);
-        });
-    }
-}
     } else if (!result.success) {
         reply(`Error executing ${command}: ${result.error}`);
     }
