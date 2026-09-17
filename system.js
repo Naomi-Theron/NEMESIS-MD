@@ -336,7 +336,7 @@ function generateMenuText(plugins, ownername, prefix, mode, versions, latensie, 
     totalCommands = uniqueCommands.size;
 
     let 
- menu = `╭──⧼♛  *NEMESIS MD V2.0* ♛⧽───❍\n`;
+ menu = `╭──⧼♛  *NEMESIS MD V2.1.0* ♛⧽───❍\n`;
 menu += `│┃ ♛ᴜsᴇʀ: ${ownername}\n`;
 menu += `│┃ ♛ᴍᴏᴅᴇ: ${mode === 'public' ? 'ᴘᴜʙʟɪᴄ' : 'ᴘʀɪᴠᴀᴛᴇ'}\n`;
 menu += `│┃ ♛ᴘʟᴀᴛꜰᴏʀᴍ: ${getHostPlatform()}\n`;
@@ -734,31 +734,44 @@ if (isCmd && command) {
     
     if (!result.found) {
         switch (command) {
-  case 'menu': {
-    const ownername = await db.get(botNumber, 'ownername', 'Not set');
-    const pluginsDir = path.join(__dirname, 'ridzplug'); 
+case 'menu': {
+    const ownername = await db.get(botNumber, 'ownername', 'Ridz Coder');
+    const pluginsDir = path.join(__dirname, 'ridzplug');
     const plugins = loadMenuPlugins(pluginsDir);
     const menulist = generateMenuText(plugins, ownername, prefix, mode, `${global.versions || '2.1.0'}`, '', readmore);
-    
+
     const menuImages = [Ridzcoder1, Ridzcoder2, Ridzcoder3, Ridzcoder4, Ridzcoder5];
     const randomImage = menuImages[Math.floor(Math.random() * menuImages.length)];
-    
-    await Ridzcoder.sendMessage(m.chat, {
-        image: randomImage,
-        caption: menulist,
-        contextInfo: {
-            externalAdReply: {
-                showAdAttribution: true,
-                title: 'Ridz Network UG',
-                body: 'Cʀᴇᴀᴛᴇᴅ ʙʏ Rɪᴅᴢ Cᴏᴅᴇʀ❦',
-                mediaType: 1,
-                mediaUrl: 'https://wa.me/255611199851',
-                sourceUrl: 'https://wa.me/255611199851',
-                renderLargerThumbnail: false
+
+    await clutch.sendMessage(
+        m.chat,
+        {
+         image: randomImage,
+            caption: menulist,
+            contextInfo: {
+                mentionedJid: [m.sender],
+                forwardingScore: 999,
+                isForwarded: true,
+                forwardedNewsletterMessageInfo: {
+                    newsletterJid: "120363404529319592@newsletter",
+                    newsletterName: "Ridz Network UG 🌋",
+                    serverMessageId: 143
+                },
+                externalAdReply: {
+                    showAdAttribution: true,
+                    title: 'Ridz Network UG',
+                    body: 'Cʀᴇᴀᴛᴇᴅ ʙʏ Rɪᴅᴢ Cᴏᴅᴇʀ❦',
+                    mediaType: 1,
+                    mediaUrl: 'https://wa.me/255611199851',
+                    sourceUrl: 'https://wa.me/255611199851',
+                    renderLargerThumbnail: false
+                }
             }
-        }
-    }, { quoted: m });
+        },
+        { quoted: m }
+    );
     break;
+}
 }
             
             case 'reloadplugins': {
