@@ -11,7 +11,7 @@ function getCompatibilityMessage(score) {
 module.exports = [
     {
         command: ['truth', 'truthgame', 'asktruth'],
-        operate: async ({ Ridzcoder, m, reply, prefix, getBuffer }) => {
+        operate: async ({ ridzcoder, m, reply, prefix, getBuffer }) => {
             try {
                 const axios = require('axios');
                 const apiUrl = 'https://api.princetechn.com/api/fun/truth?apikey=prince';
@@ -24,12 +24,12 @@ module.exports = [
                     try {
                         const buffer = await getBuffer('https://i.ibb.co/305yt26/bf84f20635dedd5dde31e7e5b6983ae9.jpg');
                         
-                        await Ridzcoder.sendMessage(from, {
+                        await ridzcoder.sendMessage(from, {
                             image: buffer,
                             caption: `*TRUTH*\n\n${truth}`
                         }, { quoted: m });
                     } catch (imgError) {
-                        await Ridzcoder.sendMessage(from, {
+                        await ridzcoder.sendMessage(from, {
                             text: `*TRUTH*\n\n${truth}`
                         }, { quoted: m });
                     }
@@ -44,7 +44,7 @@ module.exports = [
     },
     {
         command: ['dare', 'truthdare', 'dareme'],
-        operate: async ({ Ridzcoder, m, reply, prefix }) => {
+        operate: async ({ ridzcoder, m, reply, prefix }) => {
             try {
                 const axios = require('axios');
                 const apiUrl = 'https://api.princetechn.com/api/fun/dares?apikey=prince';
@@ -57,12 +57,12 @@ module.exports = [
                     try {
                         const buffer = await getBuffer('https://i.ibb.co/305yt26/bf84f20635dedd5dde31e7e5b6983ae9.jpg');
                         
-                        await Ridzcoder.sendMessage(from, {
+                        await ridzcoder.sendMessage(from, {
                             image: buffer,
                             caption: `*DARE*\n\n${dare}`
                         }, { quoted: m });
                     } catch (imgError) {
-                        await Ridzcoder.sendMessage(from, {
+                        await ridzcoder.sendMessage(from, {
                             text: `*DARE*\n\n${dare}`
                         }, { quoted: m });
                     }
@@ -77,7 +77,7 @@ module.exports = [
     },
     {
         command: ['compatibility', 'comp'],
-        operate: async ({ Ridzcoder, m, reply, botNumber }) => {
+        operate: async ({ ridzcoder, m, reply, botNumber }) => {
             try {
                 // Check if two users are mentioned
                 if (!m.mentionedJid || m.mentionedJid.length < 2) {
@@ -103,7 +103,7 @@ module.exports = [
                     `${getCompatibilityMessage(compatibilityScore)}`;
 
                 // Send the result
-                await Ridzcoder.sendMessage(
+                await ridzcoder.sendMessage(
                     m.chat,
                     { 
                         text: resultMessage,
@@ -120,7 +120,7 @@ module.exports = [
     },
         {
         command: ['lovetest', 'love', 'compatibility'],
-        operate: async ({ Ridzcoder, m, reply, args }) => {
+        operate: async ({ ridzcoder, m, reply, args }) => {
             if (args.length < 2) return reply("Tag two users! Example: .lovetest @user1 @user2");
 
             let user1 = args[0].replace("@", "") + "@s.whatsapp.net";
@@ -141,7 +141,7 @@ module.exports = [
 
             let message = `💘 *Love Compatibility Test* 💘\n\n❤️ *@${user1.split("@")[0]}* + *@${user2.split("@")[0]}* = *${lovePercent}%*\n${loveMessage}`;
 
-            await Ridzcoder.sendMessage(m.chat, { 
+            await ridzcoder.sendMessage(m.chat, { 
                 text: message, 
                 mentions: [user1, user2] 
             }, { quoted: m });
@@ -149,12 +149,12 @@ module.exports = [
     },
     {
         command: ['jokes', 'joke', 'funny'],
-        operate: async ({ Ridzcoder, m, reply }) => {
+        operate: async ({ ridzcoder, m, reply }) => {
             try {
                 let res = await fetch("https://official-joke-api.appspot.com/random_joke");
                 let json = await res.json();
                 const joke = `${json.setup}\n\n${json.punchline}`;
-                await Ridzcoder.sendMessage(m.chat, { text: joke }, { quoted: m });
+                await ridzcoder.sendMessage(m.chat, { text: joke }, { quoted: m });
             } catch (error) {
                 console.error('Error fetching joke:', error);
                 reply('An error occurred while fetching a joke.');
@@ -163,7 +163,7 @@ module.exports = [
     },
 {
     command: ['valentine', 'valentines', 'vday'],
-    operate: async ({ Ridzcoder, m, reply, args, prefix }) => {
+    operate: async ({ ridzcoder, m, reply, args, prefix }) => {
         try {
             const axios = require('axios');
             const apiUrl = `https://api.princetechn.com/api/fun/valentines?apikey=prince`;
@@ -182,7 +182,7 @@ module.exports = [
 },
     {
     command: ['pickupline', 'pickup', 'lovequotes'],
-    operate: async ({ Ridzcoder, m, reply, args, prefix }) => {
+    operate: async ({ ridzcoder, m, reply, args, prefix }) => {
         try {
             const apiUrl = `https://apis.davidcyril.name.ng/pickupline`;
             const response = await axios.get(apiUrl);
@@ -200,7 +200,7 @@ module.exports = [
 },
     {
     command: ['advice', 'advicegenerator', 'lifetips'],
-    operate: async ({ Ridzcoder, m, reply, args, prefix }) => {
+    operate: async ({ ridzcoder, m, reply, args, prefix }) => {
         try {
             const apiUrl = `https://api.princetechn.com/api/fun/advice?apikey=prince`;
             const response = await axios.get(apiUrl);
@@ -218,7 +218,7 @@ module.exports = [
 },
     {
     command: ['motivation', 'motivate', 'inspire'],
-    operate: async ({ Ridzcoder, m, reply, args, prefix }) => {
+    operate: async ({ ridzcoder, m, reply, args, prefix }) => {
         try {
             const apiUrl = `https://api.princetechn.com/api/fun/motivation?apikey=prince`;
             const response = await axios.get(apiUrl);
@@ -236,7 +236,7 @@ module.exports = [
 },        
     {
         command: ['character', 'char', 'personality'],
-        operate: async ({ Ridzcoder, m, reply, isGroup, from }) => {
+        operate: async ({ ridzcoder, m, reply, isGroup, from }) => {
             try {
                 if (!isGroup) {
                     return reply("This command can only be used in groups.");
@@ -256,7 +256,7 @@ module.exports = [
                 const userCharacterSelection = userChar[Math.floor(Math.random() * userChar.length)];
                 const message = `Character of @${mentionedUser.split("@")[0]} is *${userCharacterSelection}* 🔥⚡`;
 
-                await Ridzcoder.sendMessage(from, {
+                await ridzcoder.sendMessage(from, {
                     text: message,
                     mentions: [mentionedUser],
                 }, { quoted: m });
@@ -270,7 +270,7 @@ module.exports = [
     {
   command: ['trivia'],
   react: "❓",
-  operate: async ({ Ridzcoder, m, reply }) => {
+  operate: async ({ ridzcoder, m, reply }) => {
     try {
       let res = await fetch("https://opentdb.com/api.php?amount=1");
       let json = await res.json();
@@ -278,10 +278,10 @@ module.exports = [
       let question = json.results[0].question;
       let answer = json.results[0].correct_answer;
 
-      await Ridzcoder.sendMessage(m.chat, { text: `Question: ${question}\n\nThink you know the answer? Sending the correct answer after 20 seconds` }, { quoted: m });
+      await ridzcoder.sendMessage(m.chat, { text: `Question: ${question}\n\nThink you know the answer? Sending the correct answer after 20 seconds` }, { quoted: m });
       
       setTimeout(async () => {
-        await Ridzcoder.sendMessage(m.chat, { text: `Answer: ${answer}` });
+        await ridzcoder.sendMessage(m.chat, { text: `Answer: ${answer}` });
       }, 20000); // 20 seconds
     } catch (error) {
       console.error('Error fetching trivia question:', error);
@@ -343,7 +343,7 @@ module.exports = [
 },
 {
   command: ['guesscartoon', 'cartoonquiz', 'guesscharacter'],
-  operate: async ({ m, reply, Ridzcoder }) => {
+  operate: async ({ m, reply, ridzcoder }) => {
     try {
       await reply("🎮 Fetching a cartoon character...");
       
@@ -354,7 +354,7 @@ module.exports = [
         return reply("*Failed to fetch cartoon character.*");
       }
       
-      await Ridzcoder.sendMessage(m.chat, {
+      await ridzcoder.sendMessage(m.chat, {
         image: { url: data.data.img },
         caption: `🎪 *GUESS THE CARTOON CHARACTER!*\n\n` +
                  `Can you name this character?\n\n` +
@@ -369,7 +369,7 @@ module.exports = [
 },
 {
     command: ['riddle', 'teka'],
-    operate: async ({ Ridzcoder, m, reply, args }) => {
+    operate: async ({ ridzcoder, m, reply, args }) => {
         try {
             await reply("🧩 *Loading riddle...*");
             
