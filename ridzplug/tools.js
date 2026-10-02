@@ -1,5 +1,3 @@
-/*Kelvin Tech*/
-
 const moment = require('moment-timezone');
 const {translate} = require('@vitalets/google-translate-api')
 const googleTTS = require('google-tts-api')
