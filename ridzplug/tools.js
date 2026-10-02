@@ -16,7 +16,7 @@ const { obfuscateJS } = require("../start/lib/encapsulation");
 module.exports = [
     {
         command: ['time'],
-        operate: async ({ Ridzcoder, m, reply, text, timezones, prefix, global }) => {
+        operate: async ({ ridzcoder, m, reply, text, timezones, prefix, global }) => {
             try {
                 let countryName = text.trim();
                 
@@ -36,7 +36,7 @@ module.exports = [
     *Example:* ${prefix}time Japan
                     `.trim();
 
-                    return await Ridzcoder.sendMessage(m.chat, { 
+                    return await ridzcoder.sendMessage(m.chat, { 
                         text: `${global.wm || ''}\n\n${timeInfo}`
                     }, { quoted: m });
                 }
@@ -65,7 +65,7 @@ module.exports = [
     *Other timezones in ${countryName}:* ${timezones.slice(0, 5).join(', ')}${timezones.length > 5 ? '...' : ''}
                 `.trim();
 
-                await Ridzcoder.sendMessage(m.chat, { text: timeInfo }, { quoted: m });
+                await ridzcoder.sendMessage(m.chat, { text: timeInfo }, { quoted: m });
 
             } catch (error) {
                 console.error('Error in time command:', error);
@@ -202,7 +202,7 @@ module.exports = [
     },
     {
         command: ['say', 'tts', 'speak'],
-        operate: async ({ reply, m, Ridzcoder, text, args }) => {
+        operate: async ({ reply, m, ridzcoder, text, args }) => {
             if (!text) return reply("*Text needed!*\n\nExample: .say Hello world");
 
             try {
@@ -239,7 +239,7 @@ module.exports = [
                         return reply("*Error merging audio files.*");
                     }
 
-                    await Ridzcoder.sendMessage(
+                    await ridzcoder.sendMessage(
                         m.chat,
                         {
                             audio: fs.readFileSync(mergedFile),
@@ -265,7 +265,7 @@ module.exports = [
     },
     {
     command: ['texttosticker', 'ttp', 'textsticker'],
-    operate: async ({ Ridzcoder, m, text, reply, args, prefix }) => {
+    operate: async ({ ridzcoder, m, text, reply, args, prefix }) => {
             if (!text) return reply(`Example: ${prefix}ttp Kevin`);
 
     try {
@@ -283,7 +283,7 @@ module.exports = [
             responseType: 'arraybuffer'
         });
 
-        await Ridzcoder.sendImageAsSticker(m.chat, Buffer.from(imageBuffer.data), m, {
+        await ridzcoder.sendImageAsSticker(m.chat, Buffer.from(imageBuffer.data), m, {
             packname: global.packname || 'NEMESIS-MD',
             author: global.author || 'Ridz Coder'
         });
@@ -297,14 +297,14 @@ module.exports = [
 },
 {
     command: ['translate', 'tr', 'eng', 'english'],
-    operate: async ({ Ridzcoder, m, reply, text, prefix }) => {
+    operate: async ({ ridzcoder, m, reply, text, prefix }) => {
               if (!text) {
             return reply(`🌍 *Translate to English*\n\nUsage: ${prefix}translate <text>\n\nExamples:\n• ${prefix}translate Hola\n• ${prefix}translate Bonjour\n• ${prefix}translate 你好`);
         }
 
         try {
             // React immediately
-            await Ridzcoder.sendMessage(m.chat, {
+            await ridzcoder.sendMessage(m.chat, {
                 react: { text: "🌍", key: m.key }
             });
 
@@ -331,7 +331,7 @@ module.exports = [
             }
 
             // Clean and format
-            await Ridzcoder.sendMessage(m.chat, {
+            await ridzcoder.sendMessage(m.chat, {
                 text: `*TRANSLATION*\n\n🗣️ *Original:* ${text}\n\n*Translatd:* ${translated}\n\n`
             }, { quoted: m });
 
@@ -377,14 +377,14 @@ module.exports = [
     },
     {
         command: ['qrcode', 'qr'],
-        operate: async ({ reply, m, Ridzcoder, text }) => {
+        operate: async ({ reply, m, ridzcoder, text }) => {
             if (!text) return reply("Enter text or URL");
 
             try {
                 let res = await fetch(`https://api.qrserver.com/v1/create-qr-code/?data=${text}&size=200x200`);
                 let qrCodeUrl = res.url;
 
-                await Ridzcoder.sendMessage(m.chat, { 
+                await ridzcoder.sendMessage(m.chat, { 
                     image: { url: qrCodeUrl },
                     caption: `QR Code for: ${text}`
                 }, { quoted: m });
@@ -396,7 +396,7 @@ module.exports = [
     },
     {
         command: ['browse', 'fetch'],
-        operate: async ({ reply, m, Ridzcoder, text }) => {
+        operate: async ({ reply, m, ridzcoder, text }) => {
             if (!text) return reply("Enter URL");
 
             try {
@@ -404,12 +404,12 @@ module.exports = [
 
                 if (res.headers.get('Content-Type').includes('application/json')) {
                     let json = await res.json();
-                    await Ridzcoder.sendMessage(m.chat, { 
+                    await ridzcoder.sendMessage(m.chat, { 
                         text: JSON.stringify(json, null, 2) 
                     }, { quoted: m });
                 } else {
                     let resText = await res.text();
-                    await Ridzcoder.sendMessage(m.chat, { 
+                    await ridzcoder.sendMessage(m.chat, { 
                         text: resText 
                     }, { quoted: m });
                 }
@@ -422,7 +422,7 @@ module.exports = [
     },
     {
         command: ['filtervcf', 'cleanvcf'],
-        operate: async ({ reply, m, Ridzcoder, text }) => {
+        operate: async ({ reply, m, ridzcoder, text }) => {
             const quoted = m.quoted ? m.quoted : null;
             const mime = quoted?.mimetype || "";
             const normalizePhoneNumber = (phone) => {
@@ -431,7 +431,7 @@ module.exports = [
             };
 
             if (!quoted || !(mime === "text/vcard" || mime === "text/x-vcard")) {
-                return Ridzcoder.sendMessage(m.chat, { 
+                return ridzcoder.sendMessage(m.chat, { 
                     text: "❌ *Error:* Reply to a `.vcf` file with `.filtervcf` or `.cleanvcf`!" 
                 }, { quoted: m });
             }
@@ -440,7 +440,7 @@ module.exports = [
                 const media = await quoted.download();
                 const vcfContent = media.toString('utf8');
                 
-                await Ridzcoder.sendMessage(m.chat, { 
+                await ridzcoder.sendMessage(m.chat, { 
                     text: "🔍 Filtering VCF - checking WhatsApp numbers, this may take a while..." 
                 }, { quoted: m });
 
@@ -462,7 +462,7 @@ module.exports = [
                         if (!phoneNumber) continue;
 
                         const jid = `${phoneNumber}@s.whatsapp.net`;
-                        const result = await Ridzcoder.onWhatsApp(jid);
+                        const result = await ridzcoder.onWhatsApp(jid);
                         
                         if (result.length > 0 && result[0].exists) {
                             validContacts.push(card);
@@ -484,16 +484,16 @@ module.exports = [
                     `╰────────────────≽` +
                     `Sending filtered VCF file...`;
 
-                await Ridzcoder.sendMessage(m.chat, { text: resultMessage }, { quoted: m });
+                await ridzcoder.sendMessage(m.chat, { text: resultMessage }, { quoted: m });
 
-                await Ridzcoder.sendMessage(m.chat, { 
+                await ridzcoder.sendMessage(m.chat, { 
                     document: Buffer.from(filteredVcf), 
                     mimetype: "text/x-vcard", 
                     fileName: "filtered_contacts.vcf" 
                 });
 
             } catch (error) {
-                await Ridzcoder.sendMessage(m.chat, { 
+                await ridzcoder.sendMessage(m.chat, { 
                     text: `❌ *Error:* ${error.message}` 
                 }, { quoted: m });
             }
@@ -501,17 +501,17 @@ module.exports = [
     },
     {
     command: ['removebg', 'nobg', 'rmbg'],
-    operate: async ({ Ridzcoder, m, mime, quoted, reply, text, prefix }) => {        
+    operate: async ({ ridzcoder, m, mime, quoted, reply, text, prefix }) => {        
     if (!quoted || !/image/.test(mime)) {
         return reply(`*🖼️ REMOVE BACKGROUND*\n\nReply to an image with this command to remove its background.\n\n*Usage:*\n${prefix}removebg (reply to an image)\n${prefix}rmbg (reply to an image)\n\n*Example:* Reply to an image with .removebg`);
     }
 
     await reply(`🖼️ *Processing image...*\n\n⏳ Removing background, please wait...`);
-    await Ridzcoder.sendMessage(m.chat, { react: { text: "🎨", key: m.key } });
+    await ridzcoder.sendMessage(m.chat, { react: { text: "🎨", key: m.key } });
 
     try {
         // Upload image to catbox
-        const imageUrl = await handleMediaUpload(quoted, Ridzcoder, mime);
+        const imageUrl = await handleMediaUpload(quoted, ridzcoder, mime);
         
         if (!imageUrl || imageUrl.includes('exceeds the limit')) {
             return reply(`*Failed to upload image!*\n\nPlease try again with a smaller image.`);
@@ -526,18 +526,18 @@ module.exports = [
         const contentType = response.headers['content-type'];
         
         if (contentType && contentType.includes('image')) {
-            await Ridzcoder.sendMessage(m.chat, {
+            await ridzcoder.sendMessage(m.chat, {
                 image: Buffer.from(response.data),
                 caption: `✅ *Background removed successfully!*`
             }, { quoted: m });
-            await Ridzcoder.sendMessage(m.chat, { react: { text: "✅", key: m.key } });
+            await ridzcoder.sendMessage(m.chat, { react: { text: "✅", key: m.key } });
         } else {
             throw new Error('Invalid response from API');
         }
 
     } catch (error) {
         console.error('RemoveBG error:', error);
-        await Ridzcoder.sendMessage(m.chat, { react: { text: "❌", key: m.key } });
+        await ridzcoder.sendMessage(m.chat, { react: { text: "❌", key: m.key } });
         reply(`*Failed to remove background!*\n\nPlease try again with a different image.`);
     }
    
@@ -565,14 +565,14 @@ module.exports = [
 },
 {
     command: ['sswebtab', 'sstab'],
-    operate: async ({ reply, m, Ridzcoder, text }) => {
+    operate: async ({ reply, m, ridzcoder, text }) => {
         const q = text.trim();
         if (!q) return reply(`Please provide a URL to screenshot!`);
         
         const apiURL = `https://api.tioo.eu.org/sstab?url=${q}`;
         
         try {
-            await Ridzcoder.sendMessage(m.chat, { 
+            await ridzcoder.sendMessage(m.chat, { 
                 image: { url: apiURL },
                 caption: `Screenshot of: ${q}`
             }, { quoted: m });
@@ -584,14 +584,14 @@ module.exports = [
 },
 {
     command: ['ss2', 'ssmobile'],
-    operate: async ({ reply, m, Ridzcoder, text }) => {
+    operate: async ({ reply, m, ridzcoder, text }) => {
         const q = text.trim();
         if (!q) return reply(`Please provide a URL to screenshot!`);
         
         const apiURL = `${global?.siputzx || 'https://api.siputzx.xyz'}/api/tools/ssweb?url=${q}&theme=light&device=mobile`;
         
         try {
-            await Ridzcoder.sendMessage(m.chat, { 
+            await ridzcoder.sendMessage(m.chat, { 
                 image: { url: apiURL },
                 caption: `Mobile Screenshot of: ${q}`
             }, { quoted: m });
@@ -603,20 +603,20 @@ module.exports = [
 },
 {
     command: ['ss', 'screenshot'],
-    operate: async ({ reply, m, Ridzcoder, args, text }) => {
+    operate: async ({ reply, m, ridzcoder, args, text }) => {
         try {
             const url = text.trim();
             if (!url) return reply("❌ Please provide a URL\nExample: .ss https://google.com");
             if (!url.startsWith("http")) return reply("❌ URL must start with http:// or https://");
 
             // Send initial loading message
-            const loadingMsg = await Ridzcoder.sendMessage(m.chat, {
+            const loadingMsg = await ridzcoder.sendMessage(m.chat, {
                 text: "🔄 Starting screenshot capture...\n✦ Please wait..."
             }, { quoted: m });
 
             try {
                 // Send the screenshot
-                await Ridzcoder.sendMessage(m.chat, {
+                await ridzcoder.sendMessage(m.chat, {
                     image: { url: `https://image.thum.io/get/fullpage/${url}` },
                     caption: `- 🖼️ *Screenshot Generated*\n\n` +
                             `📸 *URL:* ${url}\n` +
@@ -624,7 +624,7 @@ module.exports = [
                 }, { quoted: m });
 
                 // Update loading message to success
-                await Ridzcoder.relayMessage(m.chat, {
+                await ridzcoder.relayMessage(m.chat, {
                     protocolMessage: {
                         key: loadingMsg.key,
                         type: 14,
@@ -636,7 +636,7 @@ module.exports = [
 
             } catch (captureError) {
                 // Update loading message to error
-                await Ridzcoder.relayMessage(m.chat, {
+                await ridzcoder.relayMessage(m.chat, {
                     protocolMessage: {
                         key: loadingMsg.key,
                         type: 14,
@@ -656,14 +656,14 @@ module.exports = [
 },
 {
     command: ['sswebpc', 'sspc', 'ssdesktop'],
-    operate: async ({ reply, m, Ridzcoder, text }) => {
+    operate: async ({ reply, m, ridzcoder, text }) => {
         const q = text.trim();
         if (!q) return reply(`Please provide a URL to screenshot!`);
         
         const apiURL = `${global?.siputzx || 'https://api.siputzx.xyz'}/api/tools/ssweb?url=${q}&theme=light&device=tablet`;
         
         try {
-            await Ridzcoder.sendMessage(m.chat, { 
+            await ridzcoder.sendMessage(m.chat, { 
                 image: { url: apiURL },
                 caption: `💻 Desktop Screenshot of: ${q}`
             }, { quoted: m });
@@ -675,13 +675,13 @@ module.exports = [
 },
 {
         command: ['take', 'copysticker', 'stealsticker'],
-        operate: async ({ Ridzcoder, m, reply, args, text }) => {
-            await takeCommand(Ridzcoder, m.chat, m, args);
+        operate: async ({ ridzcoder, m, reply, args, text }) => {
+            await takeCommand(ridzcoder, m.chat, m, args);
         }
 },
 {
     command: ['obfuscate'],
-    operate: async ({ reply, m, Ridzcoder }) => {
+    operate: async ({ reply, m, ridzcoder }) => {
         // Directory creation code
         const tmpDir = './tmp';
         if (!fs.existsSync(tmpDir)) {
@@ -692,7 +692,7 @@ module.exports = [
         const mime = quoted?.mimetype || "";
 
         if (!quoted || mime !== "application/javascript") {
-            return Ridzcoder.sendMessage(m.chat, { 
+            return ridzcoder.sendMessage(m.chat, { 
                 text: "❌ *Error:* Reply to a `.js` file with `.obfuscate`!" 
             }, { quoted: m });
         }
@@ -702,17 +702,17 @@ module.exports = [
             const tempFile = `./tmp/original-${Date.now()}.js`;
             await fs.promises.writeFile(tempFile, media);
 
-            Ridzcoder.sendMessage(m.chat, { 
+            ridzcoder.sendMessage(m.chat, { 
                 text: "🔒 Obfuscation started..." 
             }, { quoted: m });
 
             const obfuscatedFile = await obfuscateJS(tempFile);
 
-            await Ridzcoder.sendMessage(m.chat, { 
+            await ridzcoder.sendMessage(m.chat, { 
                 text: "✅ Obfuscation complete! Sending file..." 
             }, { quoted: m }); 
             
-            await Ridzcoder.sendMessage(m.chat, { 
+            await ridzcoder.sendMessage(m.chat, { 
                 document: fs.readFileSync(obfuscatedFile), 
                 mimetype: "text/javascript", 
                 fileName: "nemesis.js" 
@@ -722,7 +722,7 @@ module.exports = [
             await fs.promises.unlink(obfuscatedFile);
             
         } catch (error) {
-            Ridzcoder.sendMessage(m.chat, { 
+            ridzcoder.sendMessage(m.chat, { 
                 text: `❌ *Error:* ${error.message}` 
             }, { quoted: m });
         }
@@ -730,7 +730,7 @@ module.exports = [
 },
 {
         command: ['emoji', 'emojify'],
-        operate: async ({ Ridzcoder, m, reply, args, text }) => {
+        operate: async ({ ridzcoder, m, reply, args, text }) => {
             try {
                 let inputText = text || args.join(" ");
                 
@@ -751,7 +751,7 @@ module.exports = [
 
                 let emojiText = inputText.toLowerCase().split("").map(char => emojiMapping[char] || char).join("");
 
-                await Ridzcoder.sendMessage(m.chat, {
+                await ridzcoder.sendMessage(m.chat, {
                     text: emojiText,
                 }, { quoted: m });
 
@@ -763,7 +763,7 @@ module.exports = [
     },
     {
   command: ['countryinfo', 'country', 'infonegara'],
-  operate: async ({ m, reply, args, Ridzcoder }) => {
+  operate: async ({ m, reply, args, ridzcoder }) => {
     const country = args.join(' ');
     
     if (!country) return reply("*Please provide a country name. Example: `.countryinfo Uganda*`");
@@ -807,7 +807,7 @@ module.exports = [
       }
       
       if (info.flag) {
-        await Ridzcoder.sendMessage(m.chat, {
+        await ridzcoder.sendMessage(m.chat, {
           image: { url: info.flag },
           caption: message
         }, { quoted: m });
@@ -823,7 +823,7 @@ module.exports = [
 },
 {
   command: ['translate2', 'tr2', 'tl2'],
-  operate: async ({ m, reply, args, Ridzcoder }) => {
+  operate: async ({ m, reply, args, ridzcoder }) => {
     const text = args.join(' ');
     
     if (!text) return reply("*Please provide text to translate. Example: `.translate2 en:id I love you*`");
@@ -870,13 +870,13 @@ module.exports = [
 },
     {
     command: ['cekidch', 'idch'],
-    operate: async ({ Ridzcoder, m, reply, text }) => {
+    operate: async ({ ridzcoder, m, reply, text }) => {
         if (!text) return reply("*Please provide a WhatsApp channel link*");
         if (!text.includes("https://whatsapp.com/channel/")) return reply("*Invalid channel link*");
         
         try {
             let result = text.split('https://whatsapp.com/channel/')[1];
-            let res = await Ridzcoder.newsletterMetadata("invite", result);
+            let res = await ridzcoder.newsletterMetadata("invite", result);
             
             let teks = `
 ╭──⧼♛ *NEMESIS MD CH ID*
@@ -898,7 +898,7 @@ module.exports = [
 },
     {
     command: ['channelinfo'],
-    operate: async ({ Ridzcoder, m, reply, text }) => {
+    operate: async ({ ridzcoder, m, reply, text }) => {
         try {
             if (!text) return reply('Please provide Whatsapp Channel link');
 
@@ -914,7 +914,7 @@ module.exports = [
 
             // METHOD 1: Get Channel ID using direct Baileys API (for the ID)
             try {
-                const metadata = await Ridzcoder.newsletterMetadata("invite", inviteId);
+                const metadata = await ridzcoder.newsletterMetadata("invite", inviteId);
                 if (metadata?.id) {
                     channelId = metadata.id;
                     console.log('✅ Got Channel ID from direct API:', channelId);
@@ -951,7 +951,7 @@ module.exports = [
                                 `> ${global.wm || ''}`;
 
                 if (image) {
-                    await Ridzcoder.sendMessage(from, {
+                    await ridzcoder.sendMessage(from, {
                         image: { url: image },
                         caption: infoText,
                         mentions: [sender]
@@ -989,7 +989,7 @@ module.exports = [
                                 `> ${global.wm || ''}`;
 
                 if (image) {
-                    await Ridzcoder.sendMessage(from, {
+                    await ridzcoder.sendMessage(from, {
                         image: { url: image },
                         caption: infoText,
                         mentions: [sender]
@@ -1011,7 +1011,7 @@ module.exports = [
 },
 {
         command: ['npm'],
-        operate: async ({ Ridzcoder, m, reply, args, text, botNumber, }) => {
+        operate: async ({ ridzcoder, m, reply, args, text, botNumber, }) => {
             try {
                 // Check if a package name is provided
                 if (!args.length) {
@@ -1048,7 +1048,7 @@ module.exports = [
 `;
 
                 // Send the message
-                await Ridzcoder.sendMessage(m.chat, { text: message }, { quoted: m });
+                await ridzcoder.sendMessage(m.chat, { text: message }, { quoted: m });
 
             } catch (error) {
                 console.error("Error:", error);
@@ -1058,7 +1058,7 @@ module.exports = [
 },
 {
     command: ['gpass', 'password', 'genpass'],
-    operate: async ({ Ridzcoder, m, reply, text }) => {
+    operate: async ({ ridzcoder, m, reply, text }) => {
         let length = text ? parseInt(text) : 12;
         if (isNaN(length) || length < 6 || length > 50) {
             return reply("Please provide a valid length between 6 and 50. Example: .gpass 16");
@@ -1071,7 +1071,7 @@ module.exports = [
         }
         
         try {
-            Ridzcoder.sendMessage(m.chat, { text: pass }, { quoted: m });
+            ridzcoder.sendMessage(m.chat, { text: pass }, { quoted: m });
         } catch (error) {
             console.error('Error generating password:', error);
             reply('An error occurred while generating the password.');
@@ -1080,7 +1080,7 @@ module.exports = [
 },
 {
   command: ['emojimix', 'emix'],
-  operate: async ({ m, text, prefix, command, Ridzcoder, reply }) => {
+  operate: async ({ m, text, prefix, command, ridzcoder, reply }) => {
         if (!text) return reply(`🎨 *EMOJI MIXER*\n\nMix two emojis to create a new one!\n\n*Usage:*\n${prefix}emojimix 🥺 🤔\n${prefix}emix 😂 🥲\n${prefix}emojimix 🔥 💀\n\n*Example:*\n${prefix}emojimix 🥺 🤔`);
 
     // Extract two emojis from text
@@ -1095,7 +1095,7 @@ module.exports = [
     const emoji2 = emojis[1];
 
     await reply(`🔍 *Mixing ${emoji1} + ${emoji2}...*`);
-    await Ridzcoder.sendMessage(m.chat, { react: { text: "🎨", key: m.key } });
+    await ridzcoder.sendMessage(m.chat, { react: { text: "🎨", key: m.key } });
 
     try {
         const apiUrl = `https://api.nexray.eu.cc/tools/emojimix?emoji1=${encodeURIComponent(emoji1)}&emoji2=${encodeURIComponent(emoji2)}`;
@@ -1107,18 +1107,18 @@ module.exports = [
         // Check if response is an image
         const contentType = response.headers['content-type'];
         if (contentType && contentType.includes('image')) {
-            await Ridzcoder.sendMessage(m.chat, {
+            await ridzcoder.sendMessage(m.chat, {
                 image: Buffer.from(response.data),
                 caption: `> ${global.wm}`
             }, { quoted: m });
-            await Ridzcoder.sendMessage(m.chat, { react: { text: "✅", key: m.key } });
+            await ridzcoder.sendMessage(m.chat, { react: { text: "✅", key: m.key } });
         } else {
             throw new Error('Invalid response from API');
         }
 
     } catch (error) {
         console.error('Emojimix error:', error);
-        await Ridzcoder.sendMessage(m.chat, { react: { text: "❌", key: m.key } });
+        await ridzcoder.sendMessage(m.chat, { react: { text: "❌", key: m.key } });
         reply(`❌ *Failed to mix emojis.*\n\nPlease try different emojis or try again later.`);
     }
     
@@ -1126,7 +1126,7 @@ module.exports = [
 },
 {
   command: ['trackip'],
-  operate: async ({ m, text, prefix, command, Ridzcoder, reply }) => {
+  operate: async ({ m, text, prefix, command, ridzcoder, reply }) => {
   if (!text) return m.reply(`*Example:* ${prefix + command} 112.90.150.204`);
 try {
 let res = await fetch(`https://ipwho.is/${text}`).then(result => result.json());
@@ -1175,7 +1175,7 @@ const formatIPInfo = (info) => {
 };
 
 if (!res.success) throw new Error(`IP ${text} not found!`);
-await Ridzcoder.sendMessage(m.chat, { location: { degreesLatitude: res.latitude, degreesLongitude: res.longitude } }, { ephemeralExpiration: 604800 });
+await ridzcoder.sendMessage(m.chat, { location: { degreesLatitude: res.latitude, degreesLongitude: res.longitude } }, { ephemeralExpiration: 604800 });
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 await delay(2000);
 m.reply(formatIPInfo(res)); 
@@ -1186,7 +1186,7 @@ m.reply(`Error: Unable to retrieve data for IP ${text}`);
 },
 {
     command: ['getbusiness', 'businessinfo'],
-    operate: async ({ Ridzcoder, m, reply, text, prefix, quoted }) => {
+    operate: async ({ ridzcoder, m, reply, text, prefix, quoted }) => {
         try {
             let input = quoted ? quoted.sender : text || m.sender;
             
@@ -1209,7 +1209,7 @@ m.reply(`Error: Unable to retrieve data for IP ${text}`);
             }
             
             // Get business profile
-            const profile = await Ridzcoder.getBusinessProfile(target);
+            const profile = await ridzcoder.getBusinessProfile(target);
             
             // Check if profile exists
             if (!profile) {
@@ -1217,8 +1217,8 @@ m.reply(`Error: Unable to retrieve data for IP ${text}`);
             }
             
             // Get name and profile picture
-            const name = await Ridzcoder.getName(target).catch(() => 'Unknown');
-            const pfp = await Ridzcoder.profilePictureUrl(target, 'image').catch(() => null);
+            const name = await ridzcoder.getName(target).catch(() => 'Unknown');
+            const pfp = await ridzcoder.profilePictureUrl(target, 'image').catch(() => null);
             
             // Safely extract profile data
             const desc = profile?.description || 'No description available';
@@ -1237,7 +1237,7 @@ m.reply(`Error: Unable to retrieve data for IP ${text}`);
                 `╰────────────────≽`;
             
             if (pfp) {
-                await Ridzcoder.sendMessage(m.chat, {
+                await ridzcoder.sendMessage(m.chat, {
                     image: { url: pfp },
                     caption: caption
                 }, { quoted: m });
