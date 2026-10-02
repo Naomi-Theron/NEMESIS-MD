@@ -147,38 +147,54 @@ module.exports = [
       try {
         await ridzcoder.sendMessage(m.chat, { react: { text: "📥", key: m.key } })
 
-        if (!text) return m.reply("Example: .apk whatsapp")
+        if (!text) return m.reply("Example: .apk Telegram")
 
-        let res = await fetch(`https://kayiza-apis.zone.id/discovery/happymod?query=${encodeURIComponent(text)}`)
-        let json = await res.json()
+        const apiUrl = `https://api.stiantech.me/api/tools/apkcombo?name=${encodeURIComponent(text)}`
+        const response = await fetch(apiUrl, {
+          method: 'GET',
+          headers: {
+            'Authorization': 'Bearer st_51dd79f78cc78fe21d6cdafed5a3a2f1'
+          }
+        })
+        const json = await response.json()
 
-        if (!json.result || json.result.length === 0) {
-          return m.reply("App not found")
+        if (!json.success || !json.result) {
+          return m.reply("App not found or API error.")
         }
 
-        let app = json.result[0]
+        const app = json.result
 
-        let caption = `📥 *HappyMod Download*
+        let caption = `📥 *APK Download*
 
-📛 Name: ${app.name}
-📦 Size: ${app.size}
-⭐ Rating: ${app.rating}
-📥 Downloads: ${app.download}
+📛 Name: ${app.name || 'N/A'}
+📦 Package: ${app.package || 'N/A'}
+⭐ Rating: ${app.rating || 'N/A'}
+📥 Downloads: ${app.downloads || 'N/A'}
+📅 Updated: ${app.updated || 'N/A'}
+📦 Size: ${app.size || 'N/A'}
 
-🔗 Download: ${app.link}
+🔗 Download: ${app.downloadUrl || app.link || 'N/A'}
 
 > ᴘᴏᴡᴇʀᴇᴅ ʙʏ Rɪᴅᴢ Cᴏᴅᴇʀ`
 
-        await ridzcoder.sendMessage(m.chat, {
-          image: { url: app.icon },
-          caption: caption
-        }, { quoted: m })
+        if (app.icon) {
+          await ridzcoder.sendMessage(m.chat, {
+            image: { url: app.icon },
+            caption: caption
+          }, { quoted: m })
+        } else {
+          await ridzcoder.sendMessage(m.chat, { text: caption }, { quoted: m })
+        }
 
-        await ridzcoder.sendMessage(m.chat, {
-          document: { url: app.link },
-          fileName: `${app.name}.apk`,
-          mimetype: "application/vnd.android.package-archive"
-        }, { quoted: m })
+        // Send APK file if a download link is available
+        const downloadLink = app.downloadUrl || app.link;
+        if (downloadLink) {
+          await ridzcoder.sendMessage(m.chat, {
+            document: { url: downloadLink },
+            fileName: `${app.name || 'app'}.apk`,
+            mimetype: "application/vnd.android.package-archive"
+          }, { quoted: m })
+        }
       } catch (e) {
         console.log('apk error:', e)
         m.reply("Error fetching app")
