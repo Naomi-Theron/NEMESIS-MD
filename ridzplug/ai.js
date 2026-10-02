@@ -1,13 +1,4 @@
 const axios = require('axios');
-const {
-veniceAICommand,
-mistralAICommand,
-perplexityAICommand,
-bardAICommand,
-gpt4NanoAICommand,
-RidzAICommand,
-claudeAICommand
-} = require('../start/ridzcmd/ai');
 
 module.exports = [
     {
