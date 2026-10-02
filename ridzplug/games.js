@@ -367,34 +367,6 @@ module.exports = [
       reply("❌ Error fetching cartoon game.");
     }
   }
-},
-{
-    command: ['riddle', 'teka'],
-    operate: async ({ ridzcoder, m, reply, args }) => {
-        try {
-            await reply("🧩 *Loading riddle...*");
-            
-            const response = await fetch(`${global.siputzx}/api/games/tekadek`);
-            const data = await response.json();
-            
-            if (!data.status || !data.data) {
-                return reply("Failed to fetch riddle. Try again later.");
-            }
-            
-            const { soal, jawaban } = data.data;
-            
-            let message = `*🧩 TEKA-TEKI / RIDDLE*\n\n`;
-            message += `❓ *Question:*\n${soal}\n\n`;
-            message += `💡 *Answer:* ||${jawaban}||\n\n`;
-            message += `_Reply with .riddle to get another riddle_`;
-            
-            reply(message);
-            
-        } catch (error) {
-            console.error('Riddle error:', error);
-            reply("Error fetching riddle. Try again later.");
-        }
-    }
 }
     
 ];
