@@ -335,28 +335,68 @@ function generateMenuText(plugins, ownername, prefix, mode, versions, latensie, 
     }
     totalCommands = uniqueCommands.size;
 
+    // ─── Time / Date / Uptime helpers ───────────────
+    const now = new Date();
+
+    // Time in HH:MM:SS AM/PM format
+    const timeString = now.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true
+    }).replace(/\b(am|pm)\b/i, (m) => m.toUpperCase());
+
+    // Date like: Friday, October 2, 2026
+    const dateString = now.toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+
+    // Uptime from process.uptime() → days, hours, minutes, seconds
+    const uptimeSec = Math.floor(process.uptime());
+    const days = Math.floor(uptimeSec / 86400);
+    const hours = Math.floor((uptimeSec % 86400) / 3600);
+    const minutes = Math.floor((uptimeSec % 3600) / 60);
+    const seconds = uptimeSec % 60;
+    const uptimeString = `${days}ᴅ ${hours}ʜ ${minutes}ᴍ ${seconds}s`;
+
+    // Mood based on hour of day (24h)
+    const hour = now.getHours();
+    let mood = '☀️';
+    if (hour >= 5 && hour < 12) mood = '🌅';        // Morning
+    else if (hour >= 12 && hour < 17) mood = '☀️';  // Afternoon
+    else if (hour >= 17 && hour < 21) mood = '🌇';  // Evening
+    else mood = '🌙';                                // Night
+
+    // ─── Build menu ────────────────────────────────
     let menu = `╭──⧼♛  *NEMESIS MD V2.1.0* ♛⧽───❍\n`;
-menu += `│┃ ♛ᴜsᴇʀ: ${ownername}\n`;
-menu += `│┃ ♛ᴍᴏᴅᴇ: ${mode === 'public' ? 'ᴘᴜʙʟɪᴄ' : 'ᴘʀɪᴠᴀᴛᴇ'}\n`;
-menu += `│┃ ♛ᴘʟᴀᴛꜰᴏʀᴍ: ${getHostPlatform()}\n`;
-menu += `│┃ ♛ᴘʀᴇғɪx: [ ${prefix} ]\n`;
-menu += `│┃ ♛ᴄᴍᴅs: ${totalCommands}+\n`;
-menu += `╰───────────────────≽\n`;
-menu += `${readmore || ''}\n`;
+    menu += `│┃ ♛ ᴏᴡɴᴇʀ: ${ownername}\n`;
+    menu += `│┃ ♛ᴍᴏᴅᴇ: ${mode === 'public' ? 'ᴘᴜʙʟɪᴄ' : 'ᴘʀɪᴠᴀᴛᴇ'}\n`;
+    menu += `│┃ ♛ ᴘʟᴀᴛꜰᴏʀᴍ: ${getHostPlatform()}\n`;
+    menu += `│┃ ♛ ᴘʀᴇғɪx: [ ${prefix} ]\n`;
+    menu += `│┃ ♛ ᴄᴍᴅs: ${totalCommands}+\n`;
+    menu += `│┃ ♛ ᴠᴇʀsɪᴏɴ: ${versions || '1.0.0'}\n`;
+    menu += `│┃ ♛ ᴛɪᴍᴇ: ${timeString}\n`;
+    menu += `│┃ ♛ ᴅᴀᴛᴇ: ${dateString}\n`;
+    menu += `│┃ ♛ ᴜᴘᴛɪᴍᴇ: ${uptimeString}\n`;
+    menu += `│┃ ♛ ᴍᴏᴏᴅ: ${mood}\n`;
+    menu += `╰───────────────────≽\n`;
+    menu += `${readmore || ''}\n`;
 
     for (const category in plugins) {
-    menu += `╭──⧼♛   *${category.toUpperCase()} MENU*  ♛⧽───❍\n`;
-    plugins[category].forEach(plugin => {
-        if (plugin.command && plugin.command.length > 0) {
-            menu += `│┃ ♛ ${plugin.command[0]}\n`;
-        }
-    });
-    menu += `╰────────────────≽\n\n`;
+        menu += `╭──⧼♛   *${category.toUpperCase()} MENU*  ♛⧽───❍\n`;
+        plugins[category].forEach(plugin => {
+            if (plugin.command && plugin.command.length > 0) {
+                menu += `│┃ ♛ ${plugin.command[0]}\n`;
+            }
+        });
+        menu += `╰────────────────≽\n\n`;
     }
 
     return menu;
 }
-
 function loadMenuPlugins(directory) {
     const plugins = {};
 
