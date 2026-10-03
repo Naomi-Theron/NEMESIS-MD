@@ -11,7 +11,7 @@ antipromoteCommand
  
 
 // Helper functions
-async function buildPayloadFromQuoted(quotedMessage, Ridzcoder) {
+async function buildPayloadFromQuoted(quotedMessage, ridzcoder) {
     if (quotedMessage.videoMessage) {
         const buffer = await downloadToBuffer(quotedMessage.videoMessage, 'video');
         return { 
@@ -101,14 +101,14 @@ async function toVN(inputBuffer) {
     });
 }
 
-async function sendGroupStatus(Ridzcoder, jid, content) {
-    const inside = await generateWAMessageContent(content, { upload: Ridzcoder.waUploadToServer });
+async function sendGroupStatus(ridzcoder, jid, content) {
+    const inside = await generateWAMessageContent(content, { upload: ridzcoder.waUploadToServer });
     const messageSecret = crypto.randomBytes(32);
     const m = generateWAMessageFromContent(jid, {
         messageContextInfo: { messageSecret },
         groupStatusMessageV2: { message: { ...inside, messageContextInfo: { messageSecret } } }
     }, {});
-    await Ridzcoder.relayMessage(jid, m.message, { messageId: m.key.id });
+    await ridzcoder.relayMessage(jid, m.message, { messageId: m.key.id });
     return m;
 }
 
@@ -157,7 +157,7 @@ async function generateProfilePicture(buffer) {
 module.exports = [
 {
     command: ['listactive', 'activeusers'],
-    operate: async ({ Ridzcoder, m, reply, isGroup, from, GroupDB, groupName }) => {
+    operate: async ({ ridzcoder, m, reply, isGroup, from, GroupDB, groupName }) => {
         if (!isGroup) return reply(global.mess.notgroup);
         
         const activeUsers = await GroupDB.getActiveUsers(from, 15);
@@ -175,7 +175,7 @@ module.exports = [
         
         message += `\n📈 *Total tracked users:* ${activeUsers.length}`;
         
-        await Ridzcoder.sendMessage(m.chat, { 
+        await ridzcoder.sendMessage(m.chat, { 
             text: message, 
             mentions: activeUsers.map(u => u.jid) 
         }, { quoted: m });
@@ -183,11 +183,11 @@ module.exports = [
 },
 {
     command: ['listinactive', 'inactiveusers'],
-    operate: async ({ Ridzcoder, m, reply, isGroup, from, GroupDB, groupName }) => {
+    operate: async ({ ridzcoder, m, reply, isGroup, from, GroupDB, groupName }) => {
         if (!isGroup) return reply(global.mess.notgroup);
         
         try {
-            const metadata = await Ridzcoder.groupMetadata(from);
+            const metadata = await ridzcoder.groupMetadata(from);
             const allParticipants = metadata.participants.map(p => p.id);
             
             const inactiveUsers = await GroupDB.getInactiveUsers(from, allParticipants);
@@ -201,7 +201,7 @@ module.exports = [
             message += inactiveUsers.map((user, i) => `🔹 ${i + 1}. @${user.split('@')[0]}`).join('\n');
             message += `\n\n📊 *Total inactive:* ${inactiveUsers.length}`;
 
-            await Ridzcoder.sendMessage(m.chat, { 
+            await ridzcoder.sendMessage(m.chat, { 
                 text: message, 
                 mentions: inactiveUsers 
             }, { quoted: m });
@@ -214,14 +214,14 @@ module.exports = [
 },
 {
     command: ['groupactivity', 'activity'],
-    operate: async ({ Ridzcoder, m, reply, text, isGroup, GroupDB, from,groupName }) => {
+    operate: async ({ ridzcoder, m, reply, text, isGroup, GroupDB, from,groupName }) => {
         if (!isGroup) return reply(global.mess.notgroup);
         
         try {
-            const metadata = await Ridzcoder.groupMetadata(from);
+            const metadata = await ridzcoder.groupMetadata(from);
             const allParticipants = metadata.participants.map(p => p.id);
             const activeUsers = await GroupDB.getActiveUsers(from, 1000);
-            const inactiveUsers = await GroupDB.getInactiveUsers(Ridzcoder, from, allParticipants);
+            const inactiveUsers = await GroupDB.getInactiveUsers(ridzcoder, from, allParticipants);
             
             let message = `📊 *GROUP ACTIVITY - ${groupName || 'This Group'}*\n\n`;
             message += `*Total Members:* ${allParticipants.length}\n`;
@@ -252,7 +252,7 @@ module.exports = [
                 ...inactiveUsers.slice(0, 5)
             ];
             
-            await Ridzcoder.sendMessage(m.chat, { 
+            await ridzcoder.sendMessage(m.chat, { 
                 text: message, 
                 mentions: mentions 
             }, { quoted: m });
@@ -265,13 +265,13 @@ module.exports = [
 },
 {
     command: ['kickinactive', 'removeinactive'],
-    operate: async ({ Ridzcoder, m, reply, isGroup, GroupDB, from, prefix }) => {
+    operate: async ({ ridzcoder, m, reply, isGroup, GroupDB, from, prefix }) => {
         if (!isGroup) return reply(global.mess.notgroup);
       if (!m.isAdmin) return reply(global.mess.notadmin);
       if (!m.isBotAdmin) return reply(global.mess.botadmin);
 
         try {
-            const metadata = await Ridzcoder.groupMetadata(from);
+            const metadata = await ridzcoder.groupMetadata(from);
             const allParticipants = metadata.participants.map(p => p.id);
             const groupAdmins = metadata.participants.filter(p => p.admin).map(p => p.id);
             
@@ -289,7 +289,7 @@ module.exports = [
             message += `\n⏰ *Time:* 25 seconds`;
             message += `\n❌ *Cancel:* Use *${prefix}cancelkick* to stop`;
 
-            await Ridzcoder.sendMessage(m.chat, { 
+            await ridzcoder.sendMessage(m.chat, { 
                 text: message, 
                 mentions: inactiveUsers 
             }, { quoted: m });
@@ -308,7 +308,7 @@ module.exports = [
                 if (queueData.type === 'inactive') {
                     for (let user of inactiveUsers) {
                         try {
-                            await Ridzcoder.groupParticipantsUpdate(m.chat, [user], "remove");
+                            await ridzcoder.groupParticipantsUpdate(m.chat, [user], "remove");
                             await new Promise(resolve => setTimeout(resolve, 1000));
                         } catch (userError) {
                             console.error(`Failed to kick ${user}:`, userError);
@@ -327,7 +327,7 @@ module.exports = [
 },
 {
     command: ['kickall', 'removeall'],
-    operate: async ({ Ridzcoder, text, m, reply, isGroup, from, prefix }) => {
+    operate: async ({ ridzcoder, text, m, reply, isGroup, from, prefix }) => {
         if (!m.isGroup) return reply(mess.notgroup);
         if (!m.isAdmin) return reply(global.mess.notadmin);
       if (!m.isBotAdmin) return reply(global.mess.botadmin);
@@ -336,13 +336,13 @@ module.exports = [
             : m.quoted
             ? m.quoted.sender
             : text.replace(/[^0-9]/g, "") + "@s.whatsapp.net";
-        await Ridzcoder.groupParticipantsUpdate(m.chat, [bck], "remove");
+        await ridzcoder.groupParticipantsUpdate(m.chat, [bck], "remove");
         reply(global.mess.done);
     }
 },
 {
     command: ['cancelkick'],
-    operate: async ({ Ridzcoder, m, reply, isGroup }) => {
+    operate: async ({ ridzcoder, m, reply, isGroup }) => {
         if (!isGroup) return reply(global.mess.notgroup);
         if (!m.isAdmin) return reply(global.mess.notadmin);
       if (!m.isBotAdmin) return reply(global.mess.botadmin);
@@ -362,7 +362,7 @@ module.exports = [
                 cancelMessage += `*Cancelled by:* @${m.sender.split('@')[0]}\n`;
                 cancelMessage += `✅ *Status:* Successfully cancelled`;
                 
-                await Ridzcoder.sendMessage(m.chat, { 
+                await ridzcoder.sendMessage(m.chat, { 
                     text: cancelMessage, 
                     mentions: [m.sender]
                 });
@@ -378,13 +378,13 @@ module.exports = [
 },
 {
     command: ['totalmembers'],
-    operate: async ({ Ridzcoder, m, reply, isGroup,Access, participants, text, groupMetadata }) => {
+    operate: async ({ ridzcoder, m, reply, isGroup,Access, participants, text, groupMetadata }) => {
         if (!isGroup) return reply(global.mess.notgroup);
         
         if (!m.isAdmin) return reply(global.mess.notadmin);
         if (!m.isBotAdmin) return reply(global.mess.botadmin);
           
-        await Ridzcoder.sendMessage(
+        await ridzcoder.sendMessage(
             m.chat,
             {
                 text: `*GROUP*: ${groupMetadata.subject}\n*MEMBERS*: ${participants.length}`,
@@ -395,7 +395,7 @@ module.exports = [
 },
 {
         command: ['tagall'],
-        operate: async ({ Ridzcoder, m, reply, isGroup, participants, text }) => {
+        operate: async ({ ridzcoder, m, reply, isGroup, participants, text }) => {
             if (!isGroup) return reply(global.mess.notgroup);
             if (!m.isAdmin) return reply(global.mess.notadmin);
             if (!m.isBotAdmin) return reply(global.mess.botadmin);
@@ -408,7 +408,7 @@ module.exports = [
                 teks += `@${mem.id.split("@")[0]}\n`;
             }
             
-            Ridzcoder.sendMessage(
+            ridzcoder.sendMessage(
                 m.chat,
                 {
                     text: teks,
@@ -422,42 +422,42 @@ module.exports = [
     },
     {
         command: ['mute', 'close'],
-        operate: async ({ Ridzcoder, m, reply, isGroup, isBotAdmin }) => {
+        operate: async ({ ridzcoder, m, reply, isGroup, isBotAdmin }) => {
             if (!isGroup) return reply(global.mess.notgroup);
             if (!m.isAdmin) return reply(global.mess.notadmin);
             if (!m.isBotAdmin) return reply(global.mess.botadmin);
             
-            Ridzcoder.groupSettingUpdate(m.chat, "announcement");
+            ridzcoder.groupSettingUpdate(m.chat, "announcement");
             reply("Group closed by admin. Only admins can send messages.");
         }
     },
     {
         command: ['delgrouppp'],
-        operate: async ({ Ridzcoder, m, reply, isGroup, from }) => {
+        operate: async ({ ridzcoder, m, reply, isGroup, from }) => {
             if (!isGroup) return reply(global.mess.notgroup);
            if (!m.isAdmin) return reply(global.mess.notadmin);
             if (!m.isBotAdmin) return reply(global.mess.botadmin);
             
-            await Ridzcoder.removeProfilePicture(from);
+            await ridzcoder.removeProfilePicture(from);
             reply("Group profile picture has been successfully removed.");
         }
     },
     {
         command: ['setdesc'],
-        operate: async ({ Ridzcoder, m, reply, isGroup, text }) => {
+        operate: async ({ ridzcoder, m, reply, isGroup, text }) => {
             if (!isGroup) return reply(global.mess.notgroup);
             if (!m.isAdmin) return reply(global.mess.notadmin);
             if (!m.isBotAdmin) return reply(global.mess.botadmin);
             
             if (!text) return reply("*Please enter a text*");
             
-            await Ridzcoder.groupUpdateDescription(m.chat, text);
+            await ridzcoder.groupUpdateDescription(m.chat, text);
             reply(global.mess.done);
         }
     },
     {
         command: ['vcf'],
-        operate: async ({ Ridzcoder, m, reply, isGroup, Access, quoted, groupMetadata, from, getSetting, botNumber, sleep }) => {
+        operate: async ({ ridzcoder, m, reply, isGroup, Access, quoted, groupMetadata, from, getSetting, botNumber, sleep }) => {
             try {
                 if (!isGroup) return reply(global.mess.notgroup);
                 if (!Access) return reply("*_This command is for the owner only_*");
@@ -481,7 +481,7 @@ module.exports = [
                 fs.writeFileSync(nmfilect, vcard.trim());
                 await sleep(2000);
 
-                await Ridzcoder.sendMessage(from, {
+                await ridzcoder.sendMessage(from, {
                     document: fs.readFileSync(nmfilect), 
                     mimetype: 'text/vcard', 
                     fileName: 'nemesis.vcf', 
@@ -495,17 +495,17 @@ module.exports = [
     },
     {
         command: ['approve'],
-        operate: async ({ Ridzcoder, m, reply, isGroup, botNumber }) => {
+        operate: async ({ ridzcoder, m, reply, isGroup, botNumber }) => {
             if (!isGroup) return reply(global.mess.notgroup);
             if (!m.isAdmin) return reply(global.mess.notadmin);
             if (!m.isBotAdmin) return reply(global.mess.botadmin);
 
-            const responseList = await Ridzcoder.groupRequestParticipantsList(m.chat);
+            const responseList = await ridzcoder.groupRequestParticipantsList(m.chat);
 
             if (responseList.length === 0) return reply("*No pending requests detected at the moment!*");
 
             for (const participan of responseList) {
-                const response = await Ridzcoder.groupRequestParticipantsUpdate(
+                const response = await ridzcoder.groupRequestParticipantsUpdate(
                     m.chat, 
                     [participan.jid],
                     "approve"
@@ -517,14 +517,14 @@ module.exports = [
     },
     {
         command: ['approveall'],
-        operate: async ({ Ridzcoder, m, reply, isGroup }) => {
+        operate: async ({ ridzcoder, m, reply, isGroup }) => {
             if (!m.isAdmin) return reply(global.mess.notadmin);
             if (!m.isBotAdmin) return reply(global.mess.botadmin);
             
             const groupId = m.chat;
             
             const approveAllRequests = async (message, chatId) => {
-                const responseList = await Ridzcoder.groupRequestParticipantsList(chatId);
+                const responseList = await ridzcoder.groupRequestParticipantsList(chatId);
                 
                 if (responseList.length === 0) {
                     return message.reply("*No pending requests found!*");
@@ -533,7 +533,7 @@ module.exports = [
                 const jids = responseList.map(participant => participant.jid);
                 
                 try {
-                    const response = await Ridzcoder.groupRequestParticipantsUpdate(
+                    const response = await ridzcoder.groupRequestParticipantsUpdate(
                         chatId,
                         jids,
                         "approve"
@@ -550,7 +550,7 @@ module.exports = [
     },
     {
         command: ['disapproveall'],
-        operate: async ({ Ridzcoder, m, reply, isGroup }) => {
+        operate: async ({ ridzcoder, m, reply, isGroup }) => {
             if (!isGroup) return reply(global.mess.notgroup);
             if (!m.isAdmin) return reply(global.mess.notadmin);
             if (!m.isBotAdmin) return reply(global.mess.botadmin);
@@ -558,7 +558,7 @@ module.exports = [
             const groupId = m.chat;
             
             const disapproveAllRequests = async (message, chatId) => {
-                const responseList = await Ridzcoder.groupRequestParticipantsList(chatId);
+                const responseList = await ridzcoder.groupRequestParticipantsList(chatId);
                 
                 if (responseList.length === 0) {
                     return message.reply("*No pending requests found!*");
@@ -567,7 +567,7 @@ module.exports = [
                 const jids = responseList.map(participant => participant.jid);
                 
                 try {
-                    const response = await Ridzcoder.groupRequestParticipantsUpdate(
+                    const response = await ridzcoder.groupRequestParticipantsUpdate(
                         chatId,
                         jids,
                         "reject"
@@ -584,7 +584,7 @@ module.exports = [
     },
     {
     command: ['setgrouppp', 'setgrouppic'],
-    operate: async ({ Ridzcoder, m, reply, isGroup, prefix, quoted, mime, args, command }) => {
+    operate: async ({ ridzcoder, m, reply, isGroup, prefix, quoted, mime, args, command }) => {
         
         if (!m.isGroup) return reply(global.mess.notgroup);
         if (!m.isAdmin) return reply(global.mess.notadmin);
@@ -593,37 +593,37 @@ module.exports = [
         if (!/image/.test(mime)) return reply(`Reply to an image, not a sticker!`);
         
         try {
-            await Ridzcoder.sendMessage(m.chat, { react: { text: "⏳", key: m.key } });
+            await ridzcoder.sendMessage(m.chat, { react: { text: "⏳", key: m.key } });
             
-            const mediaPath = await Ridzcoder.downloadAndSaveMediaMessage(quoted, "pp");
+            const mediaPath = await ridzcoder.downloadAndSaveMediaMessage(quoted, "pp");
             
             if (args[0] && args[0].toLowerCase() === "full") {
                 const img = await jimp.read(mediaPath);
                 const min = Math.min(img.getWidth(), img.getHeight());
                 const cropped = await img.crop(0, 0, min, min).scaleToFit(720, 720).getBufferAsync(jimp.MIME_JPEG);
                 
-                await Ridzcoder.query({
+                await ridzcoder.query({
                     tag: "iq",
                     attrs: { to: m.chat, type: "set", xmlns: "w:profile:picture" },
                     content: [{ tag: "picture", attrs: { type: "image" }, content: cropped }]
                 });
             } else {
-                await Ridzcoder.updateProfilePicture(m.chat, { url: mediaPath });
+                await ridzcoder.updateProfilePicture(m.chat, { url: mediaPath });
             }
             
             fs.unlinkSync(mediaPath);
-            await Ridzcoder.sendMessage(m.chat, { react: { text: "✅", key: m.key } });
+            await ridzcoder.sendMessage(m.chat, { react: { text: "✅", key: m.key } });
             reply(`✅ Group icon updated!`);
             
         } catch (error) {
-            await Ridzcoder.sendMessage(m.chat, { react: { text: "❌", key: m.key } });
+            await ridzcoder.sendMessage(m.chat, { react: { text: "❌", key: m.key } });
             reply(`❌ Error: ${error.message}`);
         }
     }
 },
 {
     command: ['antigroupmention', 'antigpmention', 'agm'],
-    operate: async ({ Ridzcoder, m, reply, args, prefix, Access, db, botNumber, mess }) => {
+    operate: async ({ ridzcoder, m, reply, args, prefix, Access, db, botNumber, mess }) => {
         if (!Access) return reply(mess.owner);
         
         const mode = args[0]?.toLowerCase();
@@ -641,7 +641,7 @@ module.exports = [
 },
     {
         command: ['listrequest'],
-        operate: async ({ Ridzcoder, m, reply, isGroup }) => {
+        operate: async ({ ridzcoder, m, reply, isGroup }) => {
             if (!isGroup) return reply(global.mess.notgroup);
             if (!m.isAdmin) return reply(global.mess.notadmin);
             if (!m.isBotAdmin) return reply(global.mess.botadmin);
@@ -650,7 +650,7 @@ module.exports = [
             
             const listGroupRequests = async (message, chatId) => {
                 try {
-                    const responseList = await Ridzcoder.groupRequestParticipantsList(chatId);
+                    const responseList = await ridzcoder.groupRequestParticipantsList(chatId);
                     
                     if (responseList.length === 0) {
                         return message.reply("*📭 No pending group requests found!*");
@@ -666,7 +666,7 @@ module.exports = [
                     listMessage += `\n📌 *Use:*\n• .approveall - Approve all\n• .disapproveall - Reject all`;
                     
                     const mentions = responseList.map(p => p.jid);
-                    await Ridzcoder.sendMessage(
+                    await ridzcoder.sendMessage(
                         chatId,
                         {
                             text: listMessage,
@@ -686,14 +686,14 @@ module.exports = [
     },
     {
         command: ['mediatag'],
-        operate: async ({ Ridzcoder, m, reply, prefix, isGroup, isGroupAdmins, quoted, participants }) => {
+        operate: async ({ ridzcoder, m, reply, prefix, isGroup, isGroupAdmins, quoted, participants }) => {
             if (!isGroup) return reply(global.mess.notgroup);
             if (!m.isAdmin) return reply(global.mess.notadmin);
             if (!m.isBotAdmin) return reply(global.mess.botadmin);
             
             if (!quoted) return reply(`Reply to any media with caption ${prefix}mediatag`);
 
-            Ridzcoder.sendMessage(m.chat, {
+            ridzcoder.sendMessage(m.chat, {
                 forward: quoted.fakeObj,
                 mentions: participants.map((a) => a.id),
             });
@@ -701,7 +701,7 @@ module.exports = [
     },
     {
         command: ['promote', 'upgrade'],
-        operate: async ({ Ridzcoder, m, reply, Access, isGroup, text, mentionedJid, quoted }) => {
+        operate: async ({ ridzcoder, m, reply, Access, isGroup, text, mentionedJid, quoted }) => {
             if (!isGroup) return reply(global.mess.notgroup);
             if (!isGroup) return reply(global.mess.notgroup);
             if (!m.isAdmin) return reply(global.mess.notadmin);
@@ -718,7 +718,7 @@ module.exports = [
             if (!target) return reply("⚠ *Mention or reply to a user to promote!*");
 
             try {
-                await Ridzcoder.groupParticipantsUpdate(m.chat, [target], "promote");
+                await ridzcoder.groupParticipantsUpdate(m.chat, [target], "promote");
                 reply(`✅ *User promoted successfully!*`);
             } catch (error) {
                 reply("*Failed to promote user. They might already be an admin or the bot lacks permissions.*");
@@ -727,7 +727,7 @@ module.exports = [
     },
     {
         command: ['demote', 'downgrade'],
-        operate: async ({ Ridzcoder, m, reply, isGroup, text, mentionedJid, quoted }) => {
+        operate: async ({ ridzcoder, m, reply, isGroup, text, mentionedJid, quoted }) => {
             if (!isGroup) return reply(global.mess.notgroup);
             if (!m.isAdmin) return reply(global.mess.notadmin);
             if (!m.isBotAdmin) return reply(global.mess.botadmin);
@@ -743,7 +743,7 @@ module.exports = [
             if (!target) return reply("⚠ *Mention or reply to a user to demote!*");
 
             try {
-                await Ridzcoder.groupParticipantsUpdate(m.chat, [target], "demote");
+                await ridzcoder.groupParticipantsUpdate(m.chat, [target], "demote");
                 reply(`✅ *User demoted successfully!*`);
             } catch (error) {
                 reply("*Failed to demote user. They might already be a member or the bot lacks permissions.*");
@@ -752,18 +752,18 @@ module.exports = [
     },
     {
         command: ['tagadmins', 'listadmins', 'adminlist'],
-        operate: async ({ Ridzcoder, m, reply, isGroup, groupMetadata, participants }) => {
+        operate: async ({ ridzcoder, m, reply, isGroup, groupMetadata, participants }) => {
             if (!isGroup) return reply(global.mess.notgroup);
 
             try {
-                await Ridzcoder.sendMessage(m.chat, {
+                await ridzcoder.sendMessage(m.chat, {
                     react: {
                         text: "⏳",
                         key: m.key
                     }
                 });
 
-                const groupData = await Ridzcoder.groupMetadata(m.chat);
+                const groupData = await ridzcoder.groupMetadata(m.chat);
                 const groupParticipants = groupData.participants;
                 
                 const admins = groupParticipants.filter(p => p.admin);
@@ -771,7 +771,7 @@ module.exports = [
                 const regularAdmins = groupParticipants.filter(p => p.admin && p.admin !== 'superadmin');
 
                 if (admins.length === 0) {
-                    await Ridzcoder.sendMessage(m.chat, {
+                    await ridzcoder.sendMessage(m.chat, {
                         react: {
                             text: "ℹ️",
                             key: m.key
@@ -796,7 +796,7 @@ module.exports = [
                     });
                 }
 
-                await Ridzcoder.sendMessage(m.chat, {
+                await ridzcoder.sendMessage(m.chat, {
                     react: {
                         text: "✅",
                         key: m.key
@@ -809,7 +809,7 @@ module.exports = [
             } catch (error) {
                 console.error('Error listing admins:', error);
                 
-                await Ridzcoder.sendMessage(m.chat, {
+                await ridzcoder.sendMessage(m.chat, {
                     react: {
                         text: "❌",
                         key: m.key
@@ -822,13 +822,13 @@ module.exports = [
     },
     {
         command: ['getgrouppp'],
-        operate: async ({ Ridzcoder, quoted, m, reply, isGroup }) => {
+        operate: async ({ ridzcoder, quoted, m, reply, isGroup }) => {
             if (!isGroup) return reply(global.mess.notgroup);
 
             try {
-                const ppUrl = await Ridzcoder.profilePictureUrl(m.chat, 'image');
+                const ppUrl = await ridzcoder.profilePictureUrl(m.chat, 'image');
 
-                await Ridzcoder.sendMessage(m.chat, 
+                await ridzcoder.sendMessage(m.chat, 
                     { 
                         image: { url: ppUrl }, 
                         caption: `🔹 *This Group's Profile Picture*`
@@ -836,7 +836,7 @@ module.exports = [
                     { quoted: m }
                 );
             } catch {
-                await Ridzcoder.sendMessage(m.chat, 
+                await ridzcoder.sendMessage(m.chat, 
                     { 
                         image: { url: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png?q=60' }, 
                         caption: '⚠️ No profile picture found for this group.'
@@ -848,7 +848,7 @@ module.exports = [
     },
     {
         command: ['listonline'],
-        operate: async ({ Ridzcoder, m, reply, isGroup, args, store, botNumber }) => {
+        operate: async ({ ridzcoder, m, reply, isGroup, args, store, botNumber }) => {
     if (!m.isGroup) return reply(mess.notgroup);
     
     let id = args && /\d+\-\d+@g.us/.test(args[0]) ? args[0] : m.chat;
@@ -860,22 +860,22 @@ module.exports = [
 
     let online = [...Object.keys(presences), botNumber];
     let liston = 1;
-    Ridzcoder.sendText(m.chat, '*ONLINE MEMBERS IN THIS GROUP*\n\n' + online.map(v => `${liston++} . @` + v.replace(/@.+/, '')).join`\n`, m, { mentions: online });
+    ridzcoder.sendText(m.chat, '*ONLINE MEMBERS IN THIS GROUP*\n\n' + online.map(v => `${liston++} . @` + v.replace(/@.+/, '')).join`\n`, m, { mentions: online });
   }
 },
     {
         command: ['editinfo'],
-        operate: async ({ Ridzcoder, m, reply, isGroup, args, prefix }) => {
+        operate: async ({ ridzcoder, m, reply, isGroup, args, prefix }) => {
             if (!isGroup) return reply(global.mess.notgroup);
             if (!m.isAdmin) return reply(global.mess.notadmin);
             if (!m.isBotAdmin) return reply(global.mess.botadmin);
 
             if (args[0] === "on") {
-                await Ridzcoder.groupSettingUpdate(m.chat, "unlocked").then(
+                await ridzcoder.groupSettingUpdate(m.chat, "unlocked").then(
                     (res) => reply(`*Successful, members can edit group info*`)
                 );
             } else if (args[0] === "off") {
-                await Ridzcoder.groupSettingUpdate(m.chat, "locked").then((res) =>
+                await ridzcoder.groupSettingUpdate(m.chat, "locked").then((res) =>
                     reply(`*Successful, members cannot edit group info*`)
                 );
             } else {
@@ -885,7 +885,7 @@ module.exports = [
     },
     {
     command: ['invite'],
-    operate: async ({ Ridzcoder, m, reply, isGroup, text, prefix }) => {
+    operate: async ({ ridzcoder, m, reply, isGroup, text, prefix }) => {
         if (!isGroup) return reply(global.mess.notgroup);
               
         if (!text)
@@ -900,8 +900,8 @@ module.exports = [
             );
 
         let group = m.chat;
-        let link = "https://chat.whatsapp.com/" + (await Ridzcoder.groupInviteCode(group));
-        await Ridzcoder.sendMessage(text + "@s.whatsapp.net", {
+        let link = "https://chat.whatsapp.com/" + (await ridzcoder.groupInviteCode(group));
+        await ridzcoder.sendMessage(text + "@s.whatsapp.net", {
             text: `*GROUP INVITATION*\n\nSomeone invites you to join this group: \n\n${link}`,
             mentions: [m.sender],
         });
@@ -910,12 +910,12 @@ module.exports = [
 },
         {
         command: ['linkgc2'],
-        operate: async ({ Ridzcoder, m, reply, Access, isGroup, groupMetadata, participants }) => {
+        operate: async ({ ridzcoder, m, reply, Access, isGroup, groupMetadata, participants }) => {
            if (!isGroup) return reply(global.mess.notgroup);
             if (!Access) return reply(global.mess.owner);
             
-            let response = await Ridzcoder.groupInviteCode(m.chat);
-            Ridzcoder.sendMessage(
+            let response = await ridzcoder.groupInviteCode(m.chat);
+            ridzcoder.sendMessage(
                 m.chat,
                 { 
                     text: `*GROUP LINK*\n\n*NAME:* ${groupMetadata.subject}\n\n*OWNER:* ${groupMetadata.owner !== undefined ? "+" + groupMetadata.owner.split`@`[0] : "Unknown"}\n\n*ID:* ${groupMetadata.id}\n\n*LINK:* https://chat.whatsapp.com/${response}\n\n*MEMBERS:* ${participants.length}`,
@@ -927,13 +927,13 @@ module.exports = [
     },
     {
         command: ['unlockgc'],
-        operate: async ({ Ridzcoder, m, reply, isGroup, from }) => {
+        operate: async ({ ridzcoder, m, reply, isGroup, from }) => {
             try {
                 if (!isGroup) return reply(global.mess.notgroup);
                 if (!m.isAdmin) return reply(global.mess.notadmin);
                 if (!m.isBotAdmin) return reply(global.mess.botadmin);
                 
-                await Ridzcoder.groupSettingUpdate(from, "unlocked");
+                await ridzcoder.groupSettingUpdate(from, "unlocked");
                 reply("🔓 Group settings are now unlocked", {
                     contextInfo: {
                         forwardingScore: 999,
@@ -949,12 +949,12 @@ module.exports = [
     },
     {
         command: ['lockgcsettings', 'lockgc'],
-        operate: async ({ Ridzcoder, m, reply, isGroup, from }) => {
+        operate: async ({ ridzcoder, m, reply, isGroup, from }) => {
             try {
                 if (!isGroup) return reply(global.mess.notgroup);
                 if (!m.isAdmin) return reply(global.mess.notadmin);
                 if (!m.isBotAdmin) return reply(global.mess.botadmin);
-                await Ridzcoder.groupSettingUpdate(from, 'locked');
+                await ridzcoder.groupSettingUpdate(from, 'locked');
                 reply("🔒 Group settings are now locked (admins only)", {
                     contextInfo: {
                         forwardingScore: 999,
@@ -970,12 +970,12 @@ module.exports = [
     },
     {
         command: ['unlockgcsettings', 'unlockgc'],
-        operate: async ({ Ridzcoder, m, reply, isGroup, from }) => {
+        operate: async ({ ridzcoder, m, reply, isGroup, from }) => {
             try {
                 if (!isGroup) return reply(global.mess.notgroup);
                 if (!m.isAdmin) return reply(global.mess.notadmin);
                 if (!m.isBotAdmin) return reply(global.mess.botadmin);
-                await Ridzcoder.groupSettingUpdate(from, 'unlocked');
+                await ridzcoder.groupSettingUpdate(from, 'unlocked');
                 reply("🔓 Group settings are now unlocked (all participants)", {
                     contextInfo: {
                         forwardingScore: 999,
@@ -991,14 +991,14 @@ module.exports = [
     },
     {
         command: ['adminapproval'],
-        operate: async ({ Ridzcoder, m, reply, isGroup, from }) => {
+        operate: async ({ ridzcoder, m, reply, isGroup, from }) => {
             try {
                 if (!isGroup) return reply(global.mess.notgroup);
                 if (!m.isAdmin) return reply(global.mess.notadmin);
                 if (!m.isBotAdmin) return reply(global.mess.botadmin);
-                const groupMetadata = await Ridzcoder.groupMetadata(from);
+                const groupMetadata = await ridzcoder.groupMetadata(from);
                 
-                await Ridzcoder.groupSettingUpdate(from, groupMetadata.announce ? 'not_announcement' : 'announcement');
+                await ridzcoder.groupSettingUpdate(from, groupMetadata.announce ? 'not_announcement' : 'announcement');
                 
                 const newState = groupMetadata.announce ? "OFF" : "ON";
                 reply(`✅ Admin approval mode turned ${newState}`, {
@@ -1016,7 +1016,7 @@ module.exports = [
     },
     {
         command: ['closetime'],
-        operate: async ({ Ridzcoder, m, reply, isGroup, args }) => {
+        operate: async ({ ridzcoder, m, reply, isGroup, args }) => {
             if (!isGroup) return reply(global.mess.notgroup);
             if (!m.isAdmin) return reply(global.mess.notadmin);
             if (!m.isBotAdmin) return reply(global.mess.botadmin);
@@ -1048,14 +1048,14 @@ module.exports = [
 
             reply(`*Closing group after ${duration} ${unit}*`);
             setTimeout(() => {
-                Ridzcoder.groupSettingUpdate(m.chat, "announcement");
+                ridzcoder.groupSettingUpdate(m.chat, "announcement");
                 reply("*Group closed by admin. Only admins can send messages.*");
             }, timer);
         }
     },
     {
         command: ['opentime'],
-        operate: async ({ Ridzcoder, m, reply, isGroup, args }) => {
+        operate: async ({ ridzcoder, m, reply, isGroup, args }) => {
             if (!isGroup) return reply(global.mess.notgroup);
             if (!m.isAdmin) return reply(global.mess.notadmin);
             if (!m.isBotAdmin) return reply(global.mess.botadmin);
@@ -1084,14 +1084,14 @@ module.exports = [
 
             reply(`*Opening group after ${duration} ${unit}*`);
             setTimeout(() => {
-                Ridzcoder.groupSettingUpdate(m.chat, "not_announcement");
+                ridzcoder.groupSettingUpdate(m.chat, "not_announcement");
                 reply("*Group opened by admin. Members can now send messages.*");
             }, timer);
         }
     },
     {
         command: ['poll'],
-        operate: async ({ Ridzcoder, m, reply, Access, isGroup, prefix, text }) => {
+        operate: async ({ ridzcoder, m, reply, Access, isGroup, prefix, text }) => {
             if (!Access) return reply('*You are not my owner* 😜!');
             if (!isGroup) return reply(global.mess.notgroup);
             
@@ -1105,7 +1105,7 @@ module.exports = [
                 options.push(i);
             }
             
-            await Ridzcoder.sendMessage(m.chat, {
+            await ridzcoder.sendMessage(m.chat, {
                 poll: {
                     name: poll,
                     values: options,
@@ -1115,7 +1115,7 @@ module.exports = [
     },
     {
         command: ['antilink'],
-        operate: async ({ Ridzcoder, m, reply, prefix, args, isGroup, db, botNumber }) => {
+        operate: async ({ ridzcoder, m, reply, prefix, args, isGroup, db, botNumber }) => {
             if (!isGroup) return reply(global.mess.notgroup);
             if (!m.isAdmin) return reply(global.mess.notadmin);
             if (!m.isBotAdmin) return reply(global.mess.botadmin);
@@ -1180,7 +1180,7 @@ module.exports = [
 },
 {
     command: ['antibadword', 'antiword', 'filter'],
-    operate: async ({ Ridzcoder, m, reply, args, isGroup, db, botNumber, Access, prefix }) => {
+    operate: async ({ ridzcoder, m, reply, args, isGroup, db, botNumber, Access, prefix }) => {
         
             if (!isGroup) return reply(global.mess.notgroup);
             if (!m.isAdmin) return reply(global.mess.notadmin);
@@ -1301,7 +1301,7 @@ module.exports = [
 },
 {
     command: ['antisticker', 'nosticker', 'stickerfilter'],
-    operate: async ({ Ridzcoder, m, reply, args, isGroup, db, botNumber, Access, prefix }) => {
+    operate: async ({ ridzcoder, m, reply, args, isGroup, db, botNumber, Access, prefix }) => {
         
         if (!isGroup) return reply(global.mess.notgroup);
             if (!m.isAdmin) return reply(global.mess.notadmin);
@@ -1360,7 +1360,7 @@ module.exports = [
 },
     {
         command: ['antitag'],
-        operate: async ({ Ridzcoder, m, reply, prefix, args, isGroup, db, botNumber }) => {
+        operate: async ({ ridzcoder, m, reply, prefix, args, isGroup, db, botNumber }) => {
             if (!isGroup) return reply(global.mess.notgroup);
             if (!m.isAdmin) return reply(global.mess.notadmin);
             if (!m.isBotAdmin) return reply(global.mess.botadmin);
@@ -1407,7 +1407,7 @@ module.exports = [
 },
     {
         command: ['tagall2'],
-        operate: async ({ Ridzcoder, m, reply, isGroup, participants, from }) => {
+        operate: async ({ ridzcoder, m, reply, isGroup, participants, from }) => {
             try {
                 if (!isGroup) return reply(global.mess.notgroup);
                 if (!m.isAdmin) return reply(global.mess.notadmin);
@@ -1420,7 +1420,7 @@ module.exports = [
                     message += `@${userId.split('@')[0]} `;
                 });
 
-                await Ridzcoder.sendMessage(from, {
+                await ridzcoder.sendMessage(from, {
                     text: message,
                     mentions,
                     contextInfo: {
@@ -1437,13 +1437,13 @@ module.exports = [
     },
     {
         command: ['link', 'linkgc'],
-        operate: async ({ Ridzcoder, m, reply, Access, isGroup, global }) => {
+        operate: async ({ ridzcoder, m, reply, Access, isGroup, global }) => {
             if (!Access) return reply(global.mess.owner);
             if (!isGroup) return reply(global.mess.notgroup);
             
             try {
-                const freshGroupMetadata = await Ridzcoder.groupMetadata(m.chat);
-                let groupInvite = await Ridzcoder.groupInviteCode(m.chat);
+                const freshGroupMetadata = await ridzcoder.groupMetadata(m.chat);
+                let groupInvite = await ridzcoder.groupInviteCode(m.chat);
                 let groupOwner = freshGroupMetadata.owner ? `+${freshGroupMetadata.owner.split('@')[0]}` : "Unknown";
                 let groupLink = `https://chat.whatsapp.com/${groupInvite}`;
                 let memberCount = freshGroupMetadata.participants.length;
@@ -1455,7 +1455,7 @@ module.exports = [
                               `👥 *Members:* ${memberCount}\n\n` +
                               `🌍 *Link:* ${groupLink}\n\n> ${global.wm}`;
 
-                await Ridzcoder.sendMessage(m.chat, { text: message }, { detectLink: true });
+                await ridzcoder.sendMessage(m.chat, { text: message }, { detectLink: true });
             } catch (error) {
                 console.error('Error generating group link:', error);
                 reply("❌ *Failed to fetch group link. Make sure the bot has admin permissions.*");
@@ -1464,17 +1464,17 @@ module.exports = [
     },
     {
         command: ['unmute', 'open'],
-        operate: async ({ Ridzcoder, m, reply, isGroup }) => {
+        operate: async ({ ridzcoder, m, reply, isGroup }) => {
             if (!isGroup) return reply('*This command can only be used in groups.*');
             if (!m.isAdmin) return reply(global.mess.notadmin);
             if (!m.isBotAdmin) return reply(global.mess.botadmin);
-            Ridzcoder.groupSettingUpdate(m.chat, "not_announcement");
+            ridzcoder.groupSettingUpdate(m.chat, "not_announcement");
             reply("Group opened by admin. Members can now send messages.");
         }
     },
     {
         command: ['add'],
-        operate: async ({ Ridzcoder, m, reply, prefix, isGroup, text, quoted }) => {
+        operate: async ({ ridzcoder, m, reply, prefix, isGroup, text, quoted }) => {
               if (!m.isGroup) return reply(global.mess.notgroup);
               if (!m.isAdmin) return reply(global.mess.notadmin);
             if (!m.isBotAdmin) return reply(global.mess.botadmin);
@@ -1485,13 +1485,13 @@ module.exports = [
         let bws = m.quoted
             ? m.quoted.sender
             : text.replace(/[^0-9]/g, "") + "@s.whatsapp.net";
-        await Ridzcoder.groupParticipantsUpdate(m.chat, [bws], "add");
+        await ridzcoder.groupParticipantsUpdate(m.chat, [bws], "add");
         reply(global.mess.done);
     }
 },
     {
     command: ['kick'],
-    operate: async ({ Ridzcoder, m, reply, isGroup, mentionedJid, quoted, from, text, mess }) => {
+    operate: async ({ ridzcoder, m, reply, isGroup, mentionedJid, quoted, from, text, mess }) => {
         if (!m.isGroup) return reply(mess.group);
         if (!m.isAdmin) return reply(global.mess.notadmin);
         if (!m.isBotAdmin) return reply(global.mess.botadmin);
@@ -1501,20 +1501,20 @@ module.exports = [
             : m.quoted
             ? m.quoted.sender
             : text.replace(/[^0-9]/g, "") + "@s.whatsapp.net";
-        await Ridzcoder.groupParticipantsUpdate(m.chat, [bck], "remove");
+        await ridzcoder.groupParticipantsUpdate(m.chat, [bck], "remove");
         reply(global.mess.done);
     }
 },
     {
         command: ['groupinfo'],
-        operate: async ({ Ridzcoder, m, reply, isGroup, groupMetadata, from }) => {
+        operate: async ({ ridzcoder, m, reply, isGroup, groupMetadata, from }) => {
             try {
                 if (!isGroup) return reply(global.mess.notgroup);
 
-                const metadata = await Ridzcoder.groupMetadata(from);
+                const metadata = await ridzcoder.groupMetadata(from);
                 let ppUrl;
                 try {
-                    ppUrl = await Ridzcoder.profilePictureUrl(from, "image");
+                    ppUrl = await ridzcoder.profilePictureUrl(from, "image");
                 } catch {
                     ppUrl = "https://i.imgur.com/8nLFCVP.png";
                 }
@@ -1528,7 +1528,7 @@ module.exports = [
 🆔 *Group ID:* ${metadata.id}
 `.trim();
 
-                await Ridzcoder.sendMessage(from, {
+                await ridzcoder.sendMessage(from, {
                     image: { url: ppUrl },
                     caption: infoText,
                     mentions: [metadata.owner],
@@ -1546,41 +1546,41 @@ module.exports = [
     },
     {
         command: ['resetlinkgc'],
-        operate: async ({ Ridzcoder, m, reply, isGroup, from }) => {
+        operate: async ({ ridzcoder, m, reply, isGroup, from }) => {
             if (!isGroup) return reply('*This command can only be used in groups.*');
             if (!m.isAdmin) return reply(global.mess.notadmin);
             if (!m.isBotAdmin) return reply(global.mess.botadmin);
 
-            Ridzcoder.groupRevokeInvite(from);
+            ridzcoder.groupRevokeInvite(from);
             reply("*group link reseted by admin*");
         }
     },
    
 {
     command: ['antidemote'],
-    operate: async ({ m, reply, prefix, args, Access, botNumber, Ridzcoder }) => {
+    operate: async ({ m, reply, prefix, args, Access, botNumber, ridzcoder }) => {
         if (!m.isGroup) return reply(global.notgroup);
         if (!Access) return reply(mess.owner);
         if (!m.isAdmin) return reply(global.mess.notadmin);
         if (!m.isBotAdmin) return reply(global.mess.botadmin);
         
-        await antidemoteCommand(Ridzcoder, m, args, botNumber);
+        await antidemoteCommand(ridzcoder, m, args, botNumber);
     }
 },
 {
     command: ['antipromote'],
-    operate: async ({ m, reply, prefix, args, Access, botNumber, Ridzcoder }) => {
+    operate: async ({ m, reply, prefix, args, Access, botNumber, ridzcoder }) => {
         if (!m.isGroup) return reply(global.notgroup);
         if (!Access) return reply(mess.owner);
         if (!m.isAdmin) return reply(global.mess.notadmin);
         if (!m.isBotAdmin) return reply(global.mess.botadmin);
         
-        await antipromoteCommand(Ridzcoder, m, args, botNumber);
+        await antipromoteCommand(ridzcoder, m, args, botNumber);
     }
 },
 {
     command: ['antitagadmin'],
-    operate: async ({ m, reply, prefix, args, Access, db, botNumber, Ridzcoder }) => {
+    operate: async ({ m, reply, prefix, args, Access, db, botNumber, ridzcoder }) => {
         if (!m.isGroup) return reply(global.notgroup);
         if (!Access) return reply(mess.owner);
         if (!m.isAdmin) return reply(global.mess.notadmin);
@@ -1629,7 +1629,7 @@ module.exports = [
 },
  {
         command: ['allowlink'],
-        operate: async ({ Ridzcoder, m, args, reply, Access, isGroup, prefix, db, text, botNumber, mentionedJid, quoted }) => {
+        operate: async ({ ridzcoder, m, args, reply, Access, isGroup, prefix, db, text, botNumber, mentionedJid, quoted }) => {
         if (!m.isGroup) return reply(mess.group);
     if (!m.isAdmin && !Access) return reply(mess.notadmin);
     if (!m.isBotAdmin) return reply(mess.botadmin);
@@ -1657,7 +1657,7 @@ module.exports = [
         await db.setGroupSetting(botNumber, m.chat, 'allowlink', allowed);
         
         // Get username for better response
-        const name = await Ridzcoder.getName(jid) || jid.split('@')[0];
+        const name = await ridzcoder.getName(jid) || jid.split('@')[0];
         return reply(`✅ @${name} can now post links`, { mentions: [jid] });
     }
     
@@ -1676,7 +1676,7 @@ module.exports = [
         allowed.splice(index, 1);
         await db.setGroupSetting(botNumber, m.chat, 'allowlink', allowed);
         
-        const name = await Ridzcoder.getName(jid) || jid.split('@')[0];
+        const name = await ridzcoder.getName(jid) || jid.split('@')[0];
         return reply(`✅ @${name} removed from allowlist`, { mentions: [jid] });
     }
     
@@ -1693,7 +1693,7 @@ module.exports = [
             msg += `${i + 1}. @${jid.split('@')[0]}\n`;
         });
         
-        return Ridzcoder.sendMessage(m.chat, { 
+        return ridzcoder.sendMessage(m.chat, { 
             text: msg, 
             mentions: allowed 
         }, { quoted: m });
@@ -1710,11 +1710,11 @@ module.exports = [
 },
     {
         command: ['userjid', 'userid'],
-        operate: async ({ Ridzcoder, m, reply, isGroup }) => {
+        operate: async ({ ridzcoder, m, reply, isGroup }) => {
             if (!isGroup) return reply(global.mess.notgroup);
             
             const groupMetadata = m.isGroup
-                ? await Ridzcoder.groupMetadata(m.chat).catch((e) => {})
+                ? await ridzcoder.groupMetadata(m.chat).catch((e) => {})
                 : "";
             const participants = m.isGroup
                 ? await groupMetadata.participants
@@ -1728,40 +1728,40 @@ module.exports = [
     },
     {
         command: ['disp90days'],
-        operate: async ({ Ridzcoder, m, reply, isGroup }) => {
+        operate: async ({ ridzcoder, m, reply, isGroup }) => {
             if (!isGroup) return reply(global.mess.notgroup);
             if (!m.isAdmin) return reply(global.mess.notadmin);
             if (!m.isBotAdmin) return reply(global.mess.botadmin);
 
-            await Ridzcoder.groupToggleEphemeral(m.chat, 90*24*3600);
+            await ridzcoder.groupToggleEphemeral(m.chat, 90*24*3600);
             reply('Dissapearing messages successfully turned on for 90 days!');
         }
     },
     {
         command: ['dispoff'],
-        operate: async ({ Ridzcoder, m, reply, isGroup }) => {
+        operate: async ({ ridzcoder, m, reply, isGroup }) => {
             if (!isGroup) return reply(global.mess.notgroup);
             if (!m.isAdmin) return reply(global.mess.notadmin);
             if (!m.isBotAdmin) return reply(global.mess.botadmin);
 
-            await Ridzcoder.groupToggleEphemeral(m.chat, 0);
+            await ridzcoder.groupToggleEphemeral(m.chat, 0);
             reply('Dissapearing messages successfully turned off!');
         }
     },
     {
         command: ['disp24hours'],
-        operate: async ({ Ridzcoder, m, reply, isGroup}) => {
+        operate: async ({ ridzcoder, m, reply, isGroup}) => {
             if (!isGroup) return reply(global.mess.notgroup);
             if (!m.isAdmin) return reply(global.mess.notadmin);
             if (!m.isBotAdmin) return reply(global.mess.botadmin);
 
-            await Ridzcoder.groupToggleEphemeral(m.chat, 1*24*3600);
+            await ridzcoder.groupToggleEphemeral(m.chat, 1*24*3600);
             reply('Dissapearing messages successfully turned on for 24hrs!');
         }
     },
     {
     command: ['togstatus', 'swgc', 'groupstatus', 'tosgroup'],
-    operate: async ({ Ridzcoder, m, reply, isGroup, participants, quoted }) => {
+    operate: async ({ ridzcoder, m, reply, isGroup, participants, quoted }) => {
         if (!isGroup) return reply(global.mess.notgroup);
             if (!m.isAdmin) return reply(global.mess.notadmin);
             if (!m.isBotAdmin) return reply(global.mess.botadmin);
@@ -1784,7 +1784,7 @@ module.exports = [
             }
 
             if (quotedMessage) {
-                payload = await buildPayloadFromQuoted(quotedMessage, Ridzcoder);
+                payload = await buildPayloadFromQuoted(quotedMessage, ridzcoder);
                 if (textAfterCommand && payload) {
                     if (payload.video || payload.image || (payload.convertedSticker && payload.image)) {
                         payload.caption = textAfterCommand;
@@ -1803,7 +1803,7 @@ module.exports = [
             }
 
             // Send group status
-            await sendGroupStatus(Ridzcoder, m.chat, payload);
+            await sendGroupStatus(ridzcoder, m.chat, payload);
 
             const mediaType = detectMediaType(quotedMessage, payload);
             let successMsg = `✅ ${mediaType} sent!`;
