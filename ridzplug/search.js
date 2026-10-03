@@ -24,7 +24,6 @@ module.exports = [
                     throw new Error(res.status.msg);
                 }
 
-                // Check before accessing music[0]
                 if (!res.metadata?.music || res.metadata.music.length === 0) {
                     return reply("No music identified in this audio/video.");
                 }
@@ -40,7 +39,7 @@ module.exports = [
             }
         }
     },
-        {
+    {
         command: ['ytsearch', 'youtubesearch', 'yts'],
         operate: async ({ ridzcoder, m, reply, text, prefix, command }) => {
             if (!text) return reply(`📌 *Example: ${prefix + command} Eminem Godzilla*`);
@@ -80,7 +79,7 @@ module.exports = [
         return reply(`❌ No videos found for "${query}"`);
       }
       
-      const videos = data.data.slice(0, 5); // Show first 5 results
+      const videos = data.data.slice(0, 5);
       
       let message = `📺 *YouTube Search Results for "${query}"*\n\n`;
       
@@ -103,7 +102,7 @@ module.exports = [
     }
   }
 },
-        {
+    {
         command: ['imdb', 'movie'],
         operate: async ({ ridzcoder, m, reply, text }) => {
             if (!text) return reply("Provide a movie or series name.");
@@ -178,7 +177,6 @@ module.exports = [
             
             const data = await res.json();
 
-            // Check for error flag
             if (data.error === true) {
                 return reply(`No lyrics found for *"${text}"*\n\nTry:\n• Add artist name\n• Check spelling\n• Use exact title`);
             }
@@ -194,10 +192,8 @@ module.exports = [
             const title = lyricsData.title || text;
             const image = lyricsData.image;
 
-            // Clean up lyrics (remove "Contributor" line if present)
             const cleanLyrics = lyrics.replace(/^\d+\s+Contributor.*?\n/i, '');
 
-            // Format message (max 4000 chars for WhatsApp)
             let message = `🎵 *${title}*\n🎤 *Artist:* ${artist}\n\n📖 *Lyrics:*\n\n${cleanLyrics}`;
             
             if (message.length > 3500) {
@@ -206,7 +202,6 @@ module.exports = [
             
             message += `\n\n${global.wm || ''}`;
 
-            // Send image first if available
             if (image && typeof image === 'string' && image.includes('http') && !image.includes('default_cover_image')) {
                 try {
                     await ridzcoder.sendMessage(m.chat, {
@@ -214,14 +209,12 @@ module.exports = [
                         caption: `🎵 *${title}*\n🎤 *Artist:* ${artist}`
                     }, { quoted: m });
                     
-                    // Small delay
                     await new Promise(resolve => setTimeout(resolve, 300));
                 } catch (e) {
                     console.log('Image failed:', e.message);
                 }
             }
 
-            // Send lyrics
             await ridzcoder.sendMessage(m.chat, { text: message }, { quoted: m });
 
         } catch (error) {
@@ -242,29 +235,32 @@ module.exports = [
             if (!text) return reply(`*Query input needed*\n\nExample: .chord shape of you`);
             
             try {
-                const apiUrl = `https://api.diioffc.web.id/api/search/chord?query=${encodeURIComponent(text)}`;
+                const apiUrl = `https://api.princetechn.com/api/search/chord?apikey=prince&query=${encodeURIComponent(text)}`;
                 const res = await fetch(apiUrl);
                 const response = await res.json();
                 
-                if (!response.result) {
-                    return reply(`❌ No chord found for "${text}"\nPlease try a different song.`);
+                if (!response.success || !response.results || response.results.length === 0) {
+                    return reply(`❌ No results found for "${text}"\nPlease try a different query.`);
                 }
                 
-                const { url, artist, artistUrl, title, chord } = response.result;
+                const results = response.results.slice(0, 5);
                 
-                // Format chord output with better readability
-                const chordMessage = `🎵 *Chord Finder*\n\n` +
-                    `🎤 *Title:* ${title}\n` +
-                    `👤 *Artist:* ${artist}\n` +
-                    `🔗 *Artist URL:* ${artistUrl}\n` +
-                    `🌐 *Chord URL:* ${url}\n\n` +
-                    `🎼 *Chord:*\n\`\`\`\n${chord}\n\`\`\``;
+                let chordMessage = `🎵 *Search Results for "${text}"*\n\n`;
+                results.forEach((item, i) => {
+                    chordMessage += `*${i + 1}. ${item.name || 'Unknown'}*\n`;
+                    if (item.developer) chordMessage += `👤 *Developer:* ${item.developer}\n`;
+                    if (item.rating) chordMessage += `⭐ *Rating:* ${item.rating}\n`;
+                    if (item.summary) chordMessage += `📝 ${item.summary}\n`;
+                    chordMessage += `\n`;
+                });
+                
+                chordMessage += `> ${global.wm || ''}`;
                 
                 reply(chordMessage);
                 
             } catch (error) {
                 console.error('Error in chord command:', error);
-                reply('Error fetching chord. Please try again later.');
+                reply('Error fetching results. Please try again later.');
             }
         }
     },
@@ -297,33 +293,30 @@ module.exports = [
     if (!query) return reply("*Please provide a search term. Example: `.tiktoksearch keizzah4189*`");
     
     try {
-      const response = await fetch(`${global.api}/search/tiktoksearch?query=${encodeURIComponent(query)}`);
+      const response = await fetch(`https://api.princetechn.com/api/stalk/tiktokstalk?apikey=prince&query=${encodeURIComponent(query)}`);
       const data = await response.json();
       
-      if (!data.status || !data.result?.length) {
-        return reply(`❌ No TikTok videos found for "${query}"`);
+      if (!data.success || !data.results?.length) {
+        return reply(`❌ No results found for "${query}"`);
       }
       
-      let message = `*TikTok Search Results for "${query}"*\n\n`;
-      message += `*📊 Found:* ${data.result.length} videos\n\n`;
+      let message = `*Search Results for "${query}"*\n\n`;
+      message += `*📊 Found:* ${data.results.length} results\n\n`;
       
-      data.result.slice(0, 5).forEach((video, i) => {
-        message += `*${i + 1}. Video*\n`;
-        message += `👤 *Author:* ${video.author?.nickname || 'Unknown'}\n`;
-        message += `🌍 *Region:* ${video.region || 'N/A'}\n`;
-        message += `⏱️ *Duration:* ${video.duration || 0} seconds\n`;
-        if (video.title) message += `📝 *Title:* ${video.title.substring(0, 50)}${video.title.length > 50 ? '...' : ''}\n`;
-        message += `🎬 *Watch:* ${video.play}\n`;
-        if (video.music) message += `🎵 *Audio:* ${video.music}\n`;
+      data.results.slice(0, 5).forEach((item, i) => {
+        message += `*${i + 1}. ${item.name || 'Unknown'}*\n`;
+        if (item.developer) message += `👤 *Developer:* ${item.developer}\n`;
+        if (item.rating) message += `⭐ *Rating:* ${item.rating}\n`;
+        if (item.summary) message += `📝 ${item.summary}\n`;
         message += `\n`;
       });
       
-      message += `\n_Showing top 5 results. Use .ttdl [video_url] to download._`;
+      message += `\n_Showing top 5 results._`;
       
       reply(message);
     } catch (error) {
       console.error('TikTok Search Error:', error);
-      reply("❌ Error searching TikTok. Try again later.");
+      reply("❌ Error searching. Try again later.");
     }
   }
 },
@@ -335,87 +328,192 @@ module.exports = [
     if (!query) return reply("*Please provide a search term. Example: `.imagesearch dog*`");
     
     try {
-      const response = await fetch(`${global.api}/search/images?query=${encodeURIComponent(query)}`);
+      const response = await fetch(`https://api.princetechn.com/api/search/googleimage?apikey=prince&query=${encodeURIComponent(query)}`);
       const data = await response.json();
       
-      if (!data.status || !data.result?.length) {
-        return reply(`❌ No images found for "${query}"`);
+      if (!data.success || !data.results?.length) {
+        return reply(`❌ No results found for "${query}"`);
       }
       
-      // Remove duplicates
-      const uniqueUrls = [];
-      const seen = new Set();
-      data.result.forEach(item => {
-        if (!seen.has(item.url)) {
-          seen.add(item.url);
-          uniqueUrls.push(item);
-        }
+      const results = data.results.slice(0, 5);
+      
+      let message = `*🔍 Search Results for "${query}"*\n\n`;
+      results.forEach((item, i) => {
+        message += `*${i + 1}. ${item.name || 'Unknown'}*\n`;
+        if (item.developer) message += `👤 *Developer:* ${item.developer}\n`;
+        if (item.rating) message += `⭐ *Rating:* ${item.rating}\n`;
+        if (item.summary) message += `📝 ${item.summary}\n`;
+        if (item.icon) message += `🖼️ *Icon:* ${item.icon}\n`;
+        message += `\n`;
       });
       
-      if (uniqueUrls.length === 0) {
-        return reply(`❌ No images found for "${query}"`);
-      }
+      message += `> ${global.wm || ''}`;
       
-      // Send first 2 images
-      for (let i = 0; i < Math.min(2, uniqueUrls.length); i++) {
-        const img = uniqueUrls[i];
+      if (results[0].icon) {
         await ridzcoder.sendMessage(m.chat, {
-          image: { url: img.url },
-          caption: `*📸 Image ${i + 1}*\n ${img.width} x ${img.height}`
+          image: { url: results[0].icon },
+          caption: message
         }, { quoted: m });
-      }
-      
-      if (uniqueUrls.length > 2) {
-        reply(`✅ Found ${uniqueUrls.length} images.`);
+      } else {
+        reply(message);
       }
       
     } catch (error) {
       console.error('Image Search Error:', error);
-      reply("❌ Error searching images. Try again later.");
+      reply("❌ Error searching. Try again later.");
     }
   }
 },
-        {
-        command: ['define'],
+    // ─────────────────────────────────────────────
+    // DEFINE - Urban Dictionary via PrinceTech
+    // ─────────────────────────────────────────────
+    {
+        command: ['define', 'dictionary', 'urbandictionary'],
         operate: async ({ ridzcoder, mek, m, reply, text, q }) => {
-        try {
-        if (!q) return reply("Please provide a word to define.\n\n📌 *Usage:* .define [word]");
+            try {
+                const word = (q || text || '').trim();
+                if (!word) return reply("Please provide a word to define.\n\n📌 *Usage:* .define [word]\n📌 *Example:* .define dog");
 
-        const word = q.trim();
-        const url = `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`;
+                const apiUrl = `https://api.princetechn.com/api/tools/define?apikey=prince&term=${encodeURIComponent(word)}`;
+                const { data } = await axios.get(apiUrl);
 
-        const response = await axios.get(url);
-        const definitionData = response.data[0];
+                if (!data || !data.success || !data.results || data.results.length === 0) {
+                    return reply(`🚫 *No definition found for "${word}".*\nPlease check the spelling and try again.`);
+                }
 
-        const definition = definitionData.meanings[0].definitions[0].definition;
-        const example = definitionData.meanings[0].definitions[0].example || '❌ No example available';
-        const synonyms = definitionData.meanings[0].definitions[0].synonyms.join(', ') || '❌ No synonyms available';
-        const phonetics = definitionData.phonetics[0]?.text || '🔇 No phonetics available';
-        const audio = definitionData.phonetics[0]?.audio || null;
+                const results = data.results.slice(0, 5);
 
-        const wordInfo = `
-📖 *Word*: *${definitionData.word}*  
-🗣️ *Pronunciation*: _${phonetics}_  
-📚 *Definition*: ${definition}  
-✍️ *Example*: ${example}  
-📝 *Synonyms*: ${synonyms}  
+                let message = `📖 *DEFINITIONS FOR "${word.toUpperCase()}"*\n\n`;
+                results.forEach((item, i) => {
+                    // Clean up Urban Dictionary bracket formatting
+                    const definition = (item.definition || 'No definition').replace(/\[|\]/g, '');
+                    const example = (item.example || '').replace(/\[|\]/g, '');
 
-> ${global.wm}`;
+                    message += `*${i + 1}. By ${item.author || 'Unknown'}* ${item.written_on ? `(${new Date(item.written_on).toLocaleDateString()})` : ''}\n`;
+                    message += `📚 ${definition}\n`;
+                    if (example) message += `✍️ _${example}_\n`;
+                    message += `🔗 ${item.permalink || ''}\n\n`;
+                });
 
-        if (audio) {
-            await ridzcoder.sendMessage(from, { audio: { url: audio }, mimetype: 'audio/mpeg' }, { quoted: mek });
+                message += `> ${global.wm || ''}`;
+
+                // Trim to WhatsApp limit
+                if (message.length > 4000) {
+                    message = message.substring(0, 4000) + '\n\n*...truncated*';
+                }
+
+                return reply(message);
+            } catch (e) {
+                console.error("❌ Define error:", e);
+                return reply("⚠️ An error occurred while fetching the definition. Please try again later.");
+            }
         }
+    },
 
-        return reply(wordInfo);
-    } catch (e) {
-        console.error("❌ Error:", e);
-        if (e.response && e.response.status === 404) {
-            return reply("🚫 *Word not found.* Please check the spelling and try again.");
+    // ─────────────────────────────────────────────
+    // SCREENSHOTS
+    // ─────────────────────────────────────────────
+    {
+        command: ['ssphone', 'ssmobile2', 'ssmobileweb'],
+        operate: async ({ ridzcoder, m, reply, text, prefix }) => {
+            const url = (text || '').trim();
+            if (!url) return reply(`📌 *Usage:* ${prefix}ssphone https://example.com`);
+            if (!url.startsWith('http')) return reply("❌ URL must start with http:// or https://");
+
+            try {
+                await ridzcoder.sendMessage(m.chat, { react: { text: "📱", key: m.key } });
+
+                const apiUrl = `https://api.princetechn.com/api/tools/ssphone?apikey=prince&url=${encodeURIComponent(url)}`;
+
+                await ridzcoder.sendMessage(m.chat, {
+                    image: { url: apiUrl },
+                    caption: `📱 *Phone Screenshot*\n\n🔗 ${url}\n\n> ${global.wm || ''}`
+                }, { quoted: m });
+
+                await ridzcoder.sendMessage(m.chat, { react: { text: "✅", key: m.key } });
+            } catch (error) {
+                console.error('ssphone error:', error);
+                await ridzcoder.sendMessage(m.chat, { react: { text: "❌", key: m.key } });
+                reply("❌ Error generating phone screenshot.");
+            }
         }
-        return reply("⚠️ An error occurred while fetching the definition. Please try again later.");
-    }
-  }
-},
+    },
+    {
+        command: ['sspc2', 'ssdesktop2', 'sscomputer'],
+        operate: async ({ ridzcoder, m, reply, text, prefix }) => {
+            const url = (text || '').trim();
+            if (!url) return reply(`📌 *Usage:* ${prefix}sspc2 https://example.com`);
+            if (!url.startsWith('http')) return reply("❌ URL must start with http:// or https://");
+
+            try {
+                await ridzcoder.sendMessage(m.chat, { react: { text: "💻", key: m.key } });
+
+                const apiUrl = `https://api.princetechn.com/api/tools/sspc?apikey=prince&url=${encodeURIComponent(url)}`;
+
+                await ridzcoder.sendMessage(m.chat, {
+                    image: { url: apiUrl },
+                    caption: `💻 *PC Screenshot*\n\n🔗 ${url}\n\n> ${global.wm || ''}`
+                }, { quoted: m });
+
+                await ridzcoder.sendMessage(m.chat, { react: { text: "✅", key: m.key } });
+            } catch (error) {
+                console.error('sspc error:', error);
+                await ridzcoder.sendMessage(m.chat, { react: { text: "❌", key: m.key } });
+                reply("❌ Error generating PC screenshot.");
+            }
+        }
+    },
+    {
+        command: ['sstab2', 'sstablet'],
+        operate: async ({ ridzcoder, m, reply, text, prefix }) => {
+            const url = (text || '').trim();
+            if (!url) return reply(`📌 *Usage:* ${prefix}sstab2 https://example.com`);
+            if (!url.startsWith('http')) return reply("❌ URL must start with http:// or https://");
+
+            try {
+                await ridzcoder.sendMessage(m.chat, { react: { text: "📟", key: m.key } });
+
+                const apiUrl = `https://api.princetechn.com/api/tools/sstab?apikey=prince&url=${encodeURIComponent(url)}`;
+
+                await ridzcoder.sendMessage(m.chat, {
+                    image: { url: apiUrl },
+                    caption: `📟 *Tablet Screenshot*\n\n🔗 ${url}\n\n> ${global.wm || ''}`
+                }, { quoted: m });
+
+                await ridzcoder.sendMessage(m.chat, { react: { text: "✅", key: m.key } });
+            } catch (error) {
+                console.error('sstab error:', error);
+                await ridzcoder.sendMessage(m.chat, { react: { text: "❌", key: m.key } });
+                reply("❌ Error generating tablet screenshot.");
+            }
+        }
+    },
+    {
+        command: ['ssweb2', 'ssfull', 'ssfullpage'],
+        operate: async ({ ridzcoder, m, reply, text, prefix }) => {
+            const url = (text || '').trim();
+            if (!url) return reply(`📌 *Usage:* ${prefix}ssweb2 https://example.com`);
+            if (!url.startsWith('http')) return reply("❌ URL must start with http:// or https://");
+
+            try {
+                await ridzcoder.sendMessage(m.chat, { react: { text: "🌐", key: m.key } });
+
+                const apiUrl = `https://api.princetechn.com/api/tools/ssweb?apikey=prince&url=${encodeURIComponent(url)}`;
+
+                await ridzcoder.sendMessage(m.chat, {
+                    image: { url: apiUrl },
+                    caption: `🌐 *Full Web Screenshot*\n\n🔗 ${url}\n\n> ${global.wm || ''}`
+                }, { quoted: m });
+
+                await ridzcoder.sendMessage(m.chat, { react: { text: "✅", key: m.key } });
+            } catch (error) {
+                console.error('ssweb error:', error);
+                await ridzcoder.sendMessage(m.chat, { react: { text: "❌", key: m.key } });
+                reply("❌ Error generating web screenshot.");
+            }
+        }
+    },
+
 {
         command: ['news'],
         operate: async ({ ridzcoder, mek, m, from, reply, text, q }) => {
@@ -426,7 +524,6 @@ module.exports = [
 
         if (!articles.length) return reply("No news articles found.");
 
-        // Send each article as a separate message with image and title
         for (let i = 0; i < Math.min(articles.length, 5); i++) {
             const article = articles[i];
             let message = `
@@ -440,7 +537,6 @@ module.exports = [
             console.log('Article URL:', article.urlToImage); 
 
             if (article.urlToImage) {
-                // Send image with caption
                 await ridzcoder.sendMessage(from, { image: { url: article.urlToImage }, caption: message });
             } else {
                 
@@ -491,7 +587,6 @@ module.exports = [
       return reply("Please provide a YouTube username. Example: `.ytstalk KelvinTech-hub`");
     }
 
-    // Fetch YouTube channel information from the API
     const response = await axios.get(`https://api.siputzx.my.id/api/stalk/youtube?username=${encodeURIComponent(username)}`);
     const { status, data } = response.data;
 
@@ -511,7 +606,6 @@ module.exports = [
       latest_videos,
     } = data;
 
-    // Format the YouTube channel information message
     const ytMessage = `
 📺 *YouTube Channel*: ${ytUsername}
 👥 *Subscribers*: ${subscriberCount}
@@ -545,39 +639,40 @@ ${index + 1}. *${video.title}*
         operate: async ({ ridzcoder, mek, m, q, reply, from, text }) => {
         try {
     if (!q) {
-      return reply("Please provide a valid Twitter/X username.");
+      return reply("Please provide a valid Twitter/X username or search term.");
     }
 
     await ridzcoder.sendMessage(from, {
       react: { text: "⏳", key: m.key }
     });
 
-    const apiUrl = `https://delirius-apiofc.vercel.app/tools/xstalk?username=${encodeURIComponent(q)}`;
+    const apiUrl = `https://api.princetechn.com/api/stalk/?apikey=prince&query=${encodeURIComponent(q)}`;
     const { data } = await axios.get(apiUrl);
 
-    if (!data || !data.status || !data.data) {
-      return reply("⚠️ Failed to fetch Twitter/X user details. Ensure the username is correct.");
+    if (!data || !data.success || !data.results || data.results.length === 0) {
+      return reply("⚠️ No results found. Please try a different query.");
     }
 
-    const user = data.data;
-    const verifiedBadge = user.verified ? "✅" : "❌";
+    const results = data.results.slice(0, 5);
 
-    const caption = `╭━━━〔 *TWITTER/X STALKER* 〕━━━⊷\n`
-      + `┃👤 *Name:* ${user.name}\n`
-      + `┃🔹 *Username:* @${user.username}\n`
-      + `┃✔️ *Verified:* ${verifiedBadge}\n`
-      + `┃👥 *Followers:* ${user.followers_count}\n`
-      + `┃👤 *Following:* ${user.following_count}\n`
-      + `┃📝 *Tweets:* ${user.tweets_count}\n`
-      + `┃📅 *Joined:* ${user.created}\n`
-      + `┃🔗 *Profile:* [Click Here](${user.url})\n`
-      + `╰━━━⪼\n\n`
-      + `🔹 > ${global.wm}`;
+    let caption = `╭━━━〔 *SEARCH RESULTS* 〕━━━⊷\n\n`;
+    results.forEach((item, i) => {
+      caption += `┃ *${i + 1}. ${item.name || 'Unknown'}*\n`;
+      if (item.developer) caption += `┃ 👤 *Developer:* ${item.developer}\n`;
+      if (item.rating) caption += `┃ ⭐ *Rating:* ${item.rating}\n`;
+      if (item.summary) caption += `┃ 📝 ${item.summary}\n`;
+      caption += `┃\n`;
+    });
+    caption += `╰━━━⪼\n\n🔹 > ${global.wm}`;
 
-    await ridzcoder.sendMessage(from, {
-      image: { url: user.avatar },
-      caption: caption
-    }, { quoted: m });
+    if (results[0].icon) {
+      await ridzcoder.sendMessage(from, {
+        image: { url: results[0].icon },
+        caption: caption
+      }, { quoted: m });
+    } else {
+      await ridzcoder.sendMessage(from, { text: caption }, { quoted: m });
+    }
 
   } catch (error) {
     console.error("Error:", error);
@@ -590,34 +685,34 @@ ${index + 1}. *${video.title}*
     operate: async ({ m, reply, args, ridzcoder }) => {
         const username = args[0];
         
-        if (!username) return reply("*Please provide an Instagram username. Example: `.iguser siputzx_*`");
+        if (!username) return reply("*Please provide a search term. Example: `.iguser siputzx_*`");
         
         try {
-            await reply(`🔍 Searching for @${username}...`);
+            await reply(`🔍 Searching for "${username}"...`);
             
-            const response = await fetch(`${global.siputzx}/api/d/igram?url=${encodeURIComponent(username)}`);
+            const response = await fetch(`https://api.princetechn.com/api/search/playstore?apikey=prince&query=${encodeURIComponent(username)}`);
             const data = await response.json();
             
-            if (!data.status || !data.data?.result?.length) {
-                return reply(`❌ User "@${username}" not found.`);
+            if (!data.success || !data.results?.length) {
+                return reply(`❌ No results found for "${username}".`);
             }
             
-            const user = data.data.result[0].user;
+            const results = data.results.slice(0, 5);
             
-            let message = `*📸 INSTAGRAM PROFILE*\n\n`;
-            message += `👤 *Username:* @${user.username}\n`;
-            message += `📛 *Name:* ${user.full_name || 'Not set'}\n`;
-            message += `📝 *Bio:* ${user.biography || 'No bio'}\n`;
-            message += `🔗 *Website:* ${user.external_url || 'None'}\n\n`;
-            message += `👥 *Followers:* ${user.follower_count?.toLocaleString() || 0}\n`;
-            message += `👣 *Following:* ${user.following_count?.toLocaleString() || 0}\n`;
-            message += `📹 *Posts:* ${user.media_count?.toLocaleString() || 0}\n`;
-            message += `🔒 *Private:* ${user.is_private ? 'Yes' : 'No'}\n`;
-            message += `✅ *Verified:* ${user.is_verified ? 'Yes' : 'No'}\n\n`;
+            let message = `*🔍 SEARCH RESULTS*\n\n`;
+            results.forEach((item, i) => {
+                message += `*${i + 1}. ${item.name || 'Unknown'}*\n`;
+                if (item.developer) message += `👤 *Developer:* ${item.developer}\n`;
+                if (item.rating) message += `⭐ *Rating:* ${item.rating}\n`;
+                if (item.summary) message += `📝 ${item.summary}\n`;
+                message += `\n`;
+            });
             
-            if (user.profile_pic_url) {
+            message += `> ${global.wm || ''}`;
+            
+            if (results[0].icon) {
                 await ridzcoder.sendMessage(m.chat, {
-                    image: { url: user.profile_pic_url },
+                    image: { url: results[0].icon },
                     caption: message
                 }, { quoted: m });
             } else {
@@ -627,8 +722,8 @@ ${index + 1}. *${video.title}*
             await ridzcoder.sendMessage(m.chat, { react: { text: "✅", key: m.key } });
             
         } catch (error) {
-            console.error('Instagram user error:', error);
-            reply("❌ Error fetching Instagram profile. Try again later.");
+            console.error('Search error:', error);
+            reply("❌ Error fetching results. Try again later.");
             await ridzcoder.sendMessage(m.chat, { react: { text: "❌", key: m.key } });
         }
     }
