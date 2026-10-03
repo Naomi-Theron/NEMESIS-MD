@@ -15,30 +15,30 @@ function getRandom(ext) {
 async function webp2mp4(source) {
   let form = new FormData();
   let isUrl = typeof source === 'string' && /https?:\/\//.test(source);
-  
+
   form.append('new-image-url', isUrl ? source : '');
   form.append('new-image', isUrl ? '' : source, 'image.webp');
-  
+
   let res = await fetch('https://ezgif.com/webp-to-mp4', {
     method: 'POST',
     body: form
   });
-  
+
   let html = await res.text();
   let $ = cheerio.load(html);
   let form2 = new FormData();
   let obj = {};
-  
+
   $('form input[name]').each((_, el) => {
     obj[$(el).attr('name')] = $(el).val();
     form2.append($(el).attr('name'), $(el).val());
   });
-  
+
   let res2 = await fetch('https://ezgif.com/webp-to-mp4/' + obj.file, {
     method: 'POST',
     body: form2
   });
-  
+
   let html2 = await res2.text();
   let $2 = cheerio.load(html2);
   return new URL($2('div#output > p.outfile > video > source').attr('src'), res2.url).toString();
@@ -48,14 +48,14 @@ async function webp2mp4(source) {
 module.exports = [
     {
         command: ['tourl', 'upload', 'mediaurl'],
-        operate: async ({ Ridzcoder, m, reply, quoted, mime }) => {
-            
+        operate: async ({ ridzcoder, m, reply, quoted, mime }) => {
+
             if (!quoted || !mime) {
                 return reply('*Please reply to a media message!*');
             }
 
             try {
-                const mediaUrl = await handleMediaUpload(quoted, Ridzcoder, mime);
+                const mediaUrl = await handleMediaUpload(quoted, ridzcoder, mime);
                 reply(`*Uploaded successfully:*\n${mediaUrl}`);
             } catch (error) {
                 console.error(error);
@@ -63,12 +63,12 @@ module.exports = [
             }
         }
     },
-    
+
     {
         command: ['toimage', 'stickerimage', 'stickertoimg'],
-        operate: async ({ Ridzcoder, m, reply, quoted, mime, prefix, command }) => {
-            
-            
+        operate: async ({ ridzcoder, m, reply, quoted, mime, prefix, command }) => {
+
+
             if (!quoted || !/webp/.test(mime)) {
                 return reply(`*Send or reply to a sticker with the caption ${prefix + command}*`);
             }
@@ -78,7 +78,7 @@ module.exports = [
                 const inputPath = path.join(__dirname, getRandom('.webp'));
                 fs.writeFileSync(inputPath, media);
                 const outputPath = path.join(__dirname, getRandom('.png'));
-                
+
                 exec(`ffmpeg -i ${inputPath} ${outputPath}`, (err) => {
                     fs.unlinkSync(inputPath);
 
@@ -86,12 +86,12 @@ module.exports = [
                         console.error('Error converting to image:', err);
                         return reply('An error occurred while converting the sticker to an image.');
                     }
-                    
+
                     const buffer = fs.readFileSync(outputPath);
-                    Ridzcoder.sendMessage(m.chat, { image: buffer }, { quoted: m });
+                    ridzcoder.sendMessage(m.chat, { image: buffer }, { quoted: m });
                     fs.unlinkSync(outputPath);
                 });
-                
+
             } catch (error) {
                 console.error('Error converting to image:', error);
                 reply('An error occurred while converting the sticker to an image.');
@@ -100,8 +100,8 @@ module.exports = [
     },
         {
         command: ['tomp3', 'toaudio', 'extractaudio'],
-        operate: async ({ Ridzcoder, m, reply, quoted, mime }) => {          
-            
+        operate: async ({ ridzcoder, m, reply, quoted, mime }) => {          
+
             if (!quoted) return reply('*Reply to a video to convert it to audio!*');
             if (!/video/.test(mime)) return reply('*Only videos can be converted to audio!*');
 
@@ -109,16 +109,16 @@ module.exports = [
                 let buffer = await quoted.download();
                 let converted = await toAudio(buffer, 'mp4');
 
-                await Ridzcoder.sendMessage(m.chat, { 
+                await ridzcoder.sendMessage(m.chat, { 
                     audio: converted.data, 
                     mimetype: 'audio/mpeg' 
                 }, { quoted: m });
-                
+
                 // Optional: Delete temporary data
                 if (converted.delete) {
                     await converted.delete();
                 }
-                
+
             } catch (e) {
                 console.error(e);
                 reply('*Failed to convert video to audio!*');
@@ -127,18 +127,18 @@ module.exports = [
     },
     {
     command: ['tovideo', 'stickertovid', 'sticker2vid'],
-    operate: async ({ Ridzcoder, m, reply, quoted, mime, prefix, command }) => {
+    operate: async ({ ridzcoder, m, reply, quoted, mime, prefix, command }) => {
         if (!m.quoted) return reply(`Reply to a sticker with caption *${prefix + command}*`);
     if (!m.quoted.mimetype.includes('webp')) return reply(`Please reply to a webp sticker`);
-    
+
     try {
       const media = await m.quoted.download();
       const videoUrl = await webp2mp4(media);
-      
+
       if (!videoUrl) throw new Error('Conversion failed');
-      
-      await Ridzcoder.sendFile(m.chat, videoUrl, 'converted.mp4', '', m);
-      
+
+      await ridzcoder.sendFile(m.chat, videoUrl, 'converted.mp4', '', m);
+
     } catch (error) {
       console.error(error);
       reply('❌ Failed to convert sticker to video. Please try again later.');
@@ -147,8 +147,8 @@ module.exports = [
 },
     {
         command: ['sticker', 'stiker', 's'],
-        operate: async ({ Ridzcoder, m, reply, prefix, mime,  command, args, quoted }) => {
-            
+        operate: async ({ ridzcoder, m, reply, prefix, mime,  command, args, quoted }) => {
+
             if (!quoted) {
                 return reply(`Send or reply to images, videos, or gifs with captions ${prefix + command}`);
             }
@@ -164,7 +164,7 @@ module.exports = [
             try {
                 if (/image/.test(mime)) {
                     const media = await quoted.download();
-                    await Ridzcoder.sendImageAsSticker(m.chat, media, m, {
+                    await ridzcoder.sendImageAsSticker(m.chat, media, m, {
                         packname: pcknms ? pcknms : global.packname,
                         author: atnms ? atnms : global.author,
                     });
@@ -174,7 +174,7 @@ module.exports = [
                         return reply("The video length must be 10 seconds or less. Please try again.");
                     }
                     const media = await quoted.download();
-                    await Ridzcoder.sendVideoAsSticker(m.chat, media, m, {
+                    await ridzcoder.sendVideoAsSticker(m.chat, media, m, {
                         packname: pcknms ? pcknms : global.packname,
                         author: atnms ? atnms : global.author,
                     });
