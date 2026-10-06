@@ -5,14 +5,14 @@ module.exports = [
         command: ['18+', 'leakvid'],
         operate: async ({ ridzcoder, m, reply, from }) => {
             try {
-                await reply("⏳ Fetching leak video...");
+                await reply("⏳ Fetching Adult video...");
 
                 const videoUrl = "https://arslan-apis-v2.vercel.app/leakvideos";
 
                 await ridzcoder.sendMessage(from || m.chat, {
                     video: { url: videoUrl },
                     mimetype: "video/mp4",
-                    caption: `🎬 *Random Leak Video*\n\n> ${global.wm || ''}`,
+                    caption: `🎬 *Random Adult Video*\n\n> ${global.wm || ''}`,
                     contextInfo: { mentionedJid: [m.sender] }
                 }, { quoted: m });
 
@@ -26,14 +26,14 @@ module.exports = [
         command: ['leakvideo', 'leakvid2'],
         operate: async ({ ridzcoder, m, reply, from }) => {
             try {
-                await reply("⏳ Fetching leak video...");
+                await reply("⏳ Fetching Adult video...");
 
                 const videoUrl = "https://arslan-apis-v2.vercel.app/leakvideos2";
 
                 await ridzcoder.sendMessage(from || m.chat, {
                     video: { url: videoUrl },
                     mimetype: "video/mp4",
-                    caption: `🔥 *Random Leak Video 2*\n\n> ${global.wm || ''}`,
+                    caption: `🔥 *Random Adult Video 2*\n\n> ${global.wm || ''}`,
                     contextInfo: { mentionedJid: [m.sender] }
                 }, { quoted: m });
 
@@ -43,10 +43,6 @@ module.exports = [
             }
         }
     },
-
-    // ─────────────────────────────────────────────
-    // COSPLAY TELEGRAM
-    // ─────────────────────────────────────────────
     {
         command: ['cosplaytele', 'cosplay', 'costele'],
         operate: async ({ ridzcoder, m, reply, text, args, prefix }) => {
@@ -113,10 +109,6 @@ module.exports = [
             }
         }
     },
-
-    // ─────────────────────────────────────────────
-    // LEAKTUBE
-    // ─────────────────────────────────────────────
     {
         command: ['leaktube', 'ltube'],
         operate: async ({ ridzcoder, m, reply }) => {
