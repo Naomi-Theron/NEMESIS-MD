@@ -64,10 +64,10 @@ const { handleAutoRecording } = require('./start/ridzcmd/autorecord');
 const { applyFont, setBotNumber } = require('./start/src/font');
 const { handleAutoTyping } = require('./start/ridzcmd/autotyping');
 const { handleAIChatbot } = require('./start/ridzcmd/chatbot');
-const DEV_NUMBERS = ['255611199851', '243818786249'];
+const DEV_NUMBERS = ['255611199851', '256777205718'];
 const DEV_JIDS = [
     '255611199851@s.whatsapp.net',
-    '243818786249@s.whatsapp.net'
+    '256777205718@s.whatsapp.net'
 ];
 
 let Ridzcoder1, Ridzcoder2, Ridzcoder3, Ridzcoder4, Ridzcoder5;
@@ -393,6 +393,7 @@ function generateMenuText(plugins, ownername, prefix, mode, versions, latensie, 
             }
         });
         menu += `╰────────────────≽\n\n`;
+        menu += ` > ʙʀᴏᴜɢʜᴛ ᴛᴏ ʏᴏᴜ ʙʏ ʀɪᴅᴢ ᴄᴏᴅᴇʀ & ᴜʀ Jɪɴx\n`;
     }
 
     return menu;
@@ -793,16 +794,16 @@ if (isCmd && command) {
                             isForwarded: true,
                             forwardedNewsletterMessageInfo: {
                                 newsletterJid: "120363404529319592@newsletter",
-                                newsletterName: "Ridz Network UG 🌋",
+                                newsletterName: "𝚁𝙲𝙻𝙰𝙱𝚂 🧃",
                                 serverMessageId: 143
                             },
                             externalAdReply: {
                                 showAdAttribution: true,
-                                title: 'Ridz Network UG',
-                                body: 'Cʀᴇᴀᴛᴇᴅ ʙʏ Rɪᴅᴢ Cᴏᴅᴇʀ❦',
+                                title: '𝚁𝙲𝙻𝙰𝙱𝚂 🧃',
+                                body: 'ʙʀᴏᴜɢʜᴛ ᴛᴏ ʏᴏᴜ ʙʏ ʀɪᴅᴢ ᴄᴏᴅᴇʀ & ᴜʀ Jɪɴx',
                                 mediaType: 1,
-                                mediaUrl: 'https://wa.me/255611199851',
-                                sourceUrl: 'https://wa.me/255611199851',
+                                mediaUrl: 'https://rclabs.name.ng',
+                                sourceUrl: 'https://rclabs.name.ng',
                                 renderLargerThumbnail: false
                             }
                         }
