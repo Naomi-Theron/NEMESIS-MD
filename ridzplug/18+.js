@@ -5,14 +5,14 @@ module.exports = [
         command: ['18+', 'leakvid'],
         operate: async ({ ridzcoder, m, reply, from }) => {
             try {
-                await reply("⏳ Fetching Adult video...");
+                await reply("⏳ ꜰᴇᴛᴄʜɪɴɢ  ᴀᴅᴜʟᴛ ᴄᴏɴᴛᴇɴᴛ ...");
 
                 const videoUrl = "https://arslan-apis-v2.vercel.app/leakvideos";
 
                 await ridzcoder.sendMessage(from || m.chat, {
                     video: { url: videoUrl },
                     mimetype: "video/mp4",
-                    caption: `🎬 *Random Adult Video*\n\n> ${global.wm || ''}`,
+                    caption: `🎬 *ʀᴀɴᴅᴏᴍ ᴀᴅᴜʟᴛ ᴄᴏɴᴛᴇɴᴛ *\n\n> ${global.wm || ''}`,
                     contextInfo: { mentionedJid: [m.sender] }
                 }, { quoted: m });
 
@@ -26,14 +26,14 @@ module.exports = [
         command: ['leakvideo', 'leakvid2'],
         operate: async ({ ridzcoder, m, reply, from }) => {
             try {
-                await reply("⏳ Fetching Adult video...");
+                await reply("⏳ ꜰᴇᴛᴄʜɪɴɢ ᴀᴅᴜʟᴛ ᴄᴏɴᴛᴇɴᴛ ...");
 
                 const videoUrl = "https://arslan-apis-v2.vercel.app/leakvideos2";
 
                 await ridzcoder.sendMessage(from || m.chat, {
                     video: { url: videoUrl },
                     mimetype: "video/mp4",
-                    caption: `🔥 *Random Adult Video 2*\n\n> ${global.wm || ''}`,
+                    caption: `🔥 *ʀᴀɴᴅᴏᴍ ᴀᴅᴜʟᴛ ᴄᴏɴᴛᴇɴᴛ*\n\n> ${global.wm || ''}`,
                     contextInfo: { mentionedJid: [m.sender] }
                 }, { quoted: m });
 
@@ -85,12 +85,12 @@ module.exports = [
                             await ridzcoder.sendMessage(m.chat, {
                                 video: { url: imgUrl },
                                 mimetype: "video/mp4",
-                                caption: `🎭 *Cosplay* (${sentCount + 1})\n🔍 ${query}\n\n> ${global.wm || ''}`
+                                caption: `🎭 *ᴄᴏꜱᴘʟᴀʏ* (${sentCount + 1})\n🔍 ${query}\n\n> ${global.wm || ''}`
                             }, { quoted: m });
                         } else {
                             await ridzcoder.sendMessage(m.chat, {
                                 image: { url: imgUrl },
-                                caption: `🎭 *Cosplay* (${sentCount + 1})\n🔍 ${query}\n\n> ${global.wm || ''}`
+                                caption: `🎭 *ᴄᴏꜱᴘʟᴀʏ* (${sentCount + 1})\n🔍 ${query}\n\n> ${global.wm || ''}`
                             }, { quoted: m });
                         }
                         sentCount++;
