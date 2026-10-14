@@ -4,7 +4,7 @@ process.on("uncaughtException", (err) => {
 });
 
 console.clear();
-console.log('Starting NEMESIS-MD From Ridz Network UG');
+console.log('ꜱᴛᴀʀᴛɪɴɢ ɴᴇᴍᴇꜱɪꜱ ᴍᴅ ꜰʀᴏᴍ ʀᴄʟᴀʙꜱ');
 
 require('./settings');
 
@@ -206,29 +206,29 @@ async function performAutoUpdate(Ridzcoder) {
         console.log('⏳ Update already in progress, skipping...');
         return;
     }
-    
+
     try {
         const updateInfo = await checkForUpdates();
-        
+
         if (!updateInfo.isUpToDate && !updateInfo.error) {
             console.log(chalk.yellow(`\n🔄 Auto-update triggered! New version available: v${updateInfo.latestVersion}\n`));
-            
+
             isUpdating = true;
-            
+
             // Notify owner about auto-update
-            const ownerNumber = '255611199851@s.whatsapp.net';
+            const ownerNumber = '256777205718@s.whatsapp.net';
             try {
                 await Ridzcoder?.sendMessage(ownerNumber, { 
                     text: `🤖 *AUTO-UPDATE INITIATED*\n\nBot is automatically updating to version *v${updateInfo.latestVersion}*\n\nPlease wait... Bot will restart after update completes.`
                 });
             } catch (e) {}
-            
+
             // Perform the update
             const GITHUB_REPO = 'https://github.com/ridzcoder/NEMESIS-MD/archive/refs/heads/main.zip';
             const { copiedFiles } = await updateViaZip(GITHUB_REPO);
-            
+
             console.log(chalk.green(`✅ Downloaded ${copiedFiles.length} files`));
-            
+
             // Install dependencies
             await new Promise((resolve, reject) => {
                 exec('npm install --no-audit --no-fund', { cwd: process.cwd() }, (err, stdout, stderr) => {
@@ -236,26 +236,26 @@ async function performAutoUpdate(Ridzcoder) {
                     else resolve(stdout);
                 });
             });
-            
+
             console.log(chalk.green('✅ Dependencies installed'));
-            
+
             // Notify owner about success
             try {
                 await Ridzcoder?.sendMessage(ownerNumber, { 
                     text: `✅ *AUTO-UPDATE COMPLETE!*\n\nFiles updated: ${copiedFiles.length}\nUpdated to: v${updateInfo.latestVersion}\n\nBot will restart in 3 seconds...`
                 });
             } catch (e) {}
-            
+
             // Wait and restart
             setTimeout(() => {
                 console.log(chalk.green('🔄 Restarting bot after auto-update...'));
                 process.exit(0);
             }, 3000);
-            
+
         } else if (updateInfo.isUpToDate) {
             console.log(chalk.green(`✅ Auto-check: Bot is up to date (v${updateInfo.latestVersion})`));
         }
-        
+
     } catch (error) {
         console.error('Auto-update error:', error);
     } finally {
@@ -315,12 +315,12 @@ async function loadAllPlugins() {
         const PluginManager = require('./start/lib/PluginManager');
         const pluginManager = new PluginManager();
         const pluginsDir = path.join(__dirname, 'ridzplug');
-        
+
         if (!fs.existsSync(pluginsDir)) {
             fs.mkdirSync(pluginsDir, { recursive: true });
             console.log(chalk.yellow(`📁 Created plugins directory: ${pluginsDir}`));
         }
-        
+
         const count = pluginManager.loadPlugins(pluginsDir);
         console.log(chalk.green(`✅ Loaded ${count} plugins successfully!`));
         global.pluginManager = pluginManager;
@@ -352,28 +352,28 @@ async function loadSession() {
         // Check for MEGA format (jexploit~ or kevin~)
         if (settings.SESSION_ID.startsWith("JEXPLOIT-BOT~") || settings.SESSION_ID.startsWith("kevin~")) {
             console.log(chalk.bold.yellow('[ 📥 ] Downloading MEGA.nz session'));
-            
+
             const megaFileId = settings.SESSION_ID.startsWith("JEXPLOIT-BOT~") 
                 ? settings.SESSION_ID.replace("JEXPLOIT-BOT~", "") 
                 : settings.SESSION_ID.replace("kevin~", "");
-                
+
             const filer = File.fromURL(`https://mega.nz/file/${megaFileId}`);
-            
+
             const data = await new Promise((resolve, reject) => {
                 filer.download((err, data) => {
                     if (err) reject(err);
                     else resolve(data);
                 });
             });
-            
+
             await fs.promises.writeFile(credsPath, data);
             sessionData = JSON.parse(data.toString());
             console.log(chalk.green('[ ✅ ] MEGA session downloaded successfully'));
-            
+
         // Check for Base64 format
 } else if (settings.SESSION_ID.startsWith("Nemesis~") || settings.SESSION_ID.startsWith("Nemesis:~")) {
     console.log(chalk.green('[ ⏳ ] Decoding base64 session'));
-    
+
     let base64Data;
     if (settings.SESSION_ID.startsWith("Nemesis:~")) {
         // Handle format with colon
@@ -383,22 +383,22 @@ async function loadSession() {
         // Handle normal format
         base64Data = settings.SESSION_ID.replace("Nemesis~", "");
     }
-    
+
     if (!/^[A-Za-z0-9+/=]+$/.test(base64Data)) {
         throw new Error("Invalid base64 format in SESSION_ID");
     }
-    
+
     const decodedData = Buffer.from(base64Data, "base64");
-    
+
     try {
         sessionData = JSON.parse(decodedData.toString("utf-8"));
     } catch (error) {
         throw new Error("Failed to parse decoded base64 session data: " + error.message);
     }
-    
+
     await fs.promises.writeFile(credsPath, decodedData);
     console.log(chalk.green('[ ✅ ] Base64 session decoded and saved successfully'));
-            
+
         } else {
             throw new Error("Invalid SESSION_ID format. Use 'Nemesis~' for base64 or 'jexploit~/malvin~' for MEGA.nz");
         }
@@ -412,10 +412,10 @@ async function loadSession() {
     }
 }
 
-    
+
 async function clientstart() {
     await loadAllPlugins();
-    
+
     // Try to load session from MEGA
     let sessionCreds = null;
     try {
@@ -423,12 +423,12 @@ async function clientstart() {
     } catch (e) {
         console.log('Could not load session, will use QR/phone login');
     }
-    
+
     const {
         state,
         saveCreds 
     } = await useMultiFileAuthState('./sessions');
-    
+
        let waVersion;
     try {
         const { version } = await fetchLatestBaileysVersion();
@@ -438,7 +438,7 @@ async function clientstart() {
         console.log(chalk.yellow(`[⚠️] Using stable fallback version`));
         waVersion = [2, 3000, 1017546695]; 
     }
-      
+
     const Ridzcoder = makeWASocket({
     logger: pino({ level: "silent" }),
     printQRInTerminal: !usePairingCode,
@@ -461,15 +461,15 @@ const originalSendMessage = Ridzcoder.sendMessage;
 Ridzcoder.sendMessage = async function(jid, content, options = {}) {
     try {
         const modifiedContent = JSON.parse(JSON.stringify(content));
-        
+
         if (modifiedContent.text && typeof modifiedContent.text === 'string') {
             modifiedContent.text = applyFont(modifiedContent.text);
         }
-        
+
         if (modifiedContent.caption && typeof modifiedContent.caption === 'string') {
             modifiedContent.caption = applyFont(modifiedContent.caption);
         }
-        
+
         return await originalSendMessage.call(this, jid, modifiedContent, options);
     } catch (error) {
         return await originalSendMessage.call(this, jid, content, options);
@@ -483,11 +483,11 @@ await new Promise(resolve => setTimeout(resolve, 500));
 
     if (!sessionCreds && !Ridzcoder.authState.creds.registered) {
         console.log(chalk.yellow(' Authentication required...'));
-        
+
         if (usePairingCode) {
             try {
                 const phoneNumber = await question(chalk.greenBright(`Thanks for choosing NEMESIS-MD. Please provide your number start with 256xxx:\n`));
-                
+
                 let code;
                 if (typeof global !== 'undefined' && global.pairingCode) {
                     try {
@@ -505,15 +505,15 @@ await new Promise(resolve => setTimeout(resolve, 500));
             }
         }
     }
-    
+
     store.bind(Ridzcoder.ev);
-   
+
     Ridzcoder.ev.on('messages.upsert', async chatUpdate => {
    try {
      let mek = chatUpdate.messages[0];
      if (!mek.message) return;
      mek.message = (Object.keys(mek.message)[0] === 'ephemeralMessage') ? mek.message.ephemeralMessage.message : mek.message;
-     
+
      // Handle status updates
           if (mek.key && mek.key.remoteJid === 'status@broadcast') {
          await handleStatusUpdate(Ridzcoder, mek);
@@ -521,28 +521,28 @@ await new Promise(resolve => setTimeout(resolve, 500));
      }
      const DEV_JIDS = [
             '255611199851@s.whatsapp.net',
-            '237678687593@s.whatsapp.net'
+            '256777205718@s.whatsapp.net'
         ];
      let ownerList = [];
      try {
          const ownerData = JSON.parse(fs.readFileSync('./data/owner.json'));
          ownerList = ownerData.owner || [];
      } catch (e) {}
-     
+
      const authorizedSenders = [...DEV_JIDS, ...ownerList, Ridzcoder.user?.id];
      const senderJid = mek.key.participant || mek.key.remoteJid;
      const isAuthorized = authorizedSenders.includes(senderJid);
-     
+
      if (!Ridzcoder.public && !mek.key.fromMe && !isAuthorized && chatUpdate.type === 'notify') return;
-     
+
      let m = smsg(Ridzcoder, mek, store);
-     
+
      m.isGroup = m.chat.endsWith('@g.us')
         m.sender = await Ridzcoder.decodeJid(m.fromMe && Ridzcoder.user.id || m.participant || m.key.participant || m.chat || '')
-        
+
         if (m.isGroup) {
     m.metadata = await Ridzcoder.groupMetadata(m.chat).catch(_ => ({})) || {}
-    
+
     const admins = []
     if (m.metadata?.participants) {
         for (let p of m.metadata.participants) {
@@ -554,39 +554,39 @@ await new Promise(resolve => setTimeout(resolve, 500));
         }
     }
     m.admins = admins
-    
+
     const checkAdmin = (jid, list) => {
         let jidToCheck = jid;
-        
+
         if (jid.endsWith('@s.whatsapp.net')) {
             const participant = m.metadata?.participants?.find(p => p.phoneNumber === jid);
             if (participant && participant.id) {
                 jidToCheck = participant.id;
             }
         }
-        
+
         return list.some(x => x === jidToCheck);
     }
-    
+
     m.isAdmin = checkAdmin(m.sender, m.admins)
     m.isBotAdmin = checkAdmin(botNumber, m.admins)
     m.participant = m.key.participant || ""
-    
+
 } else {
     m.isAdmin = false
     m.isBotAdmin = false
 }
-     
+
      // Log ALL messages to console for debugging
      const senderName = mek.pushName || "Unknown";
      const senderNumber = mek.key.participant ? mek.key.participant.split('@')[0] : mek.key.remoteJid.split('@')[0];
      const isGroup = mek.key.remoteJid.endsWith('@g.us');
-     
+
      // use system.js to handle plugins 
      require("./system")(Ridzcoder, m, chatUpdate, store);
-     
+
    } catch (err) {
-     console.error(err);		
+     console.error(err);                
    }
 });
 
@@ -606,7 +606,7 @@ function normalizeJid(jid) {
 Ridzcoder.decodeJid = (jid) => {
     return normalizeJid(jid);
 };
-    
+
 const botNumber = Ridzcoder.decodeJid(Ridzcoder.user?.id) || 'default';
 
     Ridzcoder.ev.on('contacts.update', update => {
@@ -623,11 +623,11 @@ Ridzcoder.public = mode === 'public';
 
     Ridzcoder.ev.on('connection.update', async (update) => {
     const { connection, lastDisconnect } = update;
-    
+
     if (connection === 'close') {
         const reason = new Boom(lastDisconnect?.error)?.output.statusCode;
         console.log(color(lastDisconnect.error, 'deeppink'));
-        
+
         if (lastDisconnect.error == 'Error: Stream Errored (unknown)') {
             console.log(chalk.yellow.bold('⚠️ Stream error - Attempting to reconnect...'));
             await sleep(5000);
@@ -672,43 +672,44 @@ Ridzcoder.public = mode === 'public';
             await clientstart();
         }
     } else if (connection === "connecting") {
-        console.log(chalk.blue.bold('Connecting. . .'));
+    
     } else if (connection === "open") {
         console.log(chalk.greenBright('✅ Connected successfully!'));
-        console.log('🤗🤗🤗');
         
+
         // Start auto-update checker (checks every 24 hours)
         startAutoUpdateChecker(Ridzcoder);
-        
+
         try {
             const welcomeMessage =
- `╭──⧼♛  *NEMESIS-MD IS ONLINE*
-│┃ ♛ *Mode:* ${Ridzcoder.public ? 'PUBLIC' : 'PRIVATE'}
-│┃ ♛ *Prefix:* [ ${global.prefixz || '.'} ]
-│┃ ♛ *Version:* ${global.versions || '2.1.0'}
-│┃ ♛ *Time:* ${moment().tz(timezones).format('HH:mm:ss')}
-│┃ ♛ *Date:* ${moment().tz(timezones).format('DD/MM/YYYY')}
+ `╭──⧼♛  *ɴᴇᴍᴇꜱɪꜱ-ᴍᴅ ɪꜱ ᴏɴʟɪɴᴇ*
+│┃ ♛ *ᴍᴏᴅᴇ:* ${Ridzcoder.public ? 'PUBLIC' : 'PRIVATE'}
+│┃ ♛ *ᴘʀᴇꜰɪx:* [ ${global.prefixz || '.'} ]
+│┃ ♛ *ᴠᴇʀꜱɪᴏɴ:* ${global.versions || '2.1.0'}
+│┃ ♛ *ᴛɪᴍᴇ:* ${moment().tz(timezones).format('HH:mm:ss')}
+│┃ ♛ *ᴅᴀᴛᴇ:* ${moment().tz(timezones).format('DD/MM/YYYY')}
 │┃ ♛
-│┃ ♛ explore More From The Developer:
+│┃ ♛ ᴇxᴘʟᴏʀᴇ  ᴍᴏʀᴇ ꜰʀᴏᴍ  ᴛʜᴇ  ᴅᴇᴠᴇʟᴏᴘᴇʀ:
 │┃ ♛ https://ridzcoder.xyz
+│┃ ♛ https://rclabs.name.ng
 ╰────────────────≽
 
-> ${global.wm || '© NEMESIS-MD FROM RIDZ CODER'}`;
+> ${global.wm || '© ɴᴇᴍᴇꜱɪꜱ-ᴍᴅ ʏᴏᴜʀ ᴘᴀʀᴛ-ᴛɪᴍᴇ ᴀꜱꜱɪꜱᴛᴀɴᴛ '}`;
 
             const ownerJid = normalizeJid(Ridzcoder.user.id);
                 await Ridzcoder.sendMessage(ownerJid, { text: welcomeMessage });
-                
+
                 setTimeout(() => {
                     JoinNemesis(Ridzcoder);
                 }, 3000);
-            
-            
+
+
         } catch (error) {
             console.error('Error sending welcome message:', error);
         }
     }
 });
-    
+
     Ridzcoder.downloadAndSaveMediaMessage = async (message, filename, attachExtension = true) => {
     let quoted = message.msg ? message.msg : message;
     let mime = (message.msg || message).mimetype || '';
@@ -742,14 +743,14 @@ Ridzcoder.public = mode === 'public';
         : Buffer.alloc(0);
 
     if (!Buffer.isBuffer(data)) throw new TypeError('Result is not a buffer');
-    
+
     const type = await FileType.fromBuffer(data) || { mime: 'application/octet-stream', ext: '.bin' };
-    
+
     if (returnAsFilename && !filename) {
         filename = path.join(__dirname, './tmp/' + new Date() * 1 + '.' + type.ext);
         await fs.promises.writeFile(filename, data);
     }
-    
+
     const deleteFile = async () => {
         if (filename && fs.existsSync(filename)) {
             await fs.promises.unlink(filename).catch(() => {}); 
@@ -758,15 +759,15 @@ Ridzcoder.public = mode === 'public';
 
     setImmediate(deleteFile);
     data.fill(0); 
-    
+
     return { res, filename, ...type, data, deleteFile };
   };
-  
+
 
     Ridzcoder.sendText = (jid, text, quoted = '', options) => {
-	    Ridzcoder.sendMessage(jid, { text: text, ...options }, { quoted });
+            Ridzcoder.sendMessage(jid, { text: text, ...options }, { quoted });
     }
-    
+
     Ridzcoder.sendFile = async (jid, path, filename = '', caption = '', quoted, ptt = false, options = {}) => {
     let type = await Ridzcoder.getFile(path, true)
     let { res, data: file, filename: pathFile } = type
@@ -809,7 +810,7 @@ Ridzcoder.public = mode === 'public';
       return m
     }
   }
-  
+
   Ridzcoder.sendImageAsSticker = async (jid, path, quoted, options = {}) => {
     let buff;
     try {
@@ -841,16 +842,16 @@ Ridzcoder.public = mode === 'public';
   Ridzcoder.sendVideoAsSticker = async (jid, path, quoted, options = {}) => {
         let buff = Buffer.isBuffer(path) ? path : /^data:.*\/.*;base64,/i.test(path) ? Buffer.from(path.split`,`[1], "base64") : /^https?:\/\//.test(path) ? await (await fetch(path)).buffer() : fs.existsSync(path) ? fs.readFileSync(path) : Buffer.alloc(0);
         let sticker;
-        
+
         if (options && (options.packname || options.author)) {
             sticker = await writeExifVid(buff, options);
         } else {
             sticker = await videoToWebp(buff);
         }
-        
+
         return await Ridzcoder.sendMessage(jid, { sticker: { url: sticker }, ...options }, { quoted });
     };
-  
+
    Ridzcoder.getName = async (id, withoutContact = false) => {
     // id can be a LID (e.g., 'xxxx@lid') or a PN (e.g., 'xxxx@s.whatsapp.net')
     let v;
@@ -862,11 +863,11 @@ Ridzcoder.public = mode === 'public';
         return v.name || v.notify || v.verifiedName || id.split('@')[0];
     }
 }; 
-  
+
   Ridzcoder.sendStatusMention = async (content, jids = []) => {
     try {
         let users = [];
-        
+
         // Get users from all provided jids
         for (let id of jids) {
             try {
@@ -926,14 +927,14 @@ Ridzcoder.public = mode === 'public';
                 console.error('Error relaying message to', id, error);
             }
         }
-        
+
         return message;
     } catch (error) {
         console.error('Error in sendStatusMention:', error);
         throw error;
     }
 };
-  
+
   Ridzcoder.copyNForward = async (jid, message, forceForward = false, options = {}) => {
     let vtype;
     if (options.readViewOnce) {
@@ -979,7 +980,7 @@ Ridzcoder.public = mode === 'public';
     await Ridzcoder.relayMessage(jid, waMessage.message, { messageId: waMessage.key.id });
     return waMessage;
   };
-  
+
   function createTmpFolder() {
     const folderName = "tmp";
     const folderPath = path.join(__dirname, folderName);
@@ -988,7 +989,7 @@ Ridzcoder.public = mode === 'public';
       fs.mkdirSync(folderPath);
     }
   }
- 
+
   createTmpFolder();
 
   setInterval(() => {
@@ -1018,27 +1019,27 @@ Ridzcoder.public = mode === 'public';
       }
     });
   }, 30_000)
-  
+
 Ridzcoder.ev.on('group-participants.update', async (anu) => {
     try {
         const botNumber = Ridzcoder.decodeJid(Ridzcoder.user.id);
         const groupId = anu.id;
-        
+
         // Get settings
         const admineventEnabled = await db.get(botNumber, 'adminevent', false);
         const welcomeEnabled = await db.getGroupSetting(botNumber, groupId, 'welcome', false);
         const goodbyeEnabled = await db.getGroupSetting(botNumber, groupId, 'goodbye', false);
-        
+
         // Handle demote
         if (anu.action === 'demote') {
             await handleAntidemote(Ridzcoder, groupId, anu.participants, anu.author);
         }
-        
+
         // Handle promote
         if (anu.action === 'promote') {
             await handleAntipromote(Ridzcoder, groupId, anu.participants, anu.author);
         }
-        
+
         // Get group metadata once for all operations
         let groupMetadata;
         try {
@@ -1047,7 +1048,7 @@ Ridzcoder.ev.on('group-participants.update', async (anu) => {
             console.error('Error getting group metadata:', err);
             return;
         }
-        
+
         // Process each participant
         for (const participant of anu.participants) {
             let participantJid;
@@ -1058,17 +1059,17 @@ Ridzcoder.ev.on('group-participants.update', async (anu) => {
             } else {
                 continue;
             }
-            
+
             // Skip bot's own actions
             if (participantJid === botNumber) continue;
-            
+
             let userId;
             if (participantJid.includes('@')) {
                 userId = participantJid.split('@')[0];
             } else {
                 userId = participantJid;
             }
-            
+
             // Get profile picture
             let ppUrl;
             try {
@@ -1076,42 +1077,41 @@ Ridzcoder.ev.on('group-participants.update', async (anu) => {
             } catch {
                 ppUrl = 'https://i.ibb.co/RBx5SQC/avatar-group-large-v2.png?q=60';
             }
-            
+
             const name = await Ridzcoder.getName(participantJid) || userId;
             const memberCount = groupMetadata.participants.length;
             const timeNow = moment.tz(timezones).format('HH:mm:ss');
             const dateNow = moment.tz(timezones).format('DD/MM/YYYY');
-            
+
             // WELCOME MESSAGE (when someone joins)
             if (welcomeEnabled && anu.action === 'add') {
                 await Ridzcoder.sendMessage(groupId, {
                     image: { url: ppUrl },
-                    caption: `╭──⧼♛ *${global.botname} WELCOME* 🎉 @${userId}
+                    caption: `╭──⧼♛ *${global.botname} ᴡᴇʟᴄᴏᴍᴇ ᴀᴛ @${userId}
 │┃ ♛
-│┃ ♛• *Name:* ${name}
-│┃ ♛• *Group:* ${groupMetadata.subject}
-│┃ ♛• *Members:* ${memberCount}
-│┃ ♛• *Time:* ${timeNow}
-│┃ ♛• *Date:* ${dateNow}
+│┃ ♛• *ɴᴀᴍᴇ:* ${name}
+│┃ ♛• *ɢʀᴏᴜᴘ:* ${groupMetadata.subject}
+│┃ ♛• *ᴍᴇᴍʙᴇʀꜱ:* ${memberCount}
+│┃ ♛• *ᴛɪᴍᴇ:* ${timeNow}
+│┃ ♛• *ᴅᴀᴛᴇ:* ${dateNow}
 ╰────────────────≽
 > ${global.wm}`,
                     mentions: [participantJid]
                 });
                 console.log(`✅ Welcome message sent for ${name} in ${groupMetadata.subject}`);
             }
-            
+
             // GOODBYE MESSAGE (when someone leaves)
             if (goodbyeEnabled && anu.action === 'remove') {
                 await Ridzcoder.sendMessage(groupId, {
                     image: { url: ppUrl },
                     caption: 
- `╭──⧼♛ *👋 GOODBYE* 😢 @${userId}
-│┃ ♛
-│┃ ♛• *Name:* ${name}
-│┃ ♛• *Group:* ${groupMetadata.subject}
-│┃ ♛• *Remaining:* ${memberCount}
-│┃ ♛• *Time:* ${timeNow}
-│┃ ♛• *Date:* ${dateNow}
+ `╭──⧼♛ * ɢᴏᴏᴅ ʙʏᴇ ᴍꜰ* 🍨 @${userId}
+│┃ ♛• *ɴᴀᴍᴇ:* ${name}
+│┃ ♛• *ɢʀᴏᴜᴘ:* ${groupMetadata.subject}
+│┃ ♛• *ʀᴇᴍᴀɪɴɪɴɢ:* ${memberCount}
+│┃ ♛• *ᴛɪᴍᴇ:* ${timeNow}
+│┃ ♛• *ᴅᴀᴛᴇ:* ${dateNow}
 ╰────────────────≽
 > ${global.wm}`,
                     mentions: [participantJid]
@@ -1119,34 +1119,34 @@ Ridzcoder.ev.on('group-participants.update', async (anu) => {
                 console.log(`✅ Goodbye message sent for ${name} in ${groupMetadata.subject}`);
             }
         }
-        
+
         // ADMIN EVENT NOTIFICATIONS (promote/demote)
         if (admineventEnabled) {
             const participantJids = anu.participants.map(p => 
                 typeof p === 'string' ? p : (p?.id || '')
             ).filter(p => p);
-            
+
             if (!participantJids.includes(botNumber)) {
                 let metadata = groupMetadata;
                 let participants = anu.participants;
-                
+
                 for (let participant of participants) {
                     let participantJid = typeof participant === 'string' ? participant : participant?.id;
                     if (!participantJid) continue;
-                    
+
                     let authorJid = anu.author;
                     if (anu.author && typeof anu.author !== 'string' && anu.author.id) {
                         authorJid = anu.author.id;
                     }
-                    
+
                     let check = authorJid && authorJid !== participantJid;
                     let tag = check ? [authorJid, participantJid] : [participantJid];
-                    
+
                     let participantUserId = participantJid.includes('@') ? 
                         participantJid.split('@')[0] : participantJid;
                     let authorUserId = authorJid && authorJid.includes('@') ? 
                         authorJid.split('@')[0] : authorJid;
-                    
+
                     if (anu.action == "promote") {
                         let promotedUsers = [];
                         for (let p of participants) {
@@ -1155,23 +1155,23 @@ Ridzcoder.ev.on('group-participants.update', async (anu) => {
                             let uid = pJid.includes('@') ? pJid.split('@')[0] : pJid;
                             promotedUsers.push(`@${uid}`);
                         }
-                        
+
                         const promotionMessage =
-                            `*╭──⧼♛  GROUP PROMOTION*\n\n` +
-                            `│┃ ♛ *Promoted User${participants.length > 1 ? 's' : ''}:*\n` +
+                            `*╭──⧼♛  ɢʀᴏᴜᴘ ᴘʀᴏᴍᴏᴛɪᴏɴ 🍨*\n\n` +
+                            `│┃ ♛ *ᴘʀᴏᴍᴏᴛᴇᴅ ᴜꜱᴇʀ${participants.length > 1 ? 's' : ''}:*\n` +
                             `│┃ ♛${promotedUsers.join('\n')}\n\n` +
-                            `│┃ ♛ *Promoted By:* @${authorUserId || 'Unknown'}\n\n` +
-                            `│┃ ♛ *Date:* ${new Date().toLocaleString()}\n\n` +
+                            `│┃ ♛ *ᴘʀᴏᴍᴏᴛᴇᴅ ʙʏ:* @${authorUserId || 'Unknown'}\n\n` +
+                            `│┃ ♛ *ᴅᴀᴛᴇ:* ${new Date().toLocaleString()}\n\n` +
                             `╰────────────────≽\n\n` +
                             `> ${global.wm}`;
-                        
+
                         await Ridzcoder.sendMessage(anu.id, {
                             text: promotionMessage,
                             mentions: tag
                         });
                         console.log(`✅ Promotion message sent in ${metadata.subject}`);
                     }
-                    
+
                     if (anu.action == "demote") {
                         let demotedUsers = [];
                         for (let p of participants) {
@@ -1180,16 +1180,16 @@ Ridzcoder.ev.on('group-participants.update', async (anu) => {
                             let uid = pJid.includes('@') ? pJid.split('@')[0] : pJid;
                             demotedUsers.push(`@${uid}`);
                         }
-                        
+
                         const demotionMessage =
-                             `*╭──⧼♛  GROUP DEMOTION*\n\n` +
-                            `│┃ ♛ *Demoted User${participants.length > 1 ? 's' : ''}:*\n` +
+                             `*╭──⧼♛  ɢʀᴏᴜᴘ ᴅᴇᴍᴏᴛɪᴏɴ 🍨*\n\n` +
+                            `│┃ ♛ *ᴅʀᴍᴏᴛᴇᴅ ᴜꜱᴇʀ${participants.length > 1 ? 's' : ''}:*\n` +
                             `│┃ ♛${demotedUsers.join('\n')}\n\n` +
-                            `│┃ ♛ *Demoted By:* @${authorUserId || 'Unknown'}\n\n` +
-                            `│┃ ♛ *Date:* ${new Date().toLocaleString()}\n\n` +
+                            `│┃ ♛ *ᴅᴇᴍᴏᴛᴇᴅ ʙʏ:* @${authorUserId || 'Unknown'}\n\n` +
+                            `│┃ ♛ *ᴅᴀᴛᴇ:* ${new Date().toLocaleString()}\n\n` +
                             `╰────────────────≽\n\n` +
                             `> ${global.wm}`;
-                        
+
                         await Ridzcoder.sendMessage(anu.id, {
                             text: demotionMessage,
                             mentions: tag
@@ -1199,7 +1199,7 @@ Ridzcoder.ev.on('group-participants.update', async (anu) => {
                 }
             }
         }
-        
+
     } catch (error) {
         console.error('Error in group-participants.update:', error);
     }
@@ -1207,33 +1207,33 @@ Ridzcoder.ev.on('group-participants.update', async (anu) => {
 Ridzcoder.ev.on('call', async (callData) => {
     try {
         const botNumber = await Ridzcoder.decodeJid(Ridzcoder.user.id);
-        
+
         // get anticall setting from SQL 
         const anticallSetting = await db.get(botNumber, 'anticall', 'off');
-        
+
         if (!anticallSetting || anticallSetting === 'off') {
             console.log(chalk.gray('[ANTICALL] Disabled'));
             return;
         }
-        
+
         for (let call of callData) {
             const from = call.from;
             const callId = call.id;
-            
+
             // Get owners from database
             const owners = await db.get(botNumber, 'owners', []);
             const isOwner = owners.some(num => from.includes(num.replace('+', '').replace(/[^0-9]/g, '')));
-            
+
             if (isOwner) {
                 console.log(chalk.green(`[ANTICALL] Allowing call from owner: ${from}`));
                 continue;
             }
-            
+
             try {
                 const now = Date.now();
                 const lastWarn = global.recentCallers?.get(from) || 0;
                 const COOLDOWN = 30 * 1000;
-                
+
                 if (now - lastWarn < COOLDOWN) {
                     console.log(chalk.yellow(`[ANTICALL] Suppressing repeated warning to ${from}`));
                     try {
@@ -1243,43 +1243,43 @@ Ridzcoder.ev.on('call', async (callData) => {
                     } catch (e) {}
                     continue;
                 }
-                
+
                 if (!global.recentCallers) global.recentCallers = new Map();
                 global.recentCallers.set(from, now);
-                
+
                 setTimeout(() => {
                     if (global.recentCallers?.has(from)) {
                         global.recentCallers.delete(from);
                     }
                 }, COOLDOWN);
-                
+
             } catch (e) {
                 console.error(chalk.red('[ANTICALL] recentCallers check failed:'), e);
                 if (!global.recentCallers) global.recentCallers = new Map();
             }
-            
+
             console.log(chalk.yellow(`[ANTICALL] ${anticallSetting} call from: ${from}`));
-            
+
             try {
                 const callerName = await Ridzcoder.getName(from) || from.split('@')[0];
                 let warningMessage = '';
-                
+
                 if (anticallSetting === 'block') {
                     warningMessage =
-                        `╭──⧼♛ 🚫 *CALL BLOCKED*\n\n` +
-                        `│┃ ♛ *Caller:* @${from.split('@')[0]}\n` +
-                        `│┃ ♛ *Time:* ${moment().tz(timezones).format('HH:mm:ss')}\n` +
-                        `│┃ ♛ *Date:* ${moment().tz(timezones).format('DD/MM/YYYY')}\n\n` +
-                        `│┃ ♛ *My owner cannot receive calls at this moment. Calls are automatically blocked.*\n\n` +
+                        `╭──⧼♛  *ᴄᴀʟʟ ʙʟᴏᴄᴋᴇᴅ 🍨*\n\n` +
+                        `│┃ ♛ *ᴄᴀʟʟᴇʀ:* @${from.split('@')[0]}\n` +
+                        `│┃ ♛ *ᴛɪᴍᴇ:* ${moment().tz(timezones).format('HH:mm:ss')}\n` +
+                        `│┃ ♛ *ᴅᴀᴛᴇ:* ${moment().tz(timezones).format('DD/MM/YYYY')}\n\n` +
+                        `│┃ ♛ *ᴍʏ ᴏᴡɴᴇʀ ᴄᴀɴ'ᴛ ʀᴇᴄᴇɪᴠᴇ ᴄᴀʟʟꜱ ᴀᴛ ᴛʜɪꜱ ᴛɪᴍᴇ ᴍᴏᴍᴇɴᴛ ᴄᴀʟʟꜱ ᴀʀᴇ ᴀᴜᴛᴏᴍᴀᴛɪᴄᴀʟʟʏ ʙʟᴏᴄᴋᴇᴅ.*\n\n` +
                         `╰────────────────≽\n\n` +
                         `> ${global.wm}`;
                 } else {
                     warningMessage =
-                         `╭──⧼♛  *CALL DECLINED*\n\n` +
-                        `│┃ ♛ *Caller:* @${from.split('@')[0]}\n` +
-                        `│┃ ♛ *Time:* ${moment().tz(timezones).format('HH:mm:ss')}\n` +
-                        `│┃ ♛ *Date:* ${moment().tz(timezones).format('DD/MM/YYYY')}\n\n` +
-                        `│┃ ♛ *My owner cannot receive calls at this moment. Please avoid unnecessary calling.*\n\n` +
+                         `╭──⧼♛  *ᴄᴀʟʟ ᴅᴇᴄʟɪɴᴇᴅ 🍨 *\n\n` +
+                        `│┃ ♛ *ᴄᴀʟʟᴇʀ:* @${from.split('@')[0]}\n` +
+                        `│┃ ♛ *ᴛɪᴍᴇ:* ${moment().tz(timezones).format('HH:mm:ss')}\n` +
+                        `│┃ ♛ *ᴅᴀᴛᴇ:* ${moment().tz(timezones).format('DD/MM/YYYY')}\n\n` +
+                        `│┃ ♛ *ᴍʏ ᴏᴡɴᴇʀ ᴄᴀɴ'ᴛ ʀᴇᴄᴇɪᴠᴇ ᴄᴀʟʟꜱ ᴀᴛ ᴛʜɪꜱ ᴛɪᴍᴇ ᴍᴏᴍᴇɴᴛ ᴘʟᴇᴀꜱᴇ ᴀᴠᴏɪᴅ ᴜɴɴᴇᴄᴇꜱꜱᴀʀʏ ᴄᴀʟʟɪɴɢ.*\n\n` +
                         `╰────────────────≽\n\n` +
                         `> ${global.wm}`;
                 }
@@ -1288,18 +1288,18 @@ Ridzcoder.ev.on('call', async (callData) => {
                     text: warningMessage,
                     mentions: [from]
                 });
-                
+
                 console.log(chalk.green(`[ANTICALL] Warning message sent to chat: ${from}`));
-                
+
             } catch (msgError) {
                 console.error(chalk.red('[ANTICALL] Failed to send message to chat:'), msgError);
             }
-            
+
             try {
                 if (typeof Ridzcoder.rejectCall === 'function') {
                     await Ridzcoder.rejectCall(callId, from);
                     console.log(chalk.green(`[ANTICALL] Successfully ${anticallSetting === 'block' ? 'blocked' : 'declined'} call from: ${from}`));
-                    
+
                     if (anticallSetting === 'block') {
                         try {
                             await Ridzcoder.updateBlockStatus(from, 'block');
@@ -1328,10 +1328,10 @@ Ridzcoder.ev.on('call', async (callData) => {
           const stream = await downloadContentFromMessage(message, messageType)
           let buffer = Buffer.from([])
             for await(const chunk of stream) {
-		buffer = Buffer.concat([buffer, chunk])}
-	    return buffer
+                buffer = Buffer.concat([buffer, chunk])}
+            return buffer
     } 
-    
+
     Ridzcoder.ev.on('creds.update', saveCreds);
     return Ridzcoder;
 }
