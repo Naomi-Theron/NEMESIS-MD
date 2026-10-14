@@ -1,3 +1,7 @@
+const axios = require('axios');
+
+module.exports = [
+
     // ─────────────────────────────────────────────
     // DAVID CYRIL RANDOM ENDPOINTS
     // ─────────────────────────────────────────────
@@ -14,7 +18,6 @@
                 });
                 const data = await response.json();
 
-                // Try common field names
                 const activity = data?.result?.activity || data?.activity || data?.result || data?.data?.activity;
                 const type = data?.result?.type || data?.type || data?.data?.type;
                 const participants = data?.result?.participants || data?.participants || data?.data?.participants;
@@ -197,7 +200,6 @@
                 });
                 const data = await response.json();
 
-                // Try common shapes
                 const results = data?.result || data?.results || data?.data || (Array.isArray(data) ? data : null);
 
                 if (!results || (Array.isArray(results) && results.length === 0)) {
