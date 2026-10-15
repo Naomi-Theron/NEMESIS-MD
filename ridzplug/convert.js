@@ -48,18 +48,19 @@ async function webp2mp4(source) {
 module.exports = [
     {
         command: ['tourl', 'upload', 'mediaurl'],
+    react: "🍹",
         operate: async ({ ridzcoder, m, reply, quoted, mime }) => {
 
             if (!quoted || !mime) {
-                return reply('*Please reply to a media message!*');
+                return reply('*ʀᴇᴘʟʏ ᴛᴏ ᴀ ᴍᴇᴅɪᴀ ᴍᴇꜱꜱᴀɢᴇ!*');
             }
 
             try {
                 const mediaUrl = await handleMediaUpload(quoted, ridzcoder, mime);
-                reply(`*Uploaded successfully:*\n${mediaUrl}`);
+                reply(`*ᴜᴘʟᴏᴀᴅᴇᴅ ꜱᴜᴄᴄᴇꜱꜱꜰᴜʟʟʏ:*\n${mediaUrl}`);
             } catch (error) {
                 console.error(error);
-                reply('*An error occurred while uploading the media.*');
+                reply('*ᴀɴ ᴇʀʀᴏʀ ᴏᴄᴄᴜʀʀᴇᴅ ᴀᴛ ᴏᴜʀ ᴇɴᴅ.*');
             }
         }
     },
@@ -70,7 +71,7 @@ module.exports = [
 
 
             if (!quoted || !/webp/.test(mime)) {
-                return reply(`*Send or reply to a sticker with the caption ${prefix + command}*`);
+                return reply(`*ꜱᴇɴᴅ ᴏʀ ʀᴇᴘʟʏ ᴛᴏ ᴀ ꜱᴛɪᴄᴋᴇʀ ᴡɪᴛʜ ᴄᴀᴘᴛɪᴏɴ ${prefix + command}*`);
             }
 
             try {
@@ -84,7 +85,7 @@ module.exports = [
 
                     if (err) {
                         console.error('Error converting to image:', err);
-                        return reply('An error occurred while converting the sticker to an image.');
+                        return reply('ᴀɴ ᴇʀʀᴏʀ ᴏᴄᴄᴜʀʀᴇᴅ ᴀᴛ ᴏᴜʀ ᴇɴᴅ.');
                     }
 
                     const buffer = fs.readFileSync(outputPath);
@@ -94,16 +95,17 @@ module.exports = [
 
             } catch (error) {
                 console.error('Error converting to image:', error);
-                reply('An error occurred while converting the sticker to an image.');
+                reply('ᴀɴ ᴇʀʀᴏʀ ᴏᴄᴄᴜʀʀᴇᴅ ᴀᴛ ᴏᴜʀ ᴇɴᴅ.');
             }
         }
     },
         {
         command: ['tomp3', 'toaudio', 'extractaudio'],
+    react: "🍹",
         operate: async ({ ridzcoder, m, reply, quoted, mime }) => {          
 
-            if (!quoted) return reply('*Reply to a video to convert it to audio!*');
-            if (!/video/.test(mime)) return reply('*Only videos can be converted to audio!*');
+            if (!quoted) return reply('*ʀᴇᴘʟʏ ᴛᴏ ᴀ ᴠɪᴅᴇᴏ ᴛᴏ ᴄᴏɴᴠᴇʀᴛ ɪᴛ ᴛᴏ ᴀᴜᴅɪᴏ!*');
+            if (!/video/.test(mime)) return reply('*ᴏɴʟʏ  ᴠɪᴅᴇᴏꜱ ᴄᴀɴ ʙᴇ  ᴄᴏɴᴠᴇʀᴛᴇᴅ ᴛᴏ ᴀᴜᴅɪᴏ!*');
 
             try {
                 let buffer = await quoted.download();
@@ -121,40 +123,42 @@ module.exports = [
 
             } catch (e) {
                 console.error(e);
-                reply('*Failed to convert video to audio!*');
+                reply('*ꜰᴀɪʟᴇᴅ ᴛᴏ ᴄᴏɴᴠᴇʀᴛ ᴠɪᴅᴇᴏ ᴛᴏ ᴀᴜᴅɪᴏ*');
             }
         }
     },
     {
     command: ['tovideo', 'stickertovid', 'sticker2vid'],
+    react: "🍹",
     operate: async ({ ridzcoder, m, reply, quoted, mime, prefix, command }) => {
-        if (!m.quoted) return reply(`Reply to a sticker with caption *${prefix + command}*`);
-    if (!m.quoted.mimetype.includes('webp')) return reply(`Please reply to a webp sticker`);
+        if (!m.quoted) return reply(`ʀᴇᴘʟʏ ᴛᴏ ᴀ ꜱᴛɪᴄᴋᴇʀ ᴡɪᴛʜ ᴄᴀᴘᴛɪᴏɴ *${prefix + command}*`);
+    if (!m.quoted.mimetype.includes('webp')) return reply(`ᴘʟᴇᴀꜱᴇ ʀᴇᴘʟʏ ᴛᴏ ᴀ ᴡᴇʙᴘ ꜱᴛɪᴄᴋᴇʀ.`);
 
     try {
       const media = await m.quoted.download();
       const videoUrl = await webp2mp4(media);
 
-      if (!videoUrl) throw new Error('Conversion failed');
+      if (!videoUrl) throw new Error('ᴄᴏɴᴠᴇꜱɪᴏɴ ꜰᴀɪʟᴇᴅ');
 
       await ridzcoder.sendFile(m.chat, videoUrl, 'converted.mp4', '', m);
 
     } catch (error) {
       console.error(error);
-      reply('❌ Failed to convert sticker to video. Please try again later.');
+      reply('ꜰᴀɪʟᴇᴅ ᴛᴏ ᴄᴏɴᴠᴇʀᴛ ꜱᴛɪᴄᴋᴇʀ ᴛᴏ ᴠɪᴅᴇᴏ,ᴘʟᴇᴀꜱᴇ ᴛʀʏ ᴀɢᴀɪɴ ʟᴀᴛᴇʀ.');
     }
   }
 },
     {
         command: ['sticker', 'stiker', 's'],
+    react: "🍹",
         operate: async ({ ridzcoder, m, reply, prefix, mime,  command, args, quoted }) => {
 
             if (!quoted) {
-                return reply(`Send or reply to images, videos, or gifs with captions ${prefix + command}`);
+                return reply(`ꜱᴇɴᴅ ᴏʀ ʀᴇᴘʟʏ ᴛᴏ ɪᴍᴀɢᴇꜱ, ᴠɪᴅᴇᴏꜱ,ᴏʀ ɢɪꜰꜱ ᴡɪᴛʜ ᴄᴀᴘᴛɪᴏɴ ${prefix + command}`);
             }
 
             if (!mime) {
-                return reply(`The quoted message does not contain media. Please send or reply to an image, video, or gif.`);
+                return reply(`ᴛʜᴇ Qᴜᴏᴛᴇᴅ ᴍᴇꜱꜱᴀɢᴇꜱ ᴅᴏᴇꜱ ɴᴏᴛ ᴄᴏɴᴛᴀɪɴ ᴍᴇᴅɪᴀ. ꜱᴇɴᴅ ᴏʀ ʀᴇᴘʟʏ ᴛᴏ ɪᴍᴀɢᴇꜱ, ᴠɪᴅᴇᴏꜱ,ᴏʀ ɢɪꜰꜱ.`);
             }
 
             const swns = args.join(" ");
@@ -171,7 +175,7 @@ module.exports = [
                 }
                 else if (/video/.test(mime)) {
                     if ((quoted.msg || quoted).seconds > 10) {
-                        return reply("The video length must be 10 seconds or less. Please try again.");
+                        return reply("ᴛʜᴇ ᴠɪᴅᴇᴏ ʟᴇɴɢᴛʜ ᴍᴜꜱᴛ ʙᴇ 10 ꜱᴇᴄᴏɴᴅꜱ ᴏʀ ʟᴇꜱꜱ. ᴘʟᴇᴀꜱᴇ ᴛʀʏ ᴀɢᴀɪɴ ʟᴀᴛᴇʀ.");
                     }
                     const media = await quoted.download();
                     await ridzcoder.sendVideoAsSticker(m.chat, media, m, {
@@ -180,11 +184,11 @@ module.exports = [
                     });
                 }
                 else {
-                    return reply(`Send or reply to images, videos, or gifs with captions ${prefix + command}`);
+                    return reply(`ꜱᴇɴᴅ ᴏʀ ʀᴇᴘʟʏ ᴛᴏ ɪᴍᴀɢᴇꜱ, ᴠɪᴅᴇᴏꜱ,ᴏʀ ɢɪꜰꜱ ᴡɪᴛʜ ᴄᴀᴘᴛɪᴏɴ ${prefix + command}`);
                 }
             } catch (error) {
                 console.error('Error processing sticker:', error);
-                reply('An error occurred while processing the sticker.');
+                reply('ᴀɴ ᴇʀʀᴏʀ ᴏᴄᴄᴜʀʀᴇᴅ ᴀᴛ ᴏᴜʀ ᴇɴᴅ.');
             }
         }
     }
