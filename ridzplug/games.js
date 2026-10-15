@@ -2,16 +2,17 @@ const axios = require('axios');
 const { getBuffer } = require('../start/lib/myfunction');
 
 function getCompatibilityMessage(score) {
-    if (score >= 900) return "Soulmates! 💞 You're perfect for each other!";
-    if (score >= 700) return "Great match! 💕 You complement each other well.";
-    if (score >= 500) return "Good potential! 💗 With some work, this could be great.";
-    if (score >= 300) return "Not bad! 💖 There's some chemistry here.";
-    return "Might need some work... 💔 But don't give up!";
+    if (score >= 900) return "ꜱᴏᴜʟᴍᴀᴛᴇꜱ! 💞 ʏᴏᴜʀ'ᴇ ᴘᴇʀꜰᴇᴄᴛ ꜰᴏʀ ᴇᴀᴄʜ ᴏᴛʜᴇʀ!";
+    if (score >= 700) return "ɢʀᴇᴀᴛ ᴡᴏʀᴋ! 💕 ʏᴏᴜ ᴄᴏᴍᴘʟɪᴍᴇɴᴛ ᴇᴀᴄʜ ᴏᴛʜᴇʀ.";
+    if (score >= 500) return "ɢᴏᴏᴅ ᴘᴏᴛᴇɴᴛɪᴀʟ! 💗 ᴡɪᴛʜ ꜱᴏᴍᴇ ᴡᴏʀᴋ, ᴛʜɪꜱ ᴄᴏᴜʟᴅ ʙᴇ ɢʀᴇᴀᴛ.";
+    if (score >= 300) return "ɴᴏᴛ ʙᴀᴅ! 💖 ᴛʜᴇʀᴇ'ꜱ  ꜱᴏᴍᴇ ᴄʜᴇᴍɪꜱᴛʀʏ ʜᴇʀᴇ.";
+    return "ᴍɪɢʜᴛ ɴᴇᴇᴅ ꜱᴏᴍᴇ ᴡᴏʀᴋ... 💔 ʙᴜᴛ ᴅᴏɴ'ᴛ ɢɪᴠᴇ ᴜᴘ!";
 }
 
 module.exports = [
     {
         command: ['truth', 'truthgame', 'asktruth'],
+           react: "🍹",
         operate: async ({ ridzcoder, m, reply, prefix, getBuffer }) => {
             try {
                 const axios = require('axios');
@@ -27,24 +28,25 @@ module.exports = [
                         
                         await ridzcoder.sendMessage(from, {
                             image: buffer,
-                            caption: `*TRUTH*\n\n${truth}`
+                            caption: `*ᴛʀᴜᴛʜ*\n\n${truth}`
                         }, { quoted: m });
                     } catch (imgError) {
                         await ridzcoder.sendMessage(from, {
-                            text: `*TRUTH*\n\n${truth}`
+                            text: `*ᴛʀᴜᴛʜ*\n\n${truth}`
                         }, { quoted: m });
                     }
                 } else {
-                    reply('Failed to generate truth. Try again.');
+                    reply('ᴀɴ ᴇʀʀᴏʀ ᴏᴄᴄᴜʀʀᴇᴅ ᴀᴛ ᴏᴜʀ ᴇɴᴅ.');
                 }
             } catch (error) {
                 console.error(error);
-                reply('Error generating truth.');
+                reply('ᴀɴ ᴇʀʀᴏʀ ᴏᴄᴄᴜʀʀᴇᴅ ᴀᴛ ᴏᴜʀ ᴇɴᴅ.');
             }
         }
     },
     {
         command: ['dare', 'truthdare', 'dareme'],
+   react: "🍹",
         operate: async ({ ridzcoder, m, reply, prefix }) => {
             try {
                 const axios = require('axios');
@@ -60,29 +62,30 @@ module.exports = [
                         
                         await ridzcoder.sendMessage(from, {
                             image: buffer,
-                            caption: `*DARE*\n\n${dare}`
+                            caption: `*ᴅᴀʀᴇ*\n\n${dare}`
                         }, { quoted: m });
                     } catch (imgError) {
                         await ridzcoder.sendMessage(from, {
-                            text: `*DARE*\n\n${dare}`
+                            text: `*ᴅᴀʀᴇ*\n\n${dare}`
                         }, { quoted: m });
                     }
                 } else {
-                    reply('Failed to generate dare. Try again.');
+                    reply('ᴀɴ ᴇʀʀᴏʀ ᴏᴄᴄᴜʀʀᴇᴅ ᴀᴛ ᴏᴜʀ ᴇɴᴅ.');
                 }
             } catch (error) {
                 console.error(error);
-                reply('Error generating dare.');
+                reply('ᴀɴ ᴇʀʀᴏʀ ᴏᴄᴄᴜʀʀᴇᴅ ᴀᴛ ᴏᴜʀ ᴇɴᴅ.');
             }
         }
     },
     {
-        command: ['compatibility', 'comp'],
+        command: ['compatibility', 'comp'],  
+         react: "🍹",
         operate: async ({ ridzcoder, m, reply, botNumber }) => {
             try {
                 // Check if two users are mentioned
                 if (!m.mentionedJid || m.mentionedJid.length < 2) {
-                    return reply("Please mention two users to calculate compatibility.\nUsage: `.compatibility @user1 @user2`");
+                    return reply("ᴘʟᴇᴀꜱᴇ ᴍᴇɴᴛɪᴏɴ ᴛᴡᴏ ᴜꜱᴇʀꜱ ᴛᴏ ᴄᴀʟᴄᴜʟᴀᴛᴇ ᴄᴏᴍᴘᴀᴛɪʙɪʟɪᴛʏ.\nᴜꜱᴀɢᴇ: `.ᴄᴏᴍᴘᴀᴛɪʙɪʟɪᴛʏ @ᴜꜱᴇʀ1 @ᴜꜱᴇʀ2`");
                 }
 
                 const [user1, user2] = m.mentionedJid.slice(0, 2);
@@ -98,9 +101,9 @@ module.exports = [
 
                 // Format the response
                 const resultMessage = 
-                    `💖 *Compatibility Result* 💖\n\n` +
+                    `💖 *ᴄᴏᴍᴘᴀᴛɪʙɪʟɪᴛʏ ʀᴇꜱᴜʟᴛ* 💖\n\n` +
                     `@${user1.split('@')[0]} ❤️ @${user2.split('@')[0]}\n` +
-                    `Score: ${compatibilityScore}/1000\n\n` +
+                    `ꜱᴄᴏʀᴇ: ${compatibilityScore}/1000\n\n` +
                     `${getCompatibilityMessage(compatibilityScore)}`;
 
                 // Send the result
@@ -115,14 +118,15 @@ module.exports = [
 
             } catch (error) {
                 console.error('Error in compatibility command:', error);
-                reply(`❌ Error: ${error.message}`);
+                reply(`ᴇʀʀᴏʀ: ${error.message}`);
             }
         }
     },
         {
         command: ['lovetest', 'love', 'compatibility'],
+          react: "🍹", 
         operate: async ({ ridzcoder, m, reply, args }) => {
-            if (args.length < 2) return reply("Tag two users! Example: .lovetest @user1 @user2");
+            if (args.length < 2) return reply("ᴛᴀɢ ᴛᴡᴏ ᴜꜱᴇʀꜱ! ᴇxᴀᴍᴘʟᴇ: .ʟᴏᴠᴇᴛᴇꜱᴛ @ᴜꜱᴇʀ1 @ᴜꜱᴇʀ2");
 
             let user1 = args[0].replace("@", "") + "@s.whatsapp.net";
             let user2 = args[1].replace("@", "") + "@s.whatsapp.net";
@@ -130,17 +134,17 @@ module.exports = [
             let lovePercent = Math.floor(Math.random() * 100) + 1;
 
             let messages = [
-                { range: [90, 100], text: "💖 *A match made in heaven!* True love exists!" },
+                { range: [90, 100], text: "💖 *ᴍᴀᴛᴄʜ ᴍᴀᴅᴇ ɪɴ ʜᴇᴀᴠᴇɴ!* ᴛʀᴜᴇ ʟᴏᴠᴇ ᴇxɪꜱᴛꜱ!" },
                 { range: [75, 89], text: "😍 *Strong connection!* This love is deep and meaningful." },
-                { range: [50, 74], text: "😊 *Good compatibility!* You both can make it work." },
-                { range: [30, 49], text: "🤔 *It's complicated!* Needs effort, but possible!" },
-                { range: [10, 29], text: "😅 *Not the best match!* Maybe try being just friends?" },
-                { range: [1, 9], text: "💔 *Uh-oh!* This love is as real as a Bollywood breakup!" }
+                { range: [50, 74], text: "😊 *ɢᴏᴏᴅ ᴄᴏᴍᴘᴀᴛɪʙɪʟɪᴛʏ!* ʏᴏᴜ ʙᴏᴛʜ ᴄᴀɴ ᴍᴀᴋᴇ ɪᴛ ᴡᴏʀᴋ." },
+                { range: [30, 49], text: "🤔 *ɪᴛ'ꜱ ᴄᴏᴍᴘʟɪᴄᴀᴛᴇᴅ!* ɴᴇᴇᴅ ᴇꜰꜰᴏʀᴛ, ʙᴜᴛ ᴘᴏꜱꜱɪʙʟᴇ!" },
+                { range: [10, 29], text: "😅 *ɴᴏᴛ ᴛʜᴇ ʙᴇꜱᴛ ᴍᴀᴛᴄʜ!* ᴍᴀʏʙᴇ ᴛʀʏ ʙᴇɪɴɢ ꜰʀɪᴇɴᴅꜱ?" },
+                { range: [1, 9], text: "💔 *ᴜʜ-ᴏʜʜ* ᴛʜɪꜱ ʟᴏᴠᴇ ɪꜱ ᴀꜱ ʀᴇᴀʟᴀꜱ ᴀ ʙᴏʟʟʏᴡᴏᴏᴅ ʙʀᴇᴀᴋᴜᴘ!" }
             ];
 
             let loveMessage = messages.find(msg => lovePercent >= msg.range[0] && lovePercent <= msg.range[1]).text;
 
-            let message = `💘 *Love Compatibility Test* 💘\n\n❤️ *@${user1.split("@")[0]}* + *@${user2.split("@")[0]}* = *${lovePercent}%*\n${loveMessage}`;
+            let message = `💘 *ʟᴏᴠᴇ ᴄᴏᴍᴘᴀᴛɪʙɪʟɪᴛʏ ᴛᴇxᴛ 💘\n\n❤️ *@${user1.split("@")[0]}* + *@${user2.split("@")[0]}* = *${lovePercent}%*\n${loveMessage}`;
 
             await ridzcoder.sendMessage(m.chat, { 
                 text: message, 
@@ -149,7 +153,8 @@ module.exports = [
         }
     },
     {
-        command: ['jokes', 'joke', 'funny'],
+        command: ['jokes', 'joke', 'funny'],  
+         react: "🍹",
         operate: async ({ ridzcoder, m, reply }) => {
             try {
                 let res = await fetch("https://official-joke-api.appspot.com/random_joke");
@@ -158,12 +163,13 @@ module.exports = [
                 await ridzcoder.sendMessage(m.chat, { text: joke }, { quoted: m });
             } catch (error) {
                 console.error('Error fetching joke:', error);
-                reply('An error occurred while fetching a joke.');
+                reply('ᴀɴ ᴇʀʀᴏʀ ᴏᴄᴄᴜʀʀᴇᴅ ᴀᴛ ᴏᴜʀ ᴇɴᴅ.');
             }
         }
     },
 {
-    command: ['valentine', 'valentines', 'vday'],
+    command: ['valentine', 'valentines', 'vday'], 
+      react: "🍹",
     operate: async ({ ridzcoder, m, reply, args, prefix }) => {
         try {
             const axios = require('axios');
@@ -173,16 +179,17 @@ module.exports = [
             if (response.data?.success && response.data?.result) {
                 reply(response.data.result);
             } else {
-                reply('Failed to fetch valentine message.');
+                reply('ᴀɴ ᴇʀʀᴏʀ ᴏᴄᴄᴜʀʀᴇᴅ ᴀᴛ ᴏᴜʀ ᴇɴᴅ.');
             }
         } catch (error) {
             console.error('Valentine error:', error);
-            reply('Error fetching valentine message.');
+            reply('ᴀɴ ᴇʀʀᴏʀ ᴏᴄᴄᴜʀʀᴇᴅ ᴀᴛ ᴏᴜʀ ᴇɴᴅ.');
         }
     }
 },
     {
     command: ['pickupline', 'pickup', 'lovequotes'],
+       react: "🍹",
     operate: async ({ ridzcoder, m, reply, args, prefix }) => {
         try {
             const apiUrl = `https://apis.davidcyril.name.ng/pickupline`;
@@ -191,16 +198,17 @@ module.exports = [
             if (response.data?.success && response.data?.pickupline) {
                 reply(response.data.pickupline);
             } else {
-                reply('Failed to fetch pickup line.');
+                reply('ᴀɴ ᴇʀʀᴏʀ ᴏᴄᴄᴜʀʀᴇᴅ ᴀᴛ ᴏᴜʀ ᴇɴᴅ.');
             }
         } catch (error) {
             console.error('Pickupline error:', error);
-            reply('Error fetching pickup line.');
+            reply('ᴀɴ ᴇʀʀᴏʀ ᴏᴄᴄᴜʀʀᴇᴅ ᴀᴛ ᴏᴜʀ ᴇɴᴅ.');
         }
     }
 },
     {
-    command: ['advice', 'advicegenerator', 'lifetips'],
+    command: ['advice', 'advicegenerator', 'lifetips'], 
+      react: "🍹",
     operate: async ({ ridzcoder, m, reply, args, prefix }) => {
         try {
             const apiUrl = `https://api.princetechn.com/api/fun/advice?apikey=prince`;
@@ -209,16 +217,17 @@ module.exports = [
             if (response.data?.success && response.data?.result) {
                 reply(response.data.result);
             } else {
-                reply('Failed to fetch advice.');
+                reply('ᴀɴ ᴇʀʀᴏʀ ᴏᴄᴄᴜʀʀᴇᴅ ᴀᴛ ᴏᴜʀ ᴇɴᴅ.');
             }
         } catch (error) {
             console.error('Advice error:', error);
-            reply('Error fetching advice.');
+            reply('ᴀɴ ᴇʀʀᴏʀ ᴏᴄᴄᴜʀʀᴇᴅ ᴀᴛ ᴏᴜʀ ᴇɴᴅ.');
         }
     }
 },
     {
-    command: ['motivation', 'motivate', 'inspire'],
+    command: ['motivation', 'motivate', 'inspire'], 
+      react: "🍹",
     operate: async ({ ridzcoder, m, reply, args, prefix }) => {
         try {
             const apiUrl = `https://api.princetechn.com/api/fun/motivation?apikey=prince`;
@@ -227,25 +236,26 @@ module.exports = [
             if (response.data?.success && response.data?.result) {
                 reply(response.data.result);
             } else {
-                reply('Failed to fetch motivation message.');
+                reply('fᴀɴ ᴇʀʀᴏʀ ᴏᴄᴄᴜʀʀᴇᴅ ᴀᴛ ᴏᴜʀ ᴇɴᴅ.');
             }
         } catch (error) {
             console.error('Motivation error:', error);
-            reply('Error fetching motivation message.');
+            reply('ᴀɴ ᴇʀʀᴏʀ ᴏᴄᴄᴜʀʀᴇᴅ ᴀᴛ ᴏᴜʀ ᴇɴᴅ.');
         }
     }
 },        
     {
         command: ['character', 'char', 'personality'],
+           react: "🍹",
         operate: async ({ ridzcoder, m, reply, isGroup, from }) => {
             try {
                 if (!isGroup) {
-                    return reply("This command can only be used in groups.");
+                    return reply("ᴛʜɪꜱ ᴄᴏᴍᴍᴀɴᴅ ᴄᴀɴ ᴏɴʟʏ ʙᴇ ᴜꜱᴇᴅ ɪɴ ɢʀᴏᴜᴘ ᴀꜱꜱʜᴏʟᴇ.");
                 }
 
                 const mentionedUser = m.message?.extendedTextMessage?.contextInfo?.mentionedJid?.[0];
                 if (!mentionedUser) {
-                    return reply("Please mention a user whose character you want to check.");
+                    return reply("ᴘʟᴇᴀꜱᴇ ᴍᴇɴᴛɪᴏɴ ᴀ ᴜꜱᴇʀ ᴡʜᴏꜱᴇ ᴄʜᴀʀᴀᴄᴛᴇʀ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ ᴄʜᴇᴄᴋ.");
                 }
 
                 const userChar = [
@@ -255,7 +265,7 @@ module.exports = [
                 ];
 
                 const userCharacterSelection = userChar[Math.floor(Math.random() * userChar.length)];
-                const message = `Character of @${mentionedUser.split("@")[0]} is *${userCharacterSelection}* 🔥⚡`;
+                const message = `ᴄʜᴀʀᴀᴄᴛᴇʀ ᴏꜰ @${mentionedUser.split("@")[0]} ɪꜱ *${userCharacterSelection}* 🔥⚡`;
 
                 await ridzcoder.sendMessage(from, {
                     text: message,
@@ -264,13 +274,13 @@ module.exports = [
 
             } catch (e) {
                 console.error("Error in character command:", e);
-                reply("An error occurred while processing the command. Please try again.");
+                reply("ᴀɴ ᴇʀʀᴏʀ ᴏᴄᴄᴜʀʀᴇᴅ ᴀᴛ ᴏᴜʀ ᴇɴᴅ.");
             }
         }
     },
     {
   command: ['trivia'],
-  react: "❓",
+  react: "🍹",
   operate: async ({ ridzcoder, m, reply }) => {
     try {
       let res = await fetch("https://opentdb.com/api.php?amount=1");
@@ -279,22 +289,22 @@ module.exports = [
       let question = json.results[0].question;
       let answer = json.results[0].correct_answer;
 
-      await ridzcoder.sendMessage(m.chat, { text: `Question: ${question}\n\nThink you know the answer? Sending the correct answer after 20 seconds` }, { quoted: m });
+      await ridzcoder.sendMessage(m.chat, { text: `Qᴜᴇꜱᴛɪᴏɴ: ${question}\n\nᴛʜɪɴᴋ ʏᴏᴜ ᴋɴᴏᴡ ᴛʜᴇ ᴀɴꜱᴡᴇʀ? ꜱᴇɴᴅ ᴛʜᴇ ᴄᴏʀʀᴇᴄᴛ ᴀɴꜱᴡᴇʀ ᴀꜰᴛᴇʀ 20 ꜱᴇᴄᴏɴᴅꜱ` }, { quoted: m });
       
       setTimeout(async () => {
-        await ridzcoder.sendMessage(m.chat, { text: `Answer: ${answer}` });
+        await ridzcoder.sendMessage(m.chat, { text: `ᴀɴꜱᴡᴇʀ: ${answer}` });
       }, 20000); // 20 seconds
     } catch (error) {
       console.error('Error fetching trivia question:', error);
-      reply('An error occurred while fetching the trivia question.');
+      reply('ᴀɴ ᴇʀʀᴏʀ ᴏᴄᴄᴜʀʀᴇᴅ ᴀᴛ ᴏᴜʀ ᴇɴᴅ .');
     }
   }
 },
 {
   command: ['truthdetector', 'liedetector'],
-  react: "🕵️",
+  react: "🍹",
   operate: async ({ m, reply }) => {
-    if (!m.quoted) return reply(`Please reply to the message you want to detect!`);
+    if (!m.quoted) return reply(`ᴘʟᴇᴀꜱᴇ ʀʀᴘʟʏ ᴛᴏ ᴛʜᴇ ᴍᴇꜱꜱᴀɢᴇ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ ᴅᴇᴛᴇᴄᴛ!`);
 
     let responses = [
       "That's a blatant lie!",
@@ -337,34 +347,35 @@ module.exports = [
     ];
 
     let result = responses[Math.floor(Math.random() * responses.length)];
-    let replyText = `*RESULT*: ${result}`;
+    let replyText = `*ʀᴇꜱᴜʟᴛ*: ${result}`;
 
     await reply(replyText);
   }
 },
 {
   command: ['guesscartoon', 'cartoonquiz', 'guesscharacter'],
+   react: "🍹",
   operate: async ({ m, reply, ridzcoder }) => {
     try {
-      await reply("🎮 Fetching a cartoon character...");
+      await reply("🎮 ꜰᴇᴛᴄʜɪɴɢ ᴀ ᴄᴀʀᴛᴏᴏɴ ᴄʜᴀʀᴀᴄᴛᴇʀ...");
       
       const response = await fetch(`${global.siputzx}/api/games/tebakkartun`);
       const data = await response.json();
       
       if (!data.status || !data.data) {
-        return reply("*Failed to fetch cartoon character.*");
+        return reply("*ꜰᴀɪʟᴇᴅ ᴛᴏ ꜰᴇᴛᴄʜ ᴄᴀʀᴛᴏᴏɴ ᴄʜᴀʀᴀᴄᴛᴇʀ.*");
       }
       
       await ridzcoder.sendMessage(m.chat, {
         image: { url: data.data.img },
-        caption: `🎪 *GUESS THE CARTOON CHARACTER!*\n\n` +
-                 `Can you name this character?\n\n` +
-                 `Reply with your answer!`
+        caption: `🎪 *ɢᴜᴇꜱꜱ ᴛʜᴇ ᴄᴀʀᴛᴏᴏɴ ᴄʜᴀʀᴀᴄᴛᴇʀ!*\n\n` +
+                 `ᴄᴀɴ ʏᴏᴜ ɴᴀᴍᴇ ᴛʜɪꜱ ᴄʜᴀʀᴀᴄᴛᴇʀ?\n\n` +
+                 `ʀᴇᴘʟʏ ᴡɪᴛʜ ʏᴏᴜʀ ᴀɴꜱᴡᴇʀ!`
       }, { quoted: m });
       
     } catch (error) {
       console.error('Game error:', error);
-      reply("❌ Error fetching cartoon game.");
+      reply("ᴇʀʀᴏʀ ꜰᴇᴛᴄʜɪɴɢ ᴄᴀʀᴛᴏᴏɴ ɢᴀᴍᴇ.");
     }
   }
 }
